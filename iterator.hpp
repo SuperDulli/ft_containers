@@ -84,7 +84,7 @@ public:
 	// derefernce iterator
 	reference operator*(void) const;
 	// addtion operator
-	reverse_iterator operator+(void) const;
+	reverse_iterator operator+(difference_type n) const;
 	// increment iterator position (pre-increment)
 	reverse_iterator& operator++(void);
 	// increment iterator position (post-increment)
@@ -92,7 +92,7 @@ public:
 	// advance iterator position.
 	reverse_iterator& operator+=(difference_type n);
 	// subtraction operator
-	reverse_iterator operator-(void) const;
+	reverse_iterator operator-(difference_type n) const;
 	// decrease iterator position (pre-increment)
 	reverse_iterator& operator--(void);
 	// decrease iterator position (post-increment)
@@ -103,6 +103,64 @@ public:
 	pointer operator->(void) const;
 	// derefences with offset
 	reference operator[](difference_type n) const;
+
+	// "implementation" of reverse_iterator
+
+	// constructor implementations
+
+	reverse_iterator(void) : m_base_iterator() {}
+	explicit reverse_iterator(iterator_type it) : m_base_iterator(it) {}
+	template <class Iter>
+	reverse_iterator(const reverse_iterator<Iter>& rev_it)
+		: m_base_iterator(rev_it.base())
+	{}
+
+	// public member function implementations
+
+	iterator_type base(void) const
+	{
+		return m_base_iterator;
+	}
+
+	reference operator*(void) const
+	{
+		return m_base_iterator.reference;
+	}
+
+	reverse_iterator operator+(difference_type n) const
+	{
+		return (reverse_iterator(m_base_iterator - n));
+	}
+
+	reverse_iterator& operator++(void)
+	{
+		--m_base_iterator;
+		return (*this);
+	}
+
+	reverse_iterator operator++(int)
+	{
+		reverse_iterator tmp = *this;
+		--m_base_iterator;
+		return (tmp);
+	}
+
+	reverse_iterator operator+=(difference_type n)
+	{
+		m_base_iterator -= n;
+		return (*this);
+	}
+
+	reverse_iterator operator-(difference_type n) const
+	{
+		return (reverse_iterator(m_base_iterator + n));
+	}
+
+	reverse_iterator operator--(void)
+	{
+		++m_base_iterator;
+		return (*this);
+	}
 
 private:
 	iterator_type m_base_iterator;
