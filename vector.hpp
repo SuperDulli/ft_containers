@@ -29,36 +29,48 @@ public:
 	// default constructor - empty container
 	explicit vector(const allocator_type& alloc = allocator_type(void))
 	{
-		std::cout << "Default vector constructor called." << std::endl;
+#ifdef DEBUG
+		std::cout << "vector constructor (default)" << std::endl;
+#endif
 	}
 
 	// fill constructor
 	explicit vector(
-		size_type n, const value_type& val = value_type(void),
+		size_type			  n,
+		const value_type&	  val = value_type(void),
 		const allocator_type& alloc = allocator_type())
 	{
-		std::cout << "vector fill constructor called." << std::endl;
+#ifdef DEBUG
+		std::cout << "vector constructor (fill)" << std::endl;
+#endif
 	}
 
 	// range constructor
 	template <class InputIterator>
 	vector(
-		InputIterator first, InputIterator last,
+		InputIterator		  first,
+		InputIterator		  last,
 		const allocator_type& alloc = allocator())
 	{
-		std::cout << "vector range constructor called." << std::endl;
+#ifdef DEBUG
+		std::cout << "vector constructor (range)" << std::endl;
+#endif
 	}
 
 	// copy constructor
 	vector(const vector& src)
 	{
-		std::cout << "vector copy constructor called." << std::endl;
+#ifdef DEBUG
+		std::cout << "vector constructor (copy)" << std::endl;
+#endif
 	}
 
 	// Destructor
 	~vector(void)
 	{
-		std::cout << "vector destructor called." << std::endl;
+#ifdef DEBUG
+		std::cout << "vector destructor" << std::endl;
+#endif
 	}
 
 private:
