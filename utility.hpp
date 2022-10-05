@@ -8,6 +8,7 @@
 namespace ft
 {
 
+// not needed
 template<typename T>
 void swap(T& a, T& b)
 {
@@ -15,6 +16,21 @@ void swap(T& a, T& b)
 	a = b;
 	b = tmp;
 }
+
+// // needed as base clas for is integral?
+// template <class T, T v>
+// struct integral_constant;
+
+// template <typename T>
+// struct is_integral
+// {
+
+// public:
+// 	static const bool value;
+
+// 	bool operator bool()
+
+// };
 
 } // namespace ft
 

@@ -3,9 +3,10 @@ CXXFLAGS= -Wall -Wextra -Werror -std=c++98 -Wshadow -pedantic-errors
 
 NAME	= main
 CLASSES	= Color.cpp
-TMPLATES= iterator.hpp pair.hpp debug_utility.hpp utility.hpp
+TMPLATES= iterator.hpp pair.hpp debug_utility.hpp utility.hpp vector.hpp
 HEADERS	= $(patsubst %.cpp,%.hpp,$(CLASSES)) $(TMPLATES)
-SRCS	= main.cpp test_iterator.cpp test_pair.cpp $(CLASSES)
+TST_SRCS= test_iterator.cpp test_pair.cpp test_vector.cpp
+SRCS	= main.cpp $(patsubst %.cpp,tests/%.cpp,$(TST_SRCS)) $(CLASSES)
 OBJDIR	= obj
 OBJS	= $(patsubst %.cpp,$(OBJDIR)/%.o,$(SRCS))
 
@@ -49,11 +50,14 @@ test: all
 $(NAME): $(OBJS) $(SRCS) $(HEADERS)
 	$(CXX) $(CXXFLAGS) $(OBJS) -o $@
 
-$(OBJDIR)/%.o: %.cpp $(TMPLATES) | $(OBJDIR)
+$(OBJDIR)/%.o: %.cpp $(TMPLATES) | $(OBJDIR) $(OBJDIR)/tests
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 $(OBJDIR):
-	mkdir $(OBJDIR)
+	mkdir $@
+
+$(OBJDIR)/tests: $(OBJDIR)
+	mkdir -p $@
 
 $(INTRA_MAIN):
 	curl -o $@ https://projects.intra.42.fr/uploads/document/document/10932/main.cpp

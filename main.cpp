@@ -1,9 +1,11 @@
 #include "debug_utility.hpp"
 
 bool test_pair();
+bool test_vector();
 
 int main() {
 	debug::run_test("pair", test_pair);
+	debug::run_test("pair", test_vector);
 }
 
 bool debug::run_test(const std::string& name, bool (*test_f)(void))

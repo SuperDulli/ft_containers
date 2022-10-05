@@ -2,13 +2,13 @@
 #include <string>
 #include <iomanip>
 
-#include "debug_utility.hpp"
+#include "../debug_utility.hpp"
 
 #ifdef USE_STL	   // CREATE A REAL STL EXAMPLE
 #include <utility> // std::pair
 namespace ft = std;
 #else
-#include "pair.hpp"
+#include "../pair.hpp"
 #endif
 
 bool test_construction()
