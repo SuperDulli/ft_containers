@@ -91,7 +91,21 @@ public:
 	reverse_iterator	   rend();
 	const_reverse_iterator rend() const;
 
-	// TODO: Modifiers
+	// modifiers
+
+	void	 clear();
+	iterator insert(const_iterator pos, const T& value);
+	iterator insert(const_iterator pos, size_type count, const T& value);
+	template <class InputIterator>
+	iterator
+	insert(const_iterator pos, InputIterator first, InputIterator last);
+	iterator erase(iterator pos);
+	iterator erase(iterator first, iterator last);
+	void push_back(const T& value);
+	void pop_back();
+	void resize(size_type count);
+	void resize(size_type count, T value = T());
+	void swap(vector& other);
 
 protected:
 	void m_rangeCheck(size_type pos) const;
@@ -385,5 +399,18 @@ ft::vector<T, Alloc>::rend() const
 {
 	return ft::reverse_iterator<PtrIterator<const T>>(m_start - 1);
 }
+
+// modifiers
+
+template <class T, class Alloc>
+void ft::vector<T, Alloc>::clear()
+{
+	for (pointer it = m_start; it != m_finish; ++it)
+	{
+		it->~T();
+	}
+}
+
+// TODO: implement modifiers
 
 #endif // VECTOR_HPP
