@@ -5,6 +5,8 @@
 #include <memory>
 #include <string>
 
+#include "iterator.hpp"
+
 #include <stdexcept>
 
 namespace ft
@@ -19,10 +21,10 @@ public:
 	typedef typename allocator_type::const_reference const_reference;
 	typedef typename allocator_type::pointer		 pointer;
 	typedef typename allocator_type::const_pointer	 const_pointer;
-	// typedef implementation - defined				 iterator;
-	// typedef implementation - defined				 const_iterator;
-	// typedef std::reverse_iterator<iterator>			 reverse_iterator;
-	// typedef std::reverse_iterator<const_iterator>	 const_reverse_iterator;
+	typedef ft::PtrIterator<T>						 iterator;
+	typedef ft::PtrIterator<T>						 const_iterator;
+	typedef ft::reverse_iterator<iterator>			 reverse_iterator;
+	typedef ft::reverse_iterator<const_iterator>	 const_reverse_iterator;
 	typedef typename allocator_type::difference_type difference_type;
 	typedef typename allocator_type::size_type		 size_type;
 
@@ -80,7 +82,16 @@ public:
 
 	// iterators
 
-	// TODO: iterator declaration
+	iterator			   begin();
+	const_iterator		   begin() const;
+	iterator			   end();
+	const_iterator		   end() const;
+	reverse_iterator	   rbegin();
+	const_reverse_iterator rbegin() const;
+	reverse_iterator	   rend();
+	const_reverse_iterator rend() const;
+
+	// TODO: Modifiers
 
 protected:
 	void m_rangeCheck(size_type pos) const;
@@ -322,6 +333,57 @@ template <class T, class Alloc>
 const T* ft::vector<T, Alloc>::data() const
 {
 	return this->m_start;
+}
+
+template <class T, class Alloc>
+typename ft::vector<T, Alloc>::iterator ft::vector<T, Alloc>::begin()
+{
+	return PtrIterator<T>(m_start);
+}
+
+template <class T, class Alloc>
+typename ft::vector<T, Alloc>::const_iterator
+ft::vector<T, Alloc>::begin() const
+{
+	return PtrIterator<const T>(m_start);
+}
+
+template <class T, class Alloc>
+typename ft::vector<T, Alloc>::iterator ft::vector<T, Alloc>::end()
+{
+	return PtrIterator<T>(m_finish + 1);
+}
+
+template <class T, class Alloc>
+typename ft::vector<T, Alloc>::const_iterator ft::vector<T, Alloc>::end() const
+{
+	return PtrIterator<const T>(m_finish + 1);
+}
+
+template <class T, class Alloc>
+typename ft::vector<T, Alloc>::reverse_iterator ft::vector<T, Alloc>::rbegin()
+{
+	return ft::reverse_iterator<PtrIterator<T>>(m_finish);
+}
+
+template <class T, class Alloc>
+typename ft::vector<T, Alloc>::const_reverse_iterator
+ft::vector<T, Alloc>::rbegin() const
+{
+	return ft::reverse_iterator<PtrIterator<const T>>(m_finish);
+}
+
+template <class T, class Alloc>
+typename ft::vector<T, Alloc>::reverse_iterator ft::vector<T, Alloc>::rend()
+{
+	return ft::reverse_iterator<PtrIterator<T>>(m_start - 1);
+}
+
+template <class T, class Alloc>
+typename ft::vector<T, Alloc>::const_reverse_iterator
+ft::vector<T, Alloc>::rend() const
+{
+	return ft::reverse_iterator<PtrIterator<const T>>(m_start - 1);
 }
 
 #endif // VECTOR_HPP
