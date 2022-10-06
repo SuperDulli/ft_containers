@@ -54,6 +54,135 @@ struct iterator {
 	typedef Category  iterator_category;
 };
 
+template <typename T>
+class PtrIterator : public ft::iterator<ft::random_access_iterator_tag, T>
+{
+	typedef PtrIterator<T> iterator;
+
+public:
+	// Constructors
+
+	PtrIterator() : m_pos(NULL) {}
+	PtrIterator(T* x) : m_pos(x) {}
+	PtrIterator(const PtrIterator& it) : m_pos(it.m_pos) {}
+	~PtrIterator() {}
+
+	iterator& operator=(const PtrIterator& other)
+	{
+		this->m_pos = other.m_pos;
+		return *this;
+	}
+
+	iterator& operator++()
+	{
+		++m_pos;
+		return *this;
+	}
+
+	iterator operator++(int)
+	{
+		PtrIterator tmp(*this);
+					operator++();
+		return tmp;
+	}
+
+	iterator& operator--()
+	{
+		--m_pos;
+		return *this;
+	}
+
+	iterator operator--(int)
+	{
+		PtrIterator tmp(*this);
+					operator--();
+		return tmp;
+	}
+
+	reference operator*() const
+	{
+		return *m_pos;
+	}
+
+	pointer operator->() const
+	{
+		return m_pos;
+	}
+
+	iterator operator+(difference_type n) const
+	{
+		return (m_pos + n);
+	}
+
+	iterator& operator+=(difference_type n)
+	{
+		m_pos += n;
+		return *this;
+	}
+
+	iterator operator-(difference_type n) const
+	{
+		return (m_pos - n);
+	}
+
+	iterator& operator-=(difference_type n)
+	{
+		m_pos -= n;
+		return *this;
+	}
+
+	reference operator[](difference_type n) const
+	{
+		return m_pos[n];
+	}
+
+	const iterator& base() const
+	{
+		return m_pos;
+	}
+
+private:
+	pointer m_pos;
+};
+
+// relation operators (to allow comparison between const and non cost versions)
+
+template <typename T>
+bool operator==(const PtrIterator<T>& lhs, const PtrIterator<T>& rhs)
+{
+	return (lhs.base() == rhs.base() s);
+}
+
+template <typename T>
+bool operator!=(const PtrIterator<T>& lhs, const PtrIterator<T>& rhs)
+{
+	return (lhs.base() != rhs.base() s);
+}
+
+template <typename T>
+bool operator<(const PtrIterator<T>& lhs, const PtrIterator<T>& rhs)
+{
+	return (lhs.base() < rhs.base());
+}
+
+template <typename T>
+bool operator<=(const PtrIterator<T>& lhs, const PtrIterator<T>& rhs)
+{
+	return (lhs.base() <= rhs.base() s);
+}
+
+template <typename T>
+bool operator>(const PtrIterator<T>& lhs, const PtrIterator<T>& rhs)
+{
+	return (lhs.base() > rhs.base());
+}
+
+template <typename T>
+bool operator>=(const PtrIterator<T>& lhs, const PtrIterator<T>& rhs)
+{
+	return (lhs.base() >= rhs.base() s);
+}
+
 template <class Iterator>
 class reverse_iterator
 {
