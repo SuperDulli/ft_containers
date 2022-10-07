@@ -141,7 +141,7 @@ public:
 		return m_pos[n];
 	}
 
-	const iterator& base() const
+	const pointer& base() const
 	{
 		return m_pos;
 	}

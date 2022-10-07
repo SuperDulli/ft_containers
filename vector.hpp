@@ -22,7 +22,7 @@ public:
 	typedef typename allocator_type::pointer		 pointer;
 	typedef typename allocator_type::const_pointer	 const_pointer;
 	typedef ft::PtrIterator<T>						 iterator;
-	typedef ft::PtrIterator<T>						 const_iterator;
+	typedef ft::PtrIterator<const T>				 const_iterator;
 	typedef ft::reverse_iterator<iterator>			 reverse_iterator;
 	typedef ft::reverse_iterator<const_iterator>	 const_reverse_iterator;
 	typedef typename allocator_type::difference_type difference_type;
@@ -365,13 +365,13 @@ ft::vector<T, Alloc>::begin() const
 template <class T, class Alloc>
 typename ft::vector<T, Alloc>::iterator ft::vector<T, Alloc>::end()
 {
-	return PtrIterator<T>(m_finish + 1);
+	return PtrIterator<T>(m_finish);
 }
 
 template <class T, class Alloc>
 typename ft::vector<T, Alloc>::const_iterator ft::vector<T, Alloc>::end() const
 {
-	return PtrIterator<const T>(m_finish + 1);
+	return PtrIterator<const T>(m_finish);
 }
 
 template <class T, class Alloc>
@@ -390,14 +390,14 @@ ft::vector<T, Alloc>::rbegin() const
 template <class T, class Alloc>
 typename ft::vector<T, Alloc>::reverse_iterator ft::vector<T, Alloc>::rend()
 {
-	return ft::reverse_iterator< PtrIterator<T> >(m_start - 1);
+	return ft::reverse_iterator< PtrIterator<T> >(m_start);
 }
 
 template <class T, class Alloc>
 typename ft::vector<T, Alloc>::const_reverse_iterator
 ft::vector<T, Alloc>::rend() const
 {
-	return ft::reverse_iterator< PtrIterator<const T> >(m_start - 1);
+	return ft::reverse_iterator< PtrIterator<const T> >(m_start);
 }
 
 // modifiers

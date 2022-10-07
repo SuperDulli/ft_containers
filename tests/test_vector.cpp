@@ -20,7 +20,12 @@ bool test_vector_construction()
 	ft::vector<int> copy(init);
 
 #ifdef DEBUG
-	// std::cout << empty.si
+	std::cout << "size() of empty = " << empty.size() << std::endl;
+	std::cout << "size() of init = " << init.size() << std::endl;
+	std::cout << "size() of copy = " << copy.size() << std::endl;
+	std::cout << "empty " << empty << std::endl;
+	std::cout << "init " << init << std::endl;
+	std::cout << "copy " << copy << std::endl;
 #endif
 	return true;
 }

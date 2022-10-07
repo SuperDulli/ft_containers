@@ -19,7 +19,7 @@ bool debug::run_test(const std::string& name, bool (*test_f)(void))
 
 void debug::test_result(const std::string& name, bool result)
 {
-	std::cout << "Test(" << name << "):";
+	std::cout << "Test(" << name << "): ";
 	if (result)
 	{
 		std::cout << Color::Modifier(Color::FG_GREEN) << "passed."
