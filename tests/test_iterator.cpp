@@ -6,7 +6,7 @@
 
 typedef std::vector<int>::iterator	iter_type;
 
-bool	test_default_constructor()
+bool	test_iterator_default_constructor()
 {
 	ft::reverse_iterator<iter_type> my_rev_iter;
 	std::reverse_iterator<iter_type> std_rev_iter;

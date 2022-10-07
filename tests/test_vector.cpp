@@ -11,7 +11,7 @@ namespace ft = std;
 #include "../vector.hpp"
 #endif
 
-bool test_construction()
+bool test_vector_construction()
 {
 	ft::vector<int> empty;
 	// ft::vector<int, > emptyCstmAlloc;
@@ -30,7 +30,7 @@ bool test_vector()
 	bool success = true;
 
 	std::cout << "-- Test vector --" << std::endl;
-	debug::run_test("vector construction", test_construction);
+	debug::run_test("vector construction", test_vector_construction);
 	// debug::run_test("pair swap", test_swap);
 	// debug::run_test("relational operators", test_relational_operators);
 	return success;

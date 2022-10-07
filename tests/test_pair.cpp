@@ -11,7 +11,7 @@ namespace ft = std;
 #include "../pair.hpp"
 #endif
 
-bool test_construction()
+bool test_pair_construction()
 {
 	ft::pair<std::string, double> product1; // default constructor
 	ft::pair<std::string, double> product2("tomatoes", 2.30); // value init
@@ -147,7 +147,7 @@ bool test_pair()
 	bool success = true;
 
 	std::cout << "-- Test pair --" << std::endl;
-	debug::run_test("pair construction", test_construction);
+	debug::run_test("pair construction", test_pair_construction);
 	// debug::run_test("pair swap", test_swap);
 	debug::run_test("relational operators", test_relational_operators);
 	return success;

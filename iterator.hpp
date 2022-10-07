@@ -57,7 +57,10 @@ struct iterator {
 template <typename T>
 class PtrIterator : public ft::iterator<ft::random_access_iterator_tag, T>
 {
-	typedef PtrIterator<T> iterator;
+	typedef PtrIterator<T>							 iterator;
+	typedef typename PtrIterator<T>::difference_type difference_type;
+	typedef typename PtrIterator<T>::pointer		 pointer;
+	typedef typename PtrIterator<T>::reference		 reference;
 
 public:
 	// Constructors
@@ -66,6 +69,8 @@ public:
 	PtrIterator(T* x) : m_pos(x) {}
 	PtrIterator(const PtrIterator& it) : m_pos(it.m_pos) {}
 	~PtrIterator() {}
+
+	// operators
 
 	iterator& operator=(const PtrIterator& other)
 	{
@@ -142,7 +147,7 @@ public:
 	}
 
 private:
-	pointer m_pos;
+	T* m_pos;
 };
 
 // relation operators (to allow comparison between const and non cost versions)
@@ -150,13 +155,13 @@ private:
 template <typename T>
 bool operator==(const PtrIterator<T>& lhs, const PtrIterator<T>& rhs)
 {
-	return (lhs.base() == rhs.base() s);
+	return (lhs.base() == rhs.base());
 }
 
 template <typename T>
 bool operator!=(const PtrIterator<T>& lhs, const PtrIterator<T>& rhs)
 {
-	return (lhs.base() != rhs.base() s);
+	return (lhs.base() != rhs.base());
 }
 
 template <typename T>
@@ -168,7 +173,7 @@ bool operator<(const PtrIterator<T>& lhs, const PtrIterator<T>& rhs)
 template <typename T>
 bool operator<=(const PtrIterator<T>& lhs, const PtrIterator<T>& rhs)
 {
-	return (lhs.base() <= rhs.base() s);
+	return (lhs.base() <= rhs.base());
 }
 
 template <typename T>
@@ -180,7 +185,7 @@ bool operator>(const PtrIterator<T>& lhs, const PtrIterator<T>& rhs)
 template <typename T>
 bool operator>=(const PtrIterator<T>& lhs, const PtrIterator<T>& rhs)
 {
-	return (lhs.base() >= rhs.base() s);
+	return (lhs.base() >= rhs.base());
 }
 
 template <class Iterator>

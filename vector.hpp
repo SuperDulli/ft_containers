@@ -101,11 +101,11 @@ public:
 	insert(const_iterator pos, InputIterator first, InputIterator last);
 	iterator erase(iterator pos);
 	iterator erase(iterator first, iterator last);
-	void push_back(const T& value);
-	void pop_back();
-	void resize(size_type count);
-	void resize(size_type count, T value = T());
-	void swap(vector& other);
+	void	 push_back(const T& value);
+	void	 pop_back();
+	void	 resize(size_type count);
+	void	 resize(size_type count, T value = T());
+	void	 swap(vector& other);
 
 protected:
 	void m_rangeCheck(size_type pos) const;
@@ -377,27 +377,27 @@ typename ft::vector<T, Alloc>::const_iterator ft::vector<T, Alloc>::end() const
 template <class T, class Alloc>
 typename ft::vector<T, Alloc>::reverse_iterator ft::vector<T, Alloc>::rbegin()
 {
-	return ft::reverse_iterator<PtrIterator<T>>(m_finish);
+	return ft::reverse_iterator< PtrIterator<T> >(m_finish);
 }
 
 template <class T, class Alloc>
 typename ft::vector<T, Alloc>::const_reverse_iterator
 ft::vector<T, Alloc>::rbegin() const
 {
-	return ft::reverse_iterator<PtrIterator<const T>>(m_finish);
+	return ft::reverse_iterator< PtrIterator<const T> >(m_finish);
 }
 
 template <class T, class Alloc>
 typename ft::vector<T, Alloc>::reverse_iterator ft::vector<T, Alloc>::rend()
 {
-	return ft::reverse_iterator<PtrIterator<T>>(m_start - 1);
+	return ft::reverse_iterator< PtrIterator<T> >(m_start - 1);
 }
 
 template <class T, class Alloc>
 typename ft::vector<T, Alloc>::const_reverse_iterator
 ft::vector<T, Alloc>::rend() const
 {
-	return ft::reverse_iterator<PtrIterator<const T>>(m_start - 1);
+	return ft::reverse_iterator< PtrIterator<const T> >(m_start - 1);
 }
 
 // modifiers
@@ -410,6 +410,13 @@ void ft::vector<T, Alloc>::clear()
 		it->~T();
 	}
 }
+
+// template <class T, class Alloc>
+// typename ft::vector<T, Alloc>::iterator
+// insert(const_iterator pos, const T& value)
+// {
+// 	const_iterator
+// }
 
 // TODO: implement modifiers
 
