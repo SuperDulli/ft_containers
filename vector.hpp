@@ -262,8 +262,16 @@ void ft::vector<T, Alloc>::reserve(size_type new_cap)
 		throw std::length_error();
 	if (capacity() < new_cap)
 	{
-		// TODO: realloc
-		throw std::logic_error("not implemented");
+		size_type i;
+		pointer newArray = m_alloc.allocate(new_cap);
+		for (i = 0; i < this->capacity(); i++)
+		{
+			m_alloc.construct(newArray + i, m_start[i]);
+		}
+		m_alloc.deallocate(m_start);
+		m_start = newArray;
+		m_finish = m_start + i;
+		m_endOfStorage = m_start + new_cap;
 	}
 }
 
@@ -409,6 +417,7 @@ void ft::vector<T, Alloc>::clear()
 	{
 		it->~T();
 	}
+	m_finish = m_start;
 }
 
 // template <class T, class Alloc>
