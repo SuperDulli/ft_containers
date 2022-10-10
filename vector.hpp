@@ -6,6 +6,7 @@
 #include <string>
 
 #include "iterator.hpp"
+#include "utility.hpp"
 
 #include <stdexcept>
 
@@ -259,16 +260,17 @@ template <class T, class Alloc>
 void ft::vector<T, Alloc>::reserve(size_type new_cap)
 {
 	if (new_cap > this->max_size())
-		throw std::length_error();
+		throw std::length_error(
+			"specified capacity would exceed maximum size.");
 	if (capacity() < new_cap)
 	{
 		size_type i;
-		pointer newArray = m_alloc.allocate(new_cap);
+		pointer	  newArray = m_alloc.allocate(new_cap);
 		for (i = 0; i < this->capacity(); i++)
 		{
 			m_alloc.construct(newArray + i, m_start[i]);
 		}
-		m_alloc.deallocate(m_start);
+		m_alloc.deallocate(m_start, this->capacity());
 		m_start = newArray;
 		m_finish = m_start + i;
 		m_endOfStorage = m_start + new_cap;
@@ -426,6 +428,76 @@ void ft::vector<T, Alloc>::clear()
 // {
 // 	const_iterator
 // }
+
+template <class T, class Alloc>
+typename ft::vector<T, Alloc>::iterator ft::vector<T, Alloc>::erase(iterator pos)
+{
+	// TODO: implement erase
+	(void) pos;
+	throw std::logic_error("not yet implemented");
+	// destroy object at pos
+	// move all elements forward
+}
+
+template <class T, class Alloc>
+void ft::vector<T, Alloc>::push_back(const T& value)
+{
+	size_type currentCapacity = capacity();
+	if (size() + 1 > currentCapacity)
+	{
+		size_type newCapacity = currentCapacity + 1; // TODO: review
+		if (newCapacity > max_size())
+		{
+			newCapacity = max_size();
+			if (newCapacity <= currentCapacity)
+				throw std::length_error("could not extend vector because it already at maximum size");
+		}
+		reserve(newCapacity);
+	}
+	// if (m_start != m_finish)
+	// 	m_finish++; 
+	m_alloc.construct(m_finish++, value);
+}
+
+template <class T, class Alloc>
+void ft::vector<T, Alloc>::pop_back()
+{
+	m_alloc.destroy(m_finish);
+	m_finish--; 
+}
+
+template <class T, class Alloc>
+void ft::vector<T, Alloc>::resize(size_type count, T value)
+{
+	size_type currentSize = size();
+	pointer newEnd = m_start + count;
+	if (currentSize > count)
+	{
+		// reduce size to count
+		while (m_finish != newEnd)
+		{
+			m_alloc.destroy(m_finish);
+			m_finish--;
+		}
+	}
+	else if (currentSize < count)
+	{
+		while (m_finish != newEnd)
+		{
+			push_back(value);
+		}
+	}
+}
+
+template <class T, class Alloc>
+void ft::vector<T, Alloc>::swap(vector& other)
+{
+	ft::swap(this->m_start, other.m_start);
+	ft::swap(this->m_finish, other.m_finish);
+	ft::swap(this->m_endOfStorage, other.m_endOfStorage);
+	ft::swap(this->m_alloc, other.m_alloc);
+}
+
 
 // TODO: implement modifiers
 
