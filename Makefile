@@ -5,7 +5,7 @@ NAME	= main
 CLASSES	= Color.cpp
 TMPLATES= iterator.hpp pair.hpp debug_utility.hpp utility.hpp vector.hpp
 HEADERS	= $(patsubst %.cpp,%.hpp,$(CLASSES)) $(TMPLATES)
-TST_SRCS= test_iterator.cpp test_pair.cpp test_vector.cpp
+TST_SRCS= test_iterator.cpp test_pair.cpp test_vector.cpp test_utility.cpp
 SRCS	= main.cpp $(patsubst %.cpp,tests/%.cpp,$(TST_SRCS)) $(CLASSES)
 OBJDIR	= obj
 OBJS	= $(patsubst %.cpp,$(OBJDIR)/%.o,$(SRCS))
@@ -47,28 +47,31 @@ valgrind: debug
 test: all
 	./$(NAME)
 
+use_stl: fclean
+use_stl: CXXFLAGS := $(filter-out -std=c++98,$(CXXFLAGS)) -DUSE_STL=1
+use_stl: all
+
+use_stl_debug: fclean
+use_stl_debug: CXXFLAGS := $(filter-out -std=c++98,$(CXXFLAGS)) -g -DDEBUG=1 -DUSE_STL=1
+use_stl_debug: all
+
 $(NAME): $(OBJS) $(SRCS) $(HEADERS)
 	$(CXX) $(CXXFLAGS) $(OBJS) -o $@
 
 $(OBJDIR)/%.o: %.cpp $(TMPLATES) | $(OBJDIR) $(OBJDIR)/tests
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
+# $(OBJDIR)/tests/test_utility.o: CXXFLAGS := $(filter-out -std=c++98,$(CXXFLAGS))
+
 $(OBJDIR):
 	mkdir $@
 
-$(OBJDIR)/tests: $(OBJDIR)
+$(OBJDIR)/tests: | $(OBJDIR)
 	mkdir -p $@
 
 $(INTRA_MAIN):
 	curl -o $@ https://projects.intra.42.fr/uploads/document/document/10932/main.cpp
 
-use_stl: fclean
-use_stl: CXXFLAGS := $(CXXFLAGS) -DUSE_STL=1
-use_stl: all
-
-use_stl_debug: fclean
-use_stl_debug: CXXFLAGS := $(CXXFLAGS) -g -DDEBUG=1 -DUSE_STL=1
-use_stl_debug: all
 
 compare:
 	make debug
