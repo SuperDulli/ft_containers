@@ -22,7 +22,7 @@ template <class T, T v>
 struct integral_constant {
 	static const T value = v;
 
-	typedef T	  value_type;
+	typedef T						value_type;
 	typedef integral_constant<T, v> type;
 
 	operator value_type() const
@@ -82,6 +82,15 @@ template <>
 struct is_integral<const long> : integral_constant<bool, true> {};
 template <>
 struct is_integral<const unsigned long> : integral_constant<bool, true> {};
+
+// enable if
+
+template <bool B, class T = void>
+struct enable_if;
+template <class T>
+struct enable_if<true, T> {
+	typedef T type
+};
 
 } // namespace ft
 
