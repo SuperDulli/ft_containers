@@ -56,9 +56,11 @@ bool test_palindrome(const std::string& s)
 
 bool predicate_same_case(const char a, const char b)
 {
-	if (!isalpha(a) || !isalpha(b))
+	if (!std::isalpha(a) || !std::isalpha(b))
 		return false;
-	return ((isupper(a) && isupper(b)) || (islower(a) && islower(b)));
+	return (
+		(std::isupper(a) && std::isupper(b)) ||
+		(std::islower(a) && std::islower(b)));
 }
 
 bool compare_string_case(const std::string& s1, const std::string& s2)
@@ -73,7 +75,8 @@ bool test_string_case(const std::string& s1, const std::string& s2)
 #ifdef DEBUG
 	std::cout << "\"" << s1 << "\" and \"" << s2 << "\" "
 			  << (result ? "have" : "dont't have")
-			  << " the same case in all characters (length of first)." << std::endl;
+			  << " the same case in all characters (length of first)."
+			  << std::endl;
 #endif
 	return result;
 }
@@ -97,6 +100,60 @@ bool test_equal()
 	return result;
 }
 
+bool compare_lexicographic(const std::string& s1, const std::string& s2)
+{
+	bool result =
+		ft::lexicographical_compare(s1.begin(), s1.end(), s2.begin(), s2.end());
+
+#if DEBUG
+	std::cout << std::boolalpha;
+	std::cout << "Comparing \"" << s1 << "\" and \"" << s2
+			  << "\" lexicographical (less): " << result << std::endl;
+#endif
+	return result;
+}
+
+// a case-insensitive comparison function:
+bool case_insensitive_compare(const char a, const char b)
+{
+	return std::tolower(a) < std::tolower(b);
+}
+
+bool compare_lexicographic_case_insensitive(
+	const std::string& s1,
+	const std::string& s2)
+{
+	bool result = ft::lexicographical_compare(
+		s1.begin(), s1.end(), s2.begin(), s2.end(), case_insensitive_compare);
+
+#if DEBUG
+	std::cout << std::boolalpha;
+	std::cout << "Comparing \"" << s1 << "\" and \"" << s2
+			  << "\" lexicographical (less, case insensitve): " << result
+			  << std::endl;
+#endif
+	return result;
+}
+
+bool test_lexicographical_compare()
+{
+	bool result = true;
+
+	result = result && (compare_lexicographic("Apple", "apartment") == true);
+	result = result && (compare_lexicographic("hello", "radar") == true);
+	result = result && (compare_lexicographic("abc", "def") == true);
+	result = result && (compare_lexicographic("Abc", "Aef") == true);
+	result = result && (compare_lexicographic("short", "shorter") == true);
+	result = result && (compare_lexicographic("same", "same") == false);
+	result = result && (compare_lexicographic("Bcd", "Aef") == false);
+	result = result && (compare_lexicographic("shorter", "short") == false);
+
+	result = result && (compare_lexicographic_case_insensitive(
+							"Apple", "apartment") == false);
+
+	return result;
+}
+
 bool test_utility()
 {
 	bool success = true;
@@ -104,6 +161,7 @@ bool test_utility()
 	std::cout << "-- Test utility --" << std::endl;
 	debug::run_test("is_integral", test_is_integral);
 	debug::run_test("equal", test_equal);
+	debug::run_test("lexicographical_compare", test_lexicographical_compare);
 
 	return success;
 }
