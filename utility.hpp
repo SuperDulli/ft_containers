@@ -20,10 +20,10 @@ void swap(T& a, T& b)
 // needed as base clas for is integral?
 template <class T, T v>
 struct integral_constant {
-	typedef value_type				T;
-	typedef integral_constant<T, v> value;
-
 	static const T value = v;
+
+	typedef T	  value_type;
+	typedef integral_constant<T, v> type;
 
 	operator value_type() const
 	{
@@ -46,10 +46,6 @@ struct is_integral<unsigned char> : integral_constant<bool, true> {};
 template <>
 struct is_integral<wchar_t> : integral_constant<bool, true> {};
 template <>
-struct is_integral<char16_t> : integral_constant<bool, true> {};
-template <>
-struct is_integral<char32_t> : integral_constant<bool, true> {};
-template <>
 struct is_integral<short> : integral_constant<bool, true> {};
 template <>
 struct is_integral<unsigned short> : integral_constant<bool, true> {};
@@ -61,12 +57,31 @@ template <>
 struct is_integral<long> : integral_constant<bool, true> {};
 template <>
 struct is_integral<unsigned long> : integral_constant<bool, true> {};
-template <>
-struct is_integral<long long> : integral_constant<bool, true> {};
-template <>
-struct is_integral<unsigned long long> : integral_constant<bool, true> {};
+// long long is not c++ 98
 
-// TODO: and const variants
+// const variants
+template <>
+struct is_integral<const bool> : integral_constant<bool, true> {};
+template <>
+struct is_integral<const char> : integral_constant<bool, true> {};
+template <>
+struct is_integral<const signed char> : integral_constant<bool, true> {};
+template <>
+struct is_integral<const unsigned char> : integral_constant<bool, true> {};
+template <>
+struct is_integral<const wchar_t> : integral_constant<bool, true> {};
+template <>
+struct is_integral<const short> : integral_constant<bool, true> {};
+template <>
+struct is_integral<const unsigned short> : integral_constant<bool, true> {};
+template <>
+struct is_integral<const int> : integral_constant<bool, true> {};
+template <>
+struct is_integral<const unsigned int> : integral_constant<bool, true> {};
+template <>
+struct is_integral<const long> : integral_constant<bool, true> {};
+template <>
+struct is_integral<const unsigned long> : integral_constant<bool, true> {};
 
 } // namespace ft
 
