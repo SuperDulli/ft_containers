@@ -16,7 +16,11 @@ bool test_vector_construction()
 	ft::vector<int> empty;
 	// ft::vector<int, > emptyCstmAlloc;
 	ft::vector<int> init(4, 21);
-	// ft::vector<int> iter(init.begin(), init.end());
+
+	empty.push_back(5);
+	empty.push_back(35);
+
+	ft::vector<int> iter(empty.begin(), empty.end());
 	ft::vector<int> copy(init);
 
 #ifdef DEBUG
@@ -25,6 +29,7 @@ bool test_vector_construction()
 	std::cout << "size() of copy = " << copy.size() << std::endl;
 	std::cout << "empty " << empty << std::endl;
 	std::cout << "init " << init << std::endl;
+	std::cout << "iter " << iter << std::endl;
 	std::cout << "copy " << copy << std::endl;
 #endif
 	return true;

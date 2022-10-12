@@ -37,11 +37,14 @@ public:
 		size_type			  count,
 		const T&			  value = T(),
 		const allocator_type& alloc = Alloc());
-	// template <class InputIterator>
-	// vector(
-	// 	InputIterator		  first,
-	// 	InputIterator		  last,
-	// 	const allocator_type& alloc = Alloc());
+	template <class InputIterator>
+	vector(
+		InputIterator first,
+		typename ft::enable_if<
+			!ft::is_integral<
+				InputIterator>::value,
+			InputIterator>::type last,
+		const allocator_type& alloc = Alloc());
 	vector(const vector& other);
 
 	// Destructor
@@ -159,28 +162,33 @@ ft::vector<T, Alloc>::vector(
 	m_endOfStorage = m_finish;
 }
 
-// template <class T, class Alloc> template <class InputIterator>
-// ft::vector<T, Alloc>::vector(
-// 	InputIterator		  first,
-// 	InputIterator		  last,
-// 	const allocator_type& alloc)
-// 	: m_alloc(alloc)
-// {
-// #ifdef DEBUG
-// 	std::cout << "vector constructor (range)" << std::endl;
-// #endif
-// 	size_type i = 0;
+template <class T, class Alloc>
+template <class InputIterator>
+ft::vector<T, Alloc>::vector(
+	InputIterator first,
+		typename ft::enable_if<
+			!ft::is_integral<
+				InputIterator>::value,
+			InputIterator>::type last,
+	const allocator_type&											   alloc)
+	: m_alloc(alloc)
+{
+#ifdef DEBUG
+	std::cout << "vector constructor (range)" << std::endl;
+#endif
+	size_type i = 0;
+	size_type size = ft::distance(first, last);
 
-// 	m_start = m_alloc.allocate(static_cast<size_type>(first));
-// 	while (first != last)
-// 	{
-// 		m_alloc.construct(m_start + i, *first);
-// 		++first;
-// 		++i;
-// 	}
-// 	m_finish = m_start + i;
-// 	m_endOfStorage = m_start + static_cast<size_type>(first);
-// }
+	m_start = m_alloc.allocate(size);
+	while (first != last)
+	{
+		m_alloc.construct(m_start + i, *first);
+		++first;
+		++i;
+	}
+	m_finish = m_start + i;
+	m_endOfStorage = m_start + size;
+}
 
 template <class T, class Alloc>
 ft::vector<T, Alloc>::vector(const vector& other) : m_alloc(other.m_alloc)
@@ -430,7 +438,8 @@ void ft::vector<T, Alloc>::clear()
 // }
 
 template <class T, class Alloc>
-typename ft::vector<T, Alloc>::iterator ft::vector<T, Alloc>::erase(iterator pos)
+typename ft::vector<T, Alloc>::iterator
+ft::vector<T, Alloc>::erase(iterator pos)
 {
 	// TODO: implement erase
 	(void) pos;
@@ -450,12 +459,13 @@ void ft::vector<T, Alloc>::push_back(const T& value)
 		{
 			newCapacity = max_size();
 			if (newCapacity <= currentCapacity)
-				throw std::length_error("could not extend vector because it already at maximum size");
+				throw std::length_error("could not extend vector because it "
+										"already at maximum size");
 		}
 		reserve(newCapacity);
 	}
 	// if (m_start != m_finish)
-	// 	m_finish++; 
+	// 	m_finish++;
 	m_alloc.construct(m_finish++, value);
 }
 
@@ -463,14 +473,14 @@ template <class T, class Alloc>
 void ft::vector<T, Alloc>::pop_back()
 {
 	m_alloc.destroy(m_finish);
-	m_finish--; 
+	m_finish--;
 }
 
 template <class T, class Alloc>
 void ft::vector<T, Alloc>::resize(size_type count, T value)
 {
 	size_type currentSize = size();
-	pointer newEnd = m_start + count;
+	pointer	  newEnd = m_start + count;
 	if (currentSize > count)
 	{
 		// reduce size to count
@@ -497,7 +507,6 @@ void ft::vector<T, Alloc>::swap(vector& other)
 	ft::swap(this->m_endOfStorage, other.m_endOfStorage);
 	ft::swap(this->m_alloc, other.m_alloc);
 }
-
 
 // TODO: implement modifiers
 

@@ -57,6 +57,7 @@ struct iterator {
 template <typename T>
 class PtrIterator : public ft::iterator<ft::random_access_iterator_tag, T>
 {
+public:
 	typedef PtrIterator<T>							 iterator;
 	typedef typename PtrIterator<T>::difference_type difference_type;
 	typedef typename PtrIterator<T>::pointer		 pointer;
