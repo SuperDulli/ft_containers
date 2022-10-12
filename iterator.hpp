@@ -424,6 +424,21 @@ typename reverse_iterator<Iterator>::difference_type operator-(
 	return (lhs.base() - rhs.base());
 }
 
+// distance
+
+template <class InputIterator>
+typename iterator_traits<InputIterator>::difference_type
+distance(InputIterator first, InputIterator last)
+{
+	typename ft::iterator_traits<InputIterator>::difference_type result = 0;
+	while (first != last)
+	{
+		++first;
+		++result;
+	}
+	return result;
+}
+
 } // namespace ft
 
 #endif // ITERATOR_HPP
