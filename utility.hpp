@@ -159,6 +159,14 @@ bool lexicographical_compare(
 	return ((first1 == last1) && (first2 != last2));
 }
 
+// is same - useful for iterator
+
+template <class T, class U>
+struct is_same : integral_constant<bool, false> {};
+
+template <class T>
+struct is_same<T, T> : integral_constant<bool, true> {};
+
 } // namespace ft
 
 #endif // UTILITY_HPP
