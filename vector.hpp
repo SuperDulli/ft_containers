@@ -104,8 +104,12 @@ public:
 	iterator insert(const_iterator pos, const T& value);
 	iterator insert(const_iterator pos, size_type count, const T& value);
 	template <class InputIterator>
-	iterator
-	insert(const_iterator pos, InputIterator first, InputIterator last);
+	iterator insert(
+		const_iterator pos,
+		InputIterator  first,
+		typename ft::enable_if<
+			!ft::is_integral<InputIterator>::value,
+			InputIterator>::type last);
 	iterator erase(iterator pos);
 	iterator erase(iterator first, iterator last);
 	void	 push_back(const T& value);
@@ -122,6 +126,8 @@ private:
 	pointer		   m_start;
 	pointer		   m_finish;
 	pointer		   m_endOfStorage;
+
+	void m_moveElementsRight(iterator pos, size_type count);
 }; // class vector
 
 } // namespace ft
@@ -483,12 +489,71 @@ void ft::vector<T, Alloc>::clear()
 	m_finish = m_start;
 }
 
-// template <class T, class Alloc>
-// typename ft::vector<T, Alloc>::iterator
-// insert(const_iterator pos, const T& value)
-// {
-// 	const_iterator
-// }
+template <class T, class Alloc>
+typename ft::vector<T, Alloc>::iterator
+ft::vector<T, Alloc>::insert(const_iterator pos, const T& value)
+{
+	// pos would become in valid in case of realloc
+	difference_type offset = pos - begin();
+
+	insert(pos, 1, value);
+	return m_start + offset;
+}
+
+template <class T, class Alloc>
+typename ft::vector<T, Alloc>::iterator ft::vector<T, Alloc>::insert(
+	const_iterator pos,
+	size_type	   count,
+	const T&	   value)
+{
+	// pos would become in valid in case of realloc
+	difference_type offset = pos - begin();
+
+	reserve(size() + count);
+	iterator newPosition(m_start + offset);
+
+	if (newPosition != end())
+		m_moveElementsRight(newPosition, count);
+	for (size_type i = 0; i < count; i++)
+	{
+		m_alloc.construct(&(*newPosition), value);
+		++newPosition;
+	}
+	m_finish += count;
+
+	return m_start + offset;
+}
+
+template <class T, class Alloc>
+template <class InputIterator>
+typename ft::vector<T, Alloc>::iterator ft::vector<T, Alloc>::insert(
+	const_iterator pos,
+	InputIterator  first,
+	typename ft::enable_if<
+		!ft::is_integral<InputIterator>::value,
+		InputIterator>::type last)
+{
+	InputIterator tmp(first);
+	size_type count = ft::distance(tmp, last);
+
+	// pos would become in valid in case of realloc
+	difference_type offset = pos - begin();
+
+	reserve(size() + count);
+	iterator newPosition(m_start + offset);
+
+	if (newPosition != end())
+		m_moveElementsRight(newPosition, count);
+	for (size_type i = 0; i < count; i++)
+	{
+		m_alloc.construct(&(*newPosition), *first);
+		++newPosition;
+		++first;
+	}
+	m_finish += count;
+
+	return m_start + offset;
+}
 
 template <class T, class Alloc>
 typename ft::vector<T, Alloc>::iterator
@@ -562,5 +627,20 @@ void ft::vector<T, Alloc>::swap(vector& other)
 }
 
 // TODO: implement modifiers
+
+// helper functions
+
+template <class T, class Alloc>
+void ft::vector<T, Alloc>::m_moveElementsRight(iterator pos, size_type steps)
+{
+	ft::pair<iterator, iterator> oldEnd(end() - 1, end());
+	while (oldEnd.second != pos)
+	{
+		m_alloc.construct(&(*oldEnd.first + steps), *oldEnd.first);
+		m_alloc.construct(&(*oldEnd.first));
+		--oldEnd.first;
+		--oldEnd.second;
+	}
+}
 
 #endif // VECTOR_HPP
