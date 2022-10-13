@@ -36,15 +36,14 @@ public:
 	explicit vector(
 		size_type			  count,
 		const T&			  value = T(),
-		const allocator_type& alloc = Alloc());
+		const allocator_type& alloc = allocator_type());
 	template <class InputIterator>
 	vector(
 		InputIterator first,
 		typename ft::enable_if<
-			!ft::is_integral<
-				InputIterator>::value,
+			!ft::is_integral< InputIterator>::value,
 			InputIterator>::type last,
-		const allocator_type& alloc = Alloc());
+		const allocator_type&	 alloc = allocator_type());
 	vector(const vector& other);
 
 	// Destructor
@@ -166,20 +165,20 @@ template <class T, class Alloc>
 template <class InputIterator>
 ft::vector<T, Alloc>::vector(
 	InputIterator first,
-		typename ft::enable_if<
-			!ft::is_integral<
-				InputIterator>::value,
-			InputIterator>::type last,
-	const allocator_type&											   alloc)
+	typename ft::enable_if<
+		!ft::is_integral< InputIterator>::value,
+		InputIterator>::type last,
+	const allocator_type&	 alloc)
 	: m_alloc(alloc)
 {
 #ifdef DEBUG
 	std::cout << "vector constructor (range)" << std::endl;
 #endif
-	size_type i = 0;
-	size_type size = ft::distance(first, last);
+	InputIterator tmp(first);
+	size_type size = ft::distance(tmp, last);
 
 	m_start = m_alloc.allocate(size);
+	size_type i = 0;
 	while (first != last)
 	{
 		m_alloc.construct(m_start + i, *first);
