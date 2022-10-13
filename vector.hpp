@@ -41,7 +41,7 @@ public:
 	vector(
 		InputIterator first,
 		typename ft::enable_if<
-			!ft::is_integral< InputIterator>::value,
+			!ft::is_integral<InputIterator>::value,
 			InputIterator>::type last,
 		const allocator_type&	 alloc = allocator_type());
 	vector(const vector& other);
@@ -58,7 +58,11 @@ public:
 
 	void assign(size_type count, const T& value);
 	template <class InputIterator>
-	void assign(InputIterator first, InputIterator last);
+	void assign(
+		InputIterator first,
+		typename ft::enable_if<
+			!ft::is_integral<InputIterator>::value,
+			InputIterator>::type last);
 
 	allocator_type get_allocator() const;
 
@@ -175,7 +179,7 @@ ft::vector<T, Alloc>::vector(
 	std::cout << "vector constructor (range)" << std::endl;
 #endif
 	InputIterator tmp(first);
-	size_type size = ft::distance(tmp, last);
+	size_type	  size = ft::distance(tmp, last);
 
 	m_start = m_alloc.allocate(size);
 	size_type i = 0;
@@ -229,12 +233,62 @@ ft::vector<T, Alloc>& ft::vector<T, Alloc>::operator=(const vector& other)
 		std::cout << "vectors are not identical (copying elemements)"
 				  << std::endl;
 #endif
-		// TODO: copy
+		vector tmp(other);
+		swap(tmp);
+		return *this;
 	}
 	return *this;
 }
 
-// TODO: assign overloads
+// assign overloads
+
+template <class T, class Alloc>
+void ft::vector<T, Alloc>::assign(size_type count, const T& value)
+{
+	clear();
+
+	if (count > capacity())
+	{
+		m_alloc.deallocate(m_start, capacity());
+		m_start = m_alloc.allocate(count);
+		m_endOfStorage = m_start + count;
+	}
+
+	for (size_type i = 0; i < count; i++)
+	{
+		m_alloc.construct(m_start + i, value);
+	}
+	m_finish = m_start + count;
+}
+
+template <class T, class Alloc>
+template <class InputIterator>
+void ft::vector<T, Alloc>::assign(
+	InputIterator first,
+	typename ft::enable_if<
+		!ft::is_integral<InputIterator>::value,
+		InputIterator>::type last)
+{
+	clear();
+
+	InputIterator tmp(first);
+	size_type	  count = ft::distance(tmp, last);
+	if (count > capacity())
+	{
+		m_alloc.deallocate(m_start, capacity());
+		m_start = m_alloc.allocate(count);
+		m_endOfStorage = m_start + count;
+	}
+
+	size_type i = 0;
+	while (first != last)
+	{
+		m_alloc.construct(m_start + i, *first);
+		++first;
+		++i;
+	}
+	m_finish = m_start + i;
+}
 
 template <class T, class Alloc>
 typename ft::vector<T, Alloc>::allocator_type
