@@ -234,7 +234,7 @@ ft::vector<T, Alloc>& ft::vector<T, Alloc>::operator=(const vector& other)
 #ifdef DEBUG
 	std::cout << "vector operator= (copy assignment)" << std::endl;
 #endif
-	if (this != other)
+	if (this != &other)
 	{
 #ifdef DEBUG
 		std::cout << "vectors are not identical (copying elemements)"
@@ -570,7 +570,7 @@ ft::vector<T, Alloc>::erase(iterator first, iterator last)
 	if (first == end() || first == last)
 		return last;
 
-	size_type	  count = static_cast<size_type>(last - first);
+	size_type		count = static_cast<size_type>(last - first);
 	difference_type offset = first - begin();
 
 	if (last < end())
@@ -688,6 +688,51 @@ void ft::vector<T, Alloc>::m_moveElementsLeft(iterator pos, size_type steps)
 			m_alloc.construct(&(*pos), *(pos + steps));
 		++pos;
 	}
+}
+
+// relational operators
+
+template <class T, class Alloc>
+bool operator==(
+	const ft::vector<T, Alloc>& lhs,
+	const ft::vector<T, Alloc>& rhs)
+{
+	return (
+		lhs.size() == rhs.size() &&
+		ft::equal(lhs.begin(), lhs.end(), rhs.begin()));
+}
+
+template <class T, class Alloc>
+bool operator!=(
+	const ft::vector<T, Alloc>& lhs,
+	const ft::vector<T, Alloc>& rhs)
+{
+	return (!(lhs == rhs));
+}
+
+template <class T, class Alloc>
+bool operator<(const ft::vector<T, Alloc>& lhs, const ft::vector<T, Alloc>& rhs)
+{
+	return (ft::lexicographical_compare(
+		lhs.begin(), lhs.end(), rhs.begin(), rhs.end()));
+}
+
+template <class T, class Alloc>
+bool operator<=(const ft::vector<T, Alloc>& lhs, const ft::vector<T, Alloc>& rhs)
+{
+	return (!(rhs < lhs));
+}
+
+template <class T, class Alloc>
+bool operator>(const ft::vector<T, Alloc>& lhs, const ft::vector<T, Alloc>& rhs)
+{
+	return (rhs < lhs);
+}
+
+template <class T, class Alloc>
+bool operator>=(const ft::vector<T, Alloc>& lhs, const ft::vector<T, Alloc>& rhs)
+{
+	return (!(lhs < rhs));
 }
 
 #endif // VECTOR_HPP
