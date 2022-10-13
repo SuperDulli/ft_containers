@@ -128,6 +128,7 @@ private:
 	pointer		   m_endOfStorage;
 
 	void m_moveElementsRight(iterator pos, size_type count);
+	void m_moveElementsLeft(iterator pos, size_type count);
 }; // class vector
 
 } // namespace ft
@@ -534,7 +535,7 @@ typename ft::vector<T, Alloc>::iterator ft::vector<T, Alloc>::insert(
 		InputIterator>::type last)
 {
 	InputIterator tmp(first);
-	size_type count = ft::distance(tmp, last);
+	size_type	  count = ft::distance(tmp, last);
 
 	// pos would become in valid in case of realloc
 	difference_type offset = pos - begin();
@@ -559,11 +560,35 @@ template <class T, class Alloc>
 typename ft::vector<T, Alloc>::iterator
 ft::vector<T, Alloc>::erase(iterator pos)
 {
-	// TODO: implement erase
-	(void) pos;
-	throw std::logic_error("not yet implemented");
-	// destroy object at pos
-	// move all elements forward
+	return erase(pos, pos + 1);
+}
+
+template <class T, class Alloc>
+typename ft::vector<T, Alloc>::iterator
+ft::vector<T, Alloc>::erase(iterator first, iterator last)
+{
+	if (first == end() || first == last)
+		return last;
+
+	size_type	  count = static_cast<size_type>(last - first);
+	difference_type offset = first - begin();
+
+	if (last < end())
+	{
+		m_moveElementsLeft(first, count);
+		m_finish -= count;
+		return m_finish + 1;
+	}
+	else
+	{
+		size_type newFinish = m_finish - count;
+		while (newFinish != m_finish)
+		{
+			pop_back();
+		}
+	}
+
+	return m_start + offset;
 }
 
 template <class T, class Alloc>
@@ -626,10 +651,14 @@ void ft::vector<T, Alloc>::swap(vector& other)
 	ft::swap(this->m_alloc, other.m_alloc);
 }
 
-// TODO: implement modifiers
-
 // helper functions
 
+/**
+ * @brief moves elements starting at pos to the right
+ *
+ * @param pos start position
+ * @param steps number of places the elements move
+ */
 template <class T, class Alloc>
 void ft::vector<T, Alloc>::m_moveElementsRight(iterator pos, size_type steps)
 {
@@ -640,6 +669,24 @@ void ft::vector<T, Alloc>::m_moveElementsRight(iterator pos, size_type steps)
 		m_alloc.construct(&(*oldEnd.first));
 		--oldEnd.first;
 		--oldEnd.second;
+	}
+}
+
+/**
+ * @brief moves elements starting at (pos + steps) to the left
+ *
+ * @param pos start position
+ * @param steps number of places the elements move
+ */
+template <class T, class Alloc>
+void ft::vector<T, Alloc>::m_moveElementsLeft(iterator pos, size_type steps)
+{
+	while (pos != end())
+	{
+		m_alloc.destruct(&(*pos));
+		if (pos + steps < end())
+			m_alloc.construct(&(*pos), *(pos + steps));
+		++pos;
 	}
 }
 
