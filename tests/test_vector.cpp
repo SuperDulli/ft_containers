@@ -45,7 +45,7 @@ bool test_vector_copy()
 {
 	bool result;
 
-	int intArray[] = {1, 2, 3, 4};
+	int				intArray[] = {1, 2, 3, 4};
 	ft::vector<int> x(intArray, intArray + 4);
 	ft::vector<int> y;
 
@@ -70,7 +70,41 @@ bool test_vector_copy()
 	return result && y != x;
 }
 
+bool test_vector_assign()
+{
+	ft::vector<char>	   chars;
+	ft::vector<char>	   chars2;
+	ft::vector<char>	   chars3;
+	ft::vector<char>	   chars4;
+	const ft::vector<char> extra(6, 'b');
 
+	chars.assign(5, 'a');
+#ifdef DEBUG
+	std::cout << "chars " << chars << std::endl;
+#endif
+
+	chars2.assign(extra.begin(), extra.end());
+#ifdef DEBUG
+	std::cout << "chars2 " << chars2 << std::endl;
+#endif
+
+	std::cout << "first extend capacity, then assign" << std::endl;
+
+	chars3.reserve(15);
+	chars3.assign(3, 'c');
+#ifdef DEBUG
+	std::cout << "chars3 " << chars3 << std::endl;
+#endif
+
+	chars4.reserve(10);
+	chars4.assign(extra.begin(), extra.end());
+#ifdef DEBUG
+	std::cout << "chars4 " << chars4 << std::endl;
+#endif
+	return (
+		chars.size() == 5 && chars2 == extra && chars3.size() == 3 &&
+		chars4 == extra);
+}
 
 bool test_vector()
 {
@@ -79,6 +113,7 @@ bool test_vector()
 	std::cout << "-- Test vector --" << std::endl;
 	debug::run_test("vector construction", test_vector_construction);
 	debug::run_test("vector copy", test_vector_copy);
+	debug::run_test("vector assign", test_vector_assign);
 	// debug::run_test("relational operators", test_relational_operators);
 	return success;
 }

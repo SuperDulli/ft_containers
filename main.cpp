@@ -9,8 +9,8 @@ int main()
 	bool result = true;
 
 	result = result && debug::run_test("pair", test_pair);
-	result = result && debug::run_test("vector", test_vector);
 	result = result && debug::run_test("utility", test_utility);
+	result = result && debug::run_test("vector", test_vector);
 
 	if (result)
 		std::cout << Color::Modifier(Color::FG_GREEN) << "All Test passed."
