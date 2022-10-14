@@ -106,6 +106,95 @@ bool test_vector_assign()
 		chars4 == extra);
 }
 
+bool test_vector_capacity()
+{
+	bool result;
+
+	ft::vector<int>			ints;
+	ft::vector<char>		chars;
+	ft::vector<std::string> strings;
+	ft::vector<int>			large(20, 5);
+
+	result = ints.empty() == true && ints.size() == 0 &&
+			 chars.empty() == true && chars.size() == 0 &&
+			 strings.empty() == true && strings.size() == 0 &&
+			 large.empty() == false && large.size() == 20;
+#ifdef DEBUG
+	std::cout << "ints " << ints << std::endl;
+	std::cout << "chars " << chars << std::endl;
+	std::cout << "strings " << strings << std::endl;
+	std::cout << "large " << large << std::endl;
+#endif
+
+	unsigned size = 100;
+	unsigned cap = ints.capacity();
+#ifdef DEBUG
+	std::cout << "Initial size: " << ints.size() << ", capacity: " << cap
+			  << std::endl;
+	std::cout << "\nDemonstrate the capacity's growth policy."
+				 "\nSize:  Capacity:  Ratio:"
+			  << std::left << std::endl;
+#endif
+	unsigned i = size;
+	while (i-- > 0)
+	{
+		ints.push_back(i);
+		if (cap != ints.capacity())
+		{
+#ifdef DEBUG
+			std::cout << std::setw(7) << ints.size() << std::setw(11)
+					  << ints.capacity() << std::setw(10)
+					  << ints.capacity() / static_cast<float>(cap) << std::endl;
+#endif
+			cap = ints.capacity();
+		}
+	}
+#ifdef DEBUG
+	std::cout << "\nFinal size: " << ints.size()
+			  << ", capacity: " << ints.capacity() << std::endl;
+#endif
+	result = result && ints.size() == size && ints.capacity() > size;
+
+#ifdef DEBUG
+	std::cout << "Try to reserve more than max size and catch exeption" << std::endl;
+#endif
+	bool exceptionThrown = false;
+	try
+	{
+		unsigned long newCap = strings.max_size();
+		newCap += 10;
+#ifdef DEBUG
+	std::cout << "max_size:\n" << strings.max_size() << std::endl;
+	std::cout << "newCap:\n" << newCap << std::endl;
+#endif
+		strings.reserve(newCap);
+	}
+	catch(const std::length_error& e)
+	{
+		exceptionThrown = true;
+		std::cerr << e.what() << std::endl;
+	}
+	catch(const std::exception& e)
+	{
+		std::cerr << e.what() << std::endl;
+	}
+#ifdef DEBUG
+	std::cout << "strings " << strings << std::endl;
+#endif
+	result = result && exceptionThrown && strings.capacity() == 0;
+
+#ifdef DEBUG
+	std::cout << "use reserve() to expand capacity" << std::endl;
+#endif
+	chars.reserve(5);
+	#ifdef DEBUG
+	std::cout << "chars " << chars << std::endl;
+#endif
+	result = result && chars.capacity() == 5;
+
+	return result;
+}
+
 bool test_vector()
 {
 	bool success = true;
@@ -114,6 +203,7 @@ bool test_vector()
 	debug::run_test("vector construction", test_vector_construction);
 	debug::run_test("vector copy", test_vector_copy);
 	debug::run_test("vector assign", test_vector_assign);
+	debug::run_test("vector capacity", test_vector_capacity);
 	// debug::run_test("relational operators", test_relational_operators);
 	return success;
 }

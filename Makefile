@@ -56,7 +56,10 @@ valgrind: debug
 	valgrind --leak-check=full --show-leak-kinds=all ./$(NAME)
 
 test: $(NAME)
-	./$@
+	./$^
+
+test_debug: $(NAME_DEBUG)
+	./$^
 
 $(NAME): $(OBJS) $(SRCS) $(HEADERS)
 	$(CXX) $(CXXFLAGS) $(OBJS) -o $@
@@ -84,8 +87,8 @@ $(INTRA_MAIN):
 
 
 compare: $(NAME_DEBUG) $(NAME_STL_DEBUG)
-	./$< > mine.txt
-	./$(NAME_STL_DEBUG) > theirs.txt
+	./$< > mine.txt 2>&1
+	./$(NAME_STL_DEBUG) > theirs.txt 2>&1
 	diff -y --color=always mine.txt theirs.txt
 
 .PHONY: all clean fclean re show debug leaks test valgrind

@@ -329,7 +329,7 @@ void ft::vector<T, Alloc>::reserve(size_type new_cap)
 {
 	if (new_cap > this->max_size())
 		throw std::length_error(
-			"specified capacity would exceed maximum size.");
+			"vector::reserve (specified capacity would exceed maximum size)");
 	if (capacity() < new_cap)
 	{
 		size_type i;
@@ -597,7 +597,8 @@ void ft::vector<T, Alloc>::push_back(const T& value)
 	size_type currentCapacity = capacity();
 	if (size() + 1 > currentCapacity)
 	{
-		size_type newCapacity = currentCapacity + 1; // TODO: review
+		size_type newCapacity =
+			(currentCapacity == 0) ? 1 : currentCapacity * 2;
 		if (newCapacity > max_size())
 		{
 			newCapacity = max_size();
@@ -607,8 +608,6 @@ void ft::vector<T, Alloc>::push_back(const T& value)
 		}
 		reserve(newCapacity);
 	}
-	// if (m_start != m_finish)
-	// 	m_finish++;
 	m_alloc.construct(m_finish++, value);
 }
 
@@ -718,7 +717,9 @@ bool operator<(const ft::vector<T, Alloc>& lhs, const ft::vector<T, Alloc>& rhs)
 }
 
 template <class T, class Alloc>
-bool operator<=(const ft::vector<T, Alloc>& lhs, const ft::vector<T, Alloc>& rhs)
+bool operator<=(
+	const ft::vector<T, Alloc>& lhs,
+	const ft::vector<T, Alloc>& rhs)
 {
 	return (!(rhs < lhs));
 }
@@ -730,7 +731,9 @@ bool operator>(const ft::vector<T, Alloc>& lhs, const ft::vector<T, Alloc>& rhs)
 }
 
 template <class T, class Alloc>
-bool operator>=(const ft::vector<T, Alloc>& lhs, const ft::vector<T, Alloc>& rhs)
+bool operator>=(
+	const ft::vector<T, Alloc>& lhs,
+	const ft::vector<T, Alloc>& rhs)
 {
 	return (!(lhs < rhs));
 }

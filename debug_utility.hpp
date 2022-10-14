@@ -32,9 +32,10 @@ std::ostream& operator<<(std::ostream& os, const ft::pair<U, V>& pair)
 template <typename T>
 std::ostream& operator<<(std::ostream& os, const ft::vector<T>& vec)
 {
-	os << "vector(capacity=" << vec.capacity() << ", size=" << vec.size()
-	//    << ", front=" << vec.front()
-	  << ")" << std::endl;
+	os << "vector(capacity=" << vec.capacity() << ", size="
+	   << vec.size()
+	   //    << ", front=" << vec.front()
+	   << ", max_size=" << vec.max_size() << ")" << std::endl;
 
 	if (vec.size())
 	{
