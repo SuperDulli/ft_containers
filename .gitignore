@@ -30,7 +30,10 @@
 *.exe
 *.out
 *.app
-main
+mine
+mine_debug
+stl
+stl_debug
 
 *.txt
 test_main.cpp
