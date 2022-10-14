@@ -4,10 +4,22 @@ bool test_pair();
 bool test_vector();
 bool test_utility();
 
-int main() {
-	debug::run_test("pair", test_pair);
-	debug::run_test("vector", test_vector);
-	debug::run_test("utility", test_utility);
+int main()
+{
+	bool result = true;
+
+	result = result && debug::run_test("pair", test_pair);
+	result = result && debug::run_test("vector", test_vector);
+	result = result && debug::run_test("utility", test_utility);
+
+	if (result)
+		std::cout << Color::Modifier(Color::FG_GREEN) << "All Test passed."
+				  << Color::Modifier() << std::endl;
+	else
+		std::cout << Color::Modifier(Color::FG_RED)
+				  << "At least one Test failed." << Color::Modifier()
+				  << std::endl;
+	return (result ? 0 : 1);
 }
 
 bool debug::run_test(const std::string& name, bool (*test_f)(void))
