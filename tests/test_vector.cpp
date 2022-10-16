@@ -11,7 +11,9 @@ namespace ft = std;
 #include "../vector.hpp"
 #endif
 
-bool test_vector_construction()
+namespace test_vector
+{
+bool construction()
 {
 	ft::vector<int> empty;
 	ft::vector<int> intVec;
@@ -41,7 +43,7 @@ bool test_vector_construction()
 		copy.size() == init.size());
 }
 
-bool test_vector_copy()
+bool copy()
 {
 	bool result;
 
@@ -70,7 +72,7 @@ bool test_vector_copy()
 	return result && y != x;
 }
 
-bool test_vector_assign()
+bool assign()
 {
 	ft::vector<char>	   chars;
 	ft::vector<char>	   chars2;
@@ -106,7 +108,7 @@ bool test_vector_assign()
 		chars4 == extra);
 }
 
-bool test_vector_capacity()
+bool capacity()
 {
 	bool result;
 
@@ -156,7 +158,8 @@ bool test_vector_capacity()
 	result = result && ints.size() == size && ints.capacity() > size;
 
 #ifdef DEBUG
-	std::cout << "Try to reserve more than max size and catch exeption" << std::endl;
+	std::cout << "Try to reserve more than max size and catch exeption"
+			  << std::endl;
 #endif
 	bool exceptionThrown = false;
 	try
@@ -164,17 +167,15 @@ bool test_vector_capacity()
 		unsigned long newCap = strings.max_size();
 		newCap += 10;
 #ifdef DEBUG
-	std::cout << "max_size:\n" << strings.max_size() << std::endl;
-	std::cout << "newCap:\n" << newCap << std::endl;
+		std::cout << "max_size:\n" << strings.max_size() << std::endl;
+		std::cout << "newCap:\n" << newCap << std::endl;
 #endif
 		strings.reserve(newCap);
-	}
-	catch(const std::length_error& e)
+	} catch (const std::length_error& e)
 	{
 		exceptionThrown = true;
 		std::cerr << e.what() << std::endl;
-	}
-	catch(const std::exception& e)
+	} catch (const std::exception& e)
 	{
 		std::cerr << e.what() << std::endl;
 	}
@@ -187,7 +188,7 @@ bool test_vector_capacity()
 	std::cout << "use reserve() to expand capacity" << std::endl;
 #endif
 	chars.reserve(5);
-	#ifdef DEBUG
+#ifdef DEBUG
 	std::cout << "chars " << chars << std::endl;
 #endif
 	result = result && chars.capacity() == 5;
@@ -195,15 +196,16 @@ bool test_vector_capacity()
 	return result;
 }
 
-bool test_vector()
+bool all()
 {
 	bool success = true;
 
 	std::cout << "-- Test vector --" << std::endl;
-	debug::run_test("vector construction", test_vector_construction);
-	debug::run_test("vector copy", test_vector_copy);
-	debug::run_test("vector assign", test_vector_assign);
-	debug::run_test("vector capacity", test_vector_capacity);
+	debug::run_test("vector construction", test_vector::construction);
+	debug::run_test("vector copy", test_vector::copy);
+	debug::run_test("vector assign", test_vector::assign);
+	debug::run_test("vector capacity", test_vector::capacity);
 	// debug::run_test("relational operators", test_relational_operators);
 	return success;
 }
+} // namespace test_vector

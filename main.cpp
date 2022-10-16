@@ -1,8 +1,11 @@
 #include "debug_utility.hpp"
 
 bool test_pair();
-bool test_vector();
 bool test_utility();
+namespace test_vector
+{
+bool all();
+}
 
 int main()
 {
@@ -10,7 +13,7 @@ int main()
 
 	result = result && debug::run_test("pair", test_pair);
 	result = result && debug::run_test("utility", test_utility);
-	result = result && debug::run_test("vector", test_vector);
+	result = result && debug::run_test("vector", test_vector::all);
 
 	if (result)
 		std::cout << Color::Modifier(Color::FG_GREEN) << "All Test passed."
