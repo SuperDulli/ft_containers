@@ -196,6 +196,36 @@ bool capacity()
 	return result;
 }
 
+bool data()
+{
+	bool result;
+
+	ft::vector<int> ints;
+
+	const int count = 4;
+	for (int i = 0; i < count; i++)
+	{
+		ints.push_back(i);
+	}
+
+	const int* pointer = ints.data();
+#ifdef DEBUG
+	std::cout << "Demonstrate that the elements stored contiguously:"
+			  << std::endl;
+	for (size_t i = 0; i < ints.size(); ++i)
+		std::cout << (pointer + i) << ": " << pointer[i] << std::endl;
+	std::cout << std::endl;
+#endif
+	result = true;
+	for (size_t i = 0; i < ints.size(); i++, pointer++)
+	{
+		result = result && *pointer == static_cast<int>(i);
+	}
+	result = result && ints.front() == 0 && ints.back() == count - 1;
+
+	return result;
+}
+
 bool all()
 {
 	bool success = true;
@@ -205,6 +235,7 @@ bool all()
 	debug::run_test("vector copy", test_vector::copy);
 	debug::run_test("vector assign", test_vector::assign);
 	debug::run_test("vector capacity", test_vector::capacity);
+	debug::run_test("vector data", test_vector::data);
 	// debug::run_test("relational operators", test_relational_operators);
 	return success;
 }
