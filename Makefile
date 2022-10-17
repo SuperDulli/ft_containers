@@ -47,13 +47,13 @@ show:
 
 debug: clean
 debug: CXXFLAGS := $(CXXFLAGS) -g -DDEBUG=1
-debug: $(NAME)
+debug: $(NAME_DEBUG)
 
 leaks: $(NAME)
 	leaks --atExit -- ./$@
 
 valgrind: debug
-	valgrind --leak-check=full --show-leak-kinds=all ./$(NAME)
+	valgrind --leak-check=full --show-leak-kinds=all ./$(NAME_DEBUG)
 
 test: $(NAME)
 	./$^
