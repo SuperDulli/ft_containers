@@ -69,6 +69,9 @@ public:
 	PtrIterator() : m_pos(NULL) {}
 	PtrIterator(T* x) : m_pos(x) {}
 	PtrIterator(const PtrIterator& it) : m_pos(it.m_pos) {}
+	// allows iterator to const iterator conversion
+	template <typename X>
+	PtrIterator(const PtrIterator<X>& it) : m_pos(it.base()) {}
 	~PtrIterator() {}
 
 	// operators
@@ -140,6 +143,11 @@ public:
 	reference operator[](difference_type n) const
 	{
 		return m_pos[n];
+	}
+
+	difference_type operator-(PtrIterator it) const
+	{
+		return (this->m_pos - it.m_pos);
 	}
 
 	const pointer& base() const
