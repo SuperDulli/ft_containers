@@ -334,7 +334,7 @@ void ft::vector<T, Alloc>::reserve(size_type new_cap)
 	{
 		size_type i;
 		pointer	  newArray = m_alloc.allocate(new_cap);
-		for (i = 0; i < this->capacity(); i++)
+		for (i = 0; i < this->size(); i++)
 		{
 			m_alloc.construct(newArray + i, m_start[i]);
 		}
@@ -430,26 +430,26 @@ const T* ft::vector<T, Alloc>::data() const
 template <class T, class Alloc>
 typename ft::vector<T, Alloc>::iterator ft::vector<T, Alloc>::begin()
 {
-	return PtrIterator<T>(m_start);
+	return iterator(m_start);
 }
 
 template <class T, class Alloc>
 typename ft::vector<T, Alloc>::const_iterator
 ft::vector<T, Alloc>::begin() const
 {
-	return PtrIterator<const T>(m_start);
+	return const_iterator(m_start);
 }
 
 template <class T, class Alloc>
 typename ft::vector<T, Alloc>::iterator ft::vector<T, Alloc>::end()
 {
-	return PtrIterator<T>(m_finish);
+	return iterator(m_finish);
 }
 
 template <class T, class Alloc>
 typename ft::vector<T, Alloc>::const_iterator ft::vector<T, Alloc>::end() const
 {
-	return PtrIterator<const T>(m_finish);
+	return const_iterator(m_finish);
 }
 
 template <class T, class Alloc>
@@ -510,7 +510,8 @@ typename ft::vector<T, Alloc>::iterator ft::vector<T, Alloc>::insert(
 	// pos would become in valid in case of realloc
 	difference_type offset = pos - begin();
 
-	reserve(size() + count);
+	if (size() + count > capacity())
+		reserve(capacity() == 0 ? count : (capacity()) * 2);
 	iterator newPosition(m_start + offset);
 
 	if (newPosition != end())
@@ -664,8 +665,8 @@ void ft::vector<T, Alloc>::m_moveElementsRight(iterator pos, size_type steps)
 	ft::pair<iterator, iterator> oldEnd(end() - 1, end());
 	while (oldEnd.second != pos)
 	{
-		m_alloc.construct(&(*oldEnd.first + steps), *oldEnd.first);
-		m_alloc.construct(&(*oldEnd.first));
+		m_alloc.construct(&(*(oldEnd.first + steps)), *oldEnd.first);
+		m_alloc.destroy(&(*oldEnd.first));
 		--oldEnd.first;
 		--oldEnd.second;
 	}

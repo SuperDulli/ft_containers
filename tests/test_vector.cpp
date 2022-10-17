@@ -305,6 +305,63 @@ bool clear()
 	return result;
 }
 
+bool insert()
+{
+	bool result = true;
+
+	const int				ints[] = {1, 2, 3, 4, 5};
+	ft::vector<int>			nums(ints, ints + 5);
+	ft::vector<std::string> empty;
+	const std::string		strings[] = {
+			  "orange",
+			  "apple",
+			  "raspberry",
+			  "bananna",
+			  "mango",
+			  "kiwi",
+			  "strawberry"};
+	ft::vector<std::string> fruits(strings, strings + 7);
+
+	ft::vector<int> numbers(3, 42);
+
+	// makes sure the iterators in the next line stay valid, else it would be UB
+	numbers.reserve(numbers.capacity() + numbers.size());
+
+	numbers.insert(numbers.end(), numbers.begin(), numbers.end());
+
+#ifdef DEBUG
+	std::cout << "nums " << nums << std::endl;
+	std::cout << "numbers " << numbers << std::endl;
+	std::cout << "empty " << empty << std::endl;
+#endif
+
+	// ft::vector<int>::const_iterator cit = nums.begin();
+
+	// insert one value at a time
+	nums.insert(nums.begin(), -1);
+	nums.insert(nums.begin() + 3, -2);
+	nums.insert(nums.end(), -3);
+
+	// insert multiple copies at once
+	empty.insert(empty.begin(), 2, "hi");
+
+	#ifdef DEBUG
+	std::cout << "nums " << nums << std::endl;
+	std::cout << "empty " << empty << std::endl;
+#endif
+
+	// insert range
+	empty.insert(empty.begin() + 1, fruits.begin(), fruits.end());
+	nums.insert(nums.end(), numbers.begin(), numbers.end());
+
+#ifdef DEBUG
+	std::cout << "nums " << nums << std::endl;
+	std::cout << "empty " << empty << std::endl;
+#endif
+
+	return result;
+}
+
 bool all()
 {
 	bool success = true;
@@ -317,6 +374,7 @@ bool all()
 	debug::run_test("vector data", test_vector::data);
 	debug::run_test("vector reverse_iteration", test_vector::reverse_iteration);
 	debug::run_test("vector clear", test_vector::clear);
+	debug::run_test("vector insert", test_vector::insert);
 	// debug::run_test("relational operators", test_relational_operators);
 	return success;
 }
