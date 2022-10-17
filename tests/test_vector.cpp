@@ -236,7 +236,7 @@ bool reverse_iteration()
 	ft::vector<char>		empty;
 
 #ifdef DEBUG
-		std::cout <<  "reverse of nums:" << std::endl;
+	std::cout << "reverse of nums:" << std::endl;
 #endif
 	int i = 0;
 	for (ft::vector<int>::reverse_iterator rit = nums.rbegin();
@@ -255,7 +255,7 @@ bool reverse_iteration()
 	result = result && *nums.rbegin() == 1;
 
 #ifdef DEBUG
-		std::cout <<  "reverse of fruits:" << std::endl;
+	std::cout << "reverse of fruits:" << std::endl;
 #endif
 	for (ft::vector<std::string>::reverse_iterator rit = fruits.rbegin();
 		 rit != fruits.rend();
@@ -279,6 +279,32 @@ bool reverse_iteration()
 	return result;
 }
 
+bool clear()
+{
+	bool result = true;
+
+	ft::vector<int>			ints(5, 0);
+	ft::vector<std::string> empty;
+
+#ifdef DEBUG
+	std::cout << "ints " << ints << std::endl;
+	std::cout << "empty " << empty << std::endl;
+#endif
+
+	ints.clear();
+	empty.reserve(7);
+	empty.clear();
+
+#ifdef DEBUG
+	std::cout << "ints " << ints << std::endl;
+	std::cout << "empty " << empty << std::endl;
+#endif
+	result = result && ints.size() == 0 && ints.capacity() == 5;
+	result = result && empty.size() == 0 && empty.capacity() == 7;
+
+	return result;
+}
+
 bool all()
 {
 	bool success = true;
@@ -290,6 +316,7 @@ bool all()
 	debug::run_test("vector capacity", test_vector::capacity);
 	debug::run_test("vector data", test_vector::data);
 	debug::run_test("vector reverse_iteration", test_vector::reverse_iteration);
+	debug::run_test("vector clear", test_vector::clear);
 	// debug::run_test("relational operators", test_relational_operators);
 	return success;
 }
