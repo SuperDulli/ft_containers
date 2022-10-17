@@ -455,27 +455,27 @@ typename ft::vector<T, Alloc>::const_iterator ft::vector<T, Alloc>::end() const
 template <class T, class Alloc>
 typename ft::vector<T, Alloc>::reverse_iterator ft::vector<T, Alloc>::rbegin()
 {
-	return ft::reverse_iterator< PtrIterator<T> >(m_finish);
+	return reverse_iterator(end());
 }
 
 template <class T, class Alloc>
 typename ft::vector<T, Alloc>::const_reverse_iterator
 ft::vector<T, Alloc>::rbegin() const
 {
-	return ft::reverse_iterator< PtrIterator<const T> >(m_finish);
+	return const_reverse_iterator(end());
 }
 
 template <class T, class Alloc>
 typename ft::vector<T, Alloc>::reverse_iterator ft::vector<T, Alloc>::rend()
 {
-	return ft::reverse_iterator< PtrIterator<T> >(m_start);
+	return reverse_iterator(begin());
 }
 
 template <class T, class Alloc>
 typename ft::vector<T, Alloc>::const_reverse_iterator
 ft::vector<T, Alloc>::rend() const
 {
-	return ft::reverse_iterator< PtrIterator<const T> >(m_start);
+	return const_reverse_iterator(begin());
 }
 
 // modifiers

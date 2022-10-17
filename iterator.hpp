@@ -261,7 +261,8 @@ public:
 
 	reference operator*(void) const
 	{
-		return m_base_iterator.reference;
+		iterator_type tmp = m_base_iterator;
+		return *--tmp;
 	}
 
 	reverse_iterator operator+(difference_type n) const
@@ -308,6 +309,11 @@ public:
 	pointer operator->(void) const
 	{
 		return &(operator*());
+	}
+
+	reference operator[](difference_type n) const
+	{
+		return base()[-n - 1];
 	}
 
 private:
@@ -361,7 +367,7 @@ bool operator==(
 	const reverse_iterator<Iterator>& lhs,
 	const reverse_iterator<Iterator>& rhs)
 {
-	return (*lhs.base() == *rhs.base());
+	return (lhs.base() == rhs.base());
 }
 
 template <class Iterator>
@@ -369,7 +375,7 @@ bool operator!=(
 	const reverse_iterator<Iterator>& lhs,
 	const reverse_iterator<Iterator>& rhs)
 {
-	return (*lhs.base() != *rhs.base());
+	return (lhs.base() != rhs.base());
 }
 
 template <class Iterator>
@@ -377,7 +383,7 @@ bool operator<(
 	const reverse_iterator<Iterator>& lhs,
 	const reverse_iterator<Iterator>& rhs)
 {
-	return (*lhs.base() > *rhs.base());
+	return (lhs.base() > rhs.base());
 }
 
 template <class Iterator>
@@ -385,7 +391,7 @@ bool operator<=(
 	const reverse_iterator<Iterator>& lhs,
 	const reverse_iterator<Iterator>& rhs)
 {
-	return (*lhs.base() >= *rhs.base());
+	return (lhs.base() >= rhs.base());
 }
 
 template <class Iterator>
@@ -393,7 +399,7 @@ bool operator>(
 	const reverse_iterator<Iterator>& lhs,
 	const reverse_iterator<Iterator>& rhs)
 {
-	return (*lhs.base() < *rhs.base());
+	return (lhs.base() < rhs.base());
 }
 
 template <class Iterator>
@@ -401,7 +407,7 @@ bool operator>=(
 	const reverse_iterator<Iterator>& lhs,
 	const reverse_iterator<Iterator>& rhs)
 {
-	return (*lhs.base() <= *rhs.base());
+	return (lhs.base() <= rhs.base());
 }
 
 // implementation of the addition operator
