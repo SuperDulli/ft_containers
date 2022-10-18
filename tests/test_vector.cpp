@@ -539,6 +539,55 @@ bool pop_back()
 	return result;
 }
 
+bool resize()
+{
+	bool result = true;
+
+	const int		  ints[] = {1, 2, 3, 4, 5};
+	ft::vector<int>	  nums(ints, ints + 5);
+	const std::string strings[] = {
+		"orange",
+		"apple",
+		"raspberry",
+		"bananna",
+		"mango",
+		"kiwi",
+		"strawberry"};
+	ft::vector<std::string> fruits(strings, strings + 7);
+
+#ifdef DEBUG
+	std::cout << "nums " << nums << std::endl;
+	std::cout << "fruits " << fruits << std::endl;
+	std::cout << std::endl;
+#endif
+
+	nums.resize(9);
+	result = result && nums.size() == 9 && nums.back() == 0;
+	fruits.resize(16);
+	result = result && fruits.size() == 16 && fruits.back() == "";
+
+#ifdef DEBUG
+	std::cout << "After resizing to make it bigger:" << std::endl;
+	std::cout << "nums " << nums << std::endl;
+	std::cout << "fruits " << fruits << std::endl;
+	std::cout << std::endl;
+#endif
+
+	nums.resize(3);
+	result = result && nums.size() == 3;
+	fruits.resize(3);
+	result = result && fruits.size() == 3;
+
+#ifdef DEBUG
+	std::cout << "After resizing to make it smaller:" << std::endl;
+	std::cout << "nums " << nums << std::endl;
+	std::cout << "fruits " << fruits << std::endl;
+	std::cout << std::endl;
+#endif
+
+	return result;
+}
+
 bool all()
 {
 	bool success = true;
@@ -554,6 +603,7 @@ bool all()
 	debug::run_test("vector insert", test_vector::insert);
 	debug::run_test("vector erase", test_vector::erase);
 	debug::run_test("vector pop_back", test_vector::pop_back);
+	debug::run_test("vector resize", test_vector::resize);
 	// debug::run_test("relational operators", test_relational_operators);
 	return success;
 }

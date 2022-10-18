@@ -114,7 +114,6 @@ public:
 	iterator erase(iterator first, iterator last);
 	void	 push_back(const T& value);
 	void	 pop_back();
-	void	 resize(size_type count);
 	void	 resize(size_type count, T value = T());
 	void	 swap(vector& other);
 
@@ -665,25 +664,34 @@ void ft::vector<T, Alloc>::pop_back()
 	m_finish--;
 }
 
+/**
+ * @brief Resizes the vector to contain count elements.
+ *
+ * @param count new size of the vector.
+ * If the current size is greater than count, the container is reduced to its
+ * first count elements.
+ * If the current size is less than count, additional copies of value are
+ * appended.
+ * @param value the value to initialize the new elements with
+ */
 template <class T, class Alloc>
 void ft::vector<T, Alloc>::resize(size_type count, T value)
 {
-	size_type currentSize = size();
-	pointer	  newEnd = m_start + count;
-	if (currentSize > count)
+	// size_type currentSize = size();
+	if (size() > count)
 	{
 		// reduce size to count
-		while (m_finish != newEnd)
-		{
-			m_alloc.destroy(m_finish);
-			m_finish--;
-		}
+		m_alloc.destroy(m_start + count);
+		m_finish = m_start + count;
 	}
-	else if (currentSize < count)
+	else if (size() < count)
 	{
-		while (m_finish != newEnd)
+		// append value to fill the new spots
+		size_type i = count - size();
+		while (i > 0)
 		{
 			push_back(value);
+			i--;
 		}
 	}
 }
