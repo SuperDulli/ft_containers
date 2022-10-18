@@ -654,6 +654,10 @@ void ft::vector<T, Alloc>::push_back(const T& value)
 	m_alloc.construct(m_finish++, value);
 }
 
+/**
+ * @brief removes the last element.
+ *
+ */
 template <class T, class Alloc>
 void ft::vector<T, Alloc>::pop_back()
 {
