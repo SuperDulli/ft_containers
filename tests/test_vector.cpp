@@ -398,6 +398,110 @@ bool insert()
 	return result;
 }
 
+bool erase()
+{
+	bool result = true;
+
+	const int		  ints[] = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+	ft::vector<int>	  nums(ints, ints + 9);
+	const std::string strings[] = {
+		"orange",
+		"apple",
+		"raspberry",
+		"bananna",
+		"mango",
+		"kiwi",
+		"strawberry"};
+	ft::vector<std::string> fruits(strings, strings + 7);
+
+	// return values
+	ft::vector<int>::iterator		  r_one;
+	ft::vector<int>::iterator		  r_one_end;
+	ft::vector<int>::iterator		  r_range;
+	ft::vector<int>::iterator		  r_range_end;
+	ft::vector<int>::iterator		  r_range_empty;
+	ft::vector<std::string>::iterator r_string_one;
+	ft::vector<std::string>::iterator r_string_one_end;
+	ft::vector<std::string>::iterator r_string_range;
+	ft::vector<std::string>::iterator r_string_range_end;
+	ft::vector<std::string>::iterator r_string_range_empty;
+
+#ifdef DEBUG
+	std::cout << "nums " << nums << std::endl;
+	std::cout << "fruits " << fruits << std::endl;
+	std::cout << std::endl;
+#endif
+
+	// erase the first and last element
+	r_one = nums.erase(nums.begin());
+	result = result && r_one == nums.begin();
+	r_one_end = nums.erase(nums.end() - 1);
+	result = result && r_one_end == nums.end();
+
+	r_string_one = fruits.erase(fruits.begin());
+	result = result && r_string_one == fruits.begin();
+	r_string_one_end = fruits.erase(fruits.end() - 1);
+	result = result && r_string_one_end == fruits.end();
+
+#ifdef DEBUG
+	std::cout << "After erasing the first and last element:" << std::endl;
+	std::cout << "nums " << nums << std::endl;
+	std::cout << "fruits " << fruits << std::endl;
+	std::cout << std::endl;
+#endif
+
+	// try erasing empty range -> last gets returned
+	r_range_empty = nums.erase(nums.begin(), nums.begin());
+	result = result && r_range_empty == nums.begin();
+	r_string_range_empty = fruits.erase(fruits.begin() + 2, fruits.begin() + 2);
+	result = result && r_string_range_empty == fruits.begin() + 2;
+
+#ifdef DEBUG
+	std::cout << "After erasing an empty range:" << std::endl;
+	std::cout << "nums " << nums << std::endl;
+	std::cout << "fruits " << fruits << std::endl;
+	std::cout << std::endl;
+#endif
+
+	r_range_end = nums.erase(nums.end() - 3, nums.end());
+	result = result && r_range_end == nums.end();
+	r_string_range_end = fruits.erase(fruits.end() - 1, fruits.end());
+	result = result && r_string_range_end == fruits.end();
+
+#ifdef DEBUG
+	std::cout << "After erasing an range till the end:" << std::endl;
+	std::cout << "nums " << nums << std::endl;
+	std::cout << "fruits " << fruits << std::endl;
+	std::cout << std::endl;
+#endif
+
+	r_range = nums.erase(nums.begin() + 1, nums.end() - 1);
+	result = result && r_range == nums.begin() + 1;
+	r_string_range = fruits.erase(fruits.begin() + 1, fruits.end() - 1);
+	result = result && r_string_range == fruits.begin() + 1;
+
+#ifdef DEBUG
+	std::cout << "After erasing an range in the middle:" << std::endl;
+	std::cout << "nums " << nums << std::endl;
+	std::cout << "fruits " << fruits << std::endl;
+	std::cout << std::endl;
+#endif
+
+	nums.erase(nums.begin(), nums.end());
+	result = result && nums.size() == 0;
+	fruits.erase(fruits.begin(), fruits.end());
+	result = result && fruits.size() == 0;
+
+#ifdef DEBUG
+	std::cout << "After erasing everything:" << std::endl;
+	std::cout << "nums " << nums << std::endl;
+	std::cout << "fruits " << fruits << std::endl;
+	std::cout << std::endl;
+#endif
+
+	return result;
+}
+
 bool all()
 {
 	bool success = true;
@@ -411,6 +515,7 @@ bool all()
 	debug::run_test("vector reverse_iteration", test_vector::reverse_iteration);
 	debug::run_test("vector clear", test_vector::clear);
 	debug::run_test("vector insert", test_vector::insert);
+	debug::run_test("vector erase", test_vector::erase);
 	// debug::run_test("relational operators", test_relational_operators);
 	return success;
 }

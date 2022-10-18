@@ -552,7 +552,7 @@ typename ft::vector<T, Alloc>::iterator ft::vector<T, Alloc>::insert(
  * end() iterator
  * @param first start of the range of elements to insert, can't be a iterator
  * into container for which insert is called
- * @param last end of 	the range of elements to insert, can't be a iterator
+ * @param last end of the range of elements to insert, can't be a iterator
  * into container for which insert is called
  * @return iterator pointing to the inserted value.
  */
@@ -587,6 +587,13 @@ typename ft::vector<T, Alloc>::iterator ft::vector<T, Alloc>::insert(
 	return m_start + offset;
 }
 
+/**
+ * @brief Removes the element at pos.
+ *
+ * @param pos iterator to the element to remove
+ * @return Iterator following the last removed element.
+ * If pos refers to the last element, then the end() iterator is returned.
+ */
 template <class T, class Alloc>
 typename ft::vector<T, Alloc>::iterator
 ft::vector<T, Alloc>::erase(iterator pos)
@@ -594,6 +601,14 @@ ft::vector<T, Alloc>::erase(iterator pos)
 	return erase(pos, pos + 1);
 }
 
+/**
+ * @brief Removes the elements in the range [first, last).
+ *
+ * @return Iterator following the last removed element.
+ * If last == end() prior to removal, then the updated end() iterator is
+ * returned.
+ * If [first, last) is an empty range, then last is returned.
+ */
 template <class T, class Alloc>
 typename ft::vector<T, Alloc>::iterator
 ft::vector<T, Alloc>::erase(iterator first, iterator last)
@@ -601,25 +616,22 @@ ft::vector<T, Alloc>::erase(iterator first, iterator last)
 	if (first == end() || first == last)
 		return last;
 
-	size_type		count = static_cast<size_type>(last - first);
-	difference_type offset = first - begin();
+	size_type count = static_cast<size_type>(last - first);
 
 	if (last < end())
 	{
 		m_moveElementsLeft(first, count);
 		m_finish -= count;
-		return m_finish + 1;
 	}
 	else
 	{
-		size_type newFinish = m_finish - count;
-		while (newFinish != m_finish)
+		while (first != last)
 		{
 			pop_back();
+			--last;
 		}
 	}
-
-	return m_start + offset;
+	return first;
 }
 
 template <class T, class Alloc>
@@ -713,7 +725,7 @@ void ft::vector<T, Alloc>::m_moveElementsLeft(iterator pos, size_type steps)
 {
 	while (pos != end())
 	{
-		m_alloc.destruct(&(*pos));
+		m_alloc.destroy(&(*pos));
 		if (pos + steps < end())
 			m_alloc.construct(&(*pos), *(pos + steps));
 		++pos;
