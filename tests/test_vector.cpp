@@ -321,13 +321,24 @@ bool insert()
 			  "kiwi",
 			  "strawberry"};
 	ft::vector<std::string> fruits(strings, strings + 7);
+	ft::vector<int>			numbers(3, 42);
+	ft::vector<int>			otherNumbers(2, 21);
 
-	ft::vector<int> numbers(3, 42);
+	// return values
+	ft::vector<int>::iterator		  r_one;
+	ft::vector<int>::iterator		  r_multiple;
+	ft::vector<int>::iterator		  r_range;
+	ft::vector<int>::iterator		  r_multiple_fail;
+	ft::vector<int>::iterator		  r_range_fail;
+	ft::vector<std::string>::iterator r_one_string;
+	ft::vector<std::string>::iterator r_multiple_string;
+	ft::vector<std::string>::iterator r_range_string;
+	ft::vector<std::string>::iterator r_multiple_fail_string;
+	ft::vector<std::string>::iterator r_range_fail_string;
 
 	// makes sure the iterators in the next line stay valid, else it would be UB
-	numbers.reserve(numbers.capacity() + numbers.size());
-
-	numbers.insert(numbers.end(), numbers.begin(), numbers.end());
+	// numbers.reserve(numbers.capacity() + numbers.size());
+	// numbers.insert(numbers.end(), numbers.begin(), numbers.end());
 
 #ifdef DEBUG
 	std::cout << "nums " << nums << std::endl;
@@ -338,21 +349,46 @@ bool insert()
 	// ft::vector<int>::const_iterator cit = nums.begin();
 
 	// insert one value at a time
-	nums.insert(nums.begin(), -1);
-	nums.insert(nums.begin() + 3, -2);
-	nums.insert(nums.end(), -3);
+	r_one = nums.insert(nums.begin(), -1);
+	result = result && *r_one == -1 && nums.front() == -1;
+	r_one = nums.insert(nums.begin() + 3, -2);
+	result = result && *r_one == -2 && nums.at(3) == -2;
+	r_one = nums.insert(nums.end(), -3);
+	result = result && *r_one == -3 && nums.back() == -3;
 
 	// insert multiple copies at once
-	empty.insert(empty.begin(), 2, "hi");
+	r_multiple = nums.insert(nums.begin(), 3, 0);
+	result = result && *r_multiple == 0 && nums.front() == 0;
+	r_multiple_string = empty.insert(empty.begin(), 2, "hi");
+	result = result && *r_multiple_string == "hi" && empty.front() == "hi";
 
-	#ifdef DEBUG
+	// insert 0 copies -> pos getting returned
+	r_multiple_fail = nums.insert(nums.begin(), 0, 7);
+	result = result && r_multiple_fail == nums.begin() && nums.front() != 7;
+	r_multiple_fail_string = empty.insert(empty.begin(), 0, "nothing");
+	result = result && r_multiple_fail_string == empty.begin() &&
+			 empty.front() != "nothing";
+
+#ifdef DEBUG
 	std::cout << "nums " << nums << std::endl;
 	std::cout << "empty " << empty << std::endl;
 #endif
 
 	// insert range
-	empty.insert(empty.begin() + 1, fruits.begin(), fruits.end());
-	nums.insert(nums.end(), numbers.begin(), numbers.end());
+	r_range = nums.insert(nums.end(), numbers.begin(), numbers.end());
+	result = result && *r_range == numbers.front() &&
+			 ft::equal(r_range, nums.end(), numbers.begin());
+	r_range_string =
+		empty.insert(empty.begin() + 1, fruits.begin(), fruits.end());
+	result = result && *r_range_string == fruits.front();
+
+	r_range_fail =
+		nums.insert(nums.end(), otherNumbers.begin(), otherNumbers.begin());
+	result = result && r_range_fail == nums.end() && nums.back() == 42;
+	r_range_fail_string =
+		empty.insert(empty.end(), fruits.begin(), fruits.begin());
+	result =
+		result && r_range_fail_string == empty.end() && empty.back() == "hi";
 
 #ifdef DEBUG
 	std::cout << "nums " << nums << std::endl;

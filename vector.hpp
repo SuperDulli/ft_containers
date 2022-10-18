@@ -490,17 +490,34 @@ void ft::vector<T, Alloc>::clear()
 	m_finish = m_start;
 }
 
+/**
+ * @brief Inserts one element at the specified location in the container.
+ *
+ * @param pos iterator before which the content will be inserted. pos may be the
+ * end() iterator
+ * @param value element value to insert
+ * @return iterator pointing to the inserted value.
+ */
 template <class T, class Alloc>
 typename ft::vector<T, Alloc>::iterator
 ft::vector<T, Alloc>::insert(const_iterator pos, const T& value)
 {
 	// pos would become in valid in case of realloc
-	difference_type offset = pos - begin();
+	difference_type offset = pos.base() - m_start;
 
 	insert(pos, 1, value);
 	return m_start + offset;
 }
 
+/**
+ * @brief Inserts elements at the specified location in the container.
+ *
+ * @param pos iterator before which the content will be inserted. pos may be the
+ * end() iterator
+ * @param value element value to insert
+ * @param count number of elements to insert
+ * @return iterator pointing to the inserted value.
+ */
 template <class T, class Alloc>
 typename ft::vector<T, Alloc>::iterator ft::vector<T, Alloc>::insert(
 	const_iterator pos,
@@ -508,7 +525,9 @@ typename ft::vector<T, Alloc>::iterator ft::vector<T, Alloc>::insert(
 	const T&	   value)
 {
 	// pos would become in valid in case of realloc
-	difference_type offset = pos - begin();
+	difference_type offset = pos.base() - m_start;
+	if (count == 0)
+		return iterator(m_start + offset);
 
 	if (size() + count > capacity())
 		reserve(capacity() == 0 ? count : (capacity()) * 2);
@@ -526,6 +545,17 @@ typename ft::vector<T, Alloc>::iterator ft::vector<T, Alloc>::insert(
 	return m_start + offset;
 }
 
+/**
+ * @brief Inserts elements at the specified location in the container.
+ *
+ * @param pos iterator before which the content will be inserted. pos may be the
+ * end() iterator
+ * @param first start of the range of elements to insert, can't be a iterator
+ * into container for which insert is called
+ * @param last end of 	the range of elements to insert, can't be a iterator
+ * into container for which insert is called
+ * @return iterator pointing to the inserted value.
+ */
 template <class T, class Alloc>
 template <class InputIterator>
 typename ft::vector<T, Alloc>::iterator ft::vector<T, Alloc>::insert(
@@ -535,13 +565,13 @@ typename ft::vector<T, Alloc>::iterator ft::vector<T, Alloc>::insert(
 		!ft::is_integral<InputIterator>::value,
 		InputIterator>::type last)
 {
-	InputIterator tmp(first);
-	size_type	  count = ft::distance(tmp, last);
-
 	// pos would become in valid in case of realloc
-	difference_type offset = pos - begin();
+	difference_type offset = pos.base() - m_start;
+	if (first == last)
+		return iterator(m_start + offset);
 
-	reserve(size() + count);
+	size_type count = ft::distance(first, last);
+	reserve(size() + count); // TODO: review
 	iterator newPosition(m_start + offset);
 
 	if (newPosition != end())
