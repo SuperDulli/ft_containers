@@ -7,9 +7,9 @@ NAME_DEBUG		:= $(NAME)_debug
 NAME_STL_DEBUG	:= $(NAME_STL)_debug
 
 CLASSES	= Color.cpp
-TMPLATES= iterator.hpp pair.hpp debug_utility.hpp utility.hpp vector.hpp
+TMPLATES= iterator.hpp pair.hpp debug_utility.hpp utility.hpp vector.hpp map.hpp
 HEADERS	= $(patsubst %.cpp,%.hpp,$(CLASSES)) $(TMPLATES)
-TST_SRCS= test_iterator.cpp test_pair.cpp test_vector.cpp test_utility.cpp
+TST_SRCS= test_iterator.cpp test_pair.cpp test_vector.cpp test_utility.cpp test_map.cpp
 SRCS	= main.cpp $(patsubst %.cpp,tests/%.cpp,$(TST_SRCS)) $(CLASSES)
 OBJDIR	= obj
 OBJS	= $(patsubst %.cpp,$(OBJDIR)/%.o,$(SRCS))
