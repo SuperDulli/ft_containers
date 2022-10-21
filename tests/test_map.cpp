@@ -17,6 +17,8 @@ bool construction()
 {
 	bool result = true;
 
+	ft::map<int, int> empty;
+
 	return result;
 }
 

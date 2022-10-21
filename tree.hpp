@@ -1,10 +1,9 @@
 #ifndef TREE_HPP
 #define TREE_HPP
 
+#include "iterator.hpp"
+#include "pair.hpp"
 #include <memory> // allocator
-
-namespace ft
-{
 
 enum RB_tree_color
 {
@@ -20,7 +19,7 @@ struct RB_tree_node {
 	RB_tree_node* parent;
 	RB_tree_node* left;
 	RB_tree_node* right;
-	Value		  value;
+	Value value;
 
 	static RB_tree_node* minimum(RB_tree_node* node)
 	{
@@ -213,19 +212,23 @@ template <
 	class Allocator = std::allocator<Value> >
 class RB_tree
 {
+private:
+	typedef typename Allocator::template rebind<RB_tree_node<Value> >::other
+		node_allocator;
+
 public:
-	typedef Key						   key_type;
-	typedef Value					   value_type;
-	typedef Compare					   key_compare;
-	typedef value_type*				   pointer;
-	typedef const value_type		   const_pointer;
-	typedef value_type&				   reference;
-	typedef const value_type&		   const_reference;
-	typedef RB_tree_node<Value>*	   node_type;
-	typedef const RB_tree_node<Value>* const_node_type;
-	typedef size_t					   size_type;
-	typedef ptrdiff_t				   difference_type;
-	typedef Allocator				   allocator_type;
+	typedef Key								key_type;
+	typedef Value							value_type;
+	typedef Compare							key_compare;
+	typedef value_type*						pointer;
+	typedef const value_type				const_pointer;
+	typedef value_type&						reference;
+	typedef const value_type&				const_reference;
+	typedef RB_tree_node<value_type>*		node_type;
+	typedef const RB_tree_node<value_type>* const_node_type;
+	typedef size_t							size_type;
+	typedef ptrdiff_t						difference_type;
+	typedef Allocator						allocator_type;
 
 	typedef RB_tree_iterator<value_type>	   iterator;
 	typedef RB_tree_const_iterator<value_type> const_iterator;
@@ -234,14 +237,14 @@ public:
 	typedef ft::reverse_iterator<const_iterator> const_reverse_iterator;
 
 public:
-	RB_tree() {}
+	RB_tree() : m_root(), m_node_count() {}
 	RB_tree(
 		const key_compare&	  comp,
 		const allocator_type& alloc = allocator_type())
-		: m_key_compare(comp)
+		: m_alloc(alloc), m_key_compare(comp), m_root(), m_node_count()
 	{}
 	RB_tree(const RB_tree& other)
-		: m_key_compare(other.m_key_compare), m_node_count(other.m_node_count)
+		: m_alloc(other.m_alloc), m_key_compare(other.m_key_compare)
 	{
 		*this = other;
 	}
@@ -251,16 +254,61 @@ public:
 		m_erase(m_root);
 	}
 
+	RB_tree& operator=(const RB_tree& other)
+	{
+		m_erase(m_root);
+		m_alloc = other.m_alloc;
+		m_key_compare = other.m_key_compare;
+		m_root = other.m_root;
+		m_node_count = other.m_node_count;
+	}
+
+	void insert(value_type value)
+	{
+		node_type node = m_new_node(value);
+		m_insert(node);
+	}
+
 private:
-	allocator_type m_alloc;
+	node_allocator m_alloc;
+	key_compare	   m_key_compare;
 	node_type	   m_root;
 	size_type	   m_node_count;
-	key_compare	   m_key_compare;
 
-	iterator m_insert(node_type node);
-	void	 m_erase(node_type node);
+	node_type m_new_node(value_type value);
+
+	void m_insert(node_type node);
+	void m_erase(node_type node);
 };
 
-} // namespace ft
+// implementation of Red-Black tree
+
+template <class Key, class Value, class Compare, class Allocator>
+typename RB_tree<Key, Value, Compare, Allocator>::node_type
+RB_tree<Key, Value, Compare, Allocator>::m_new_node(value_type value)
+{
+	node_type node = m_alloc.allocate(1);
+	node->color = RED;
+	node->value = value;
+	node->parent = NULL;
+	node->left = NULL;
+	node->right = NULL;
+}
+
+template <class Key, class Value, class Compare, class Allocator>
+void RB_tree<Key, Value, Compare, Allocator>::m_erase(node_type node)
+{
+	// TODO: delete subtree
+	(void) node;
+}
+
+template <class Key, class Value, class Compare, class Allocator>
+void RB_tree<Key, Value, Compare, Allocator>::m_insert(node_type node)
+{
+	if (!m_root)
+	{
+		m_root = node;
+	}
+}
 
 #endif // TREE_HPP
