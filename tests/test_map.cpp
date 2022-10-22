@@ -22,12 +22,26 @@ bool construction()
 	return result;
 }
 
+bool insert()
+{
+	bool result = true;
+
+	ft::map<int, int> empty;
+
+	empty.insert(ft::make_pair(120, 42));
+	empty.insert(ft::make_pair(333, 42));
+	empty.insert(ft::make_pair(3, 42));
+
+	return result;
+}
+
 bool all()
 {
 	bool success = true;
 
 	std::cout << "-- Test map --" << std::endl;
 	debug::run_test("map construction", test_map::construction);
+	debug::run_test("map insert", test_map::insert);
 
 	// debug::run_test("relational operators", test_relational_operators);
 	return success;

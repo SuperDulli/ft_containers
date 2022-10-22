@@ -19,7 +19,7 @@ struct RB_tree_node {
 	RB_tree_node* parent;
 	RB_tree_node* left;
 	RB_tree_node* right;
-	Value value;
+	Value		  value;
 
 	static RB_tree_node* minimum(RB_tree_node* node)
 	{
@@ -208,6 +208,7 @@ struct RB_tree_const_iterator
 template <
 	class Key,
 	class Value,
+	class KeyOfValue,
 	class Compare,
 	class Allocator = std::allocator<Value> >
 class RB_tree
@@ -237,11 +238,11 @@ public:
 	typedef ft::reverse_iterator<const_iterator> const_reverse_iterator;
 
 public:
-	RB_tree() : m_root(), m_node_count() {}
+	RB_tree() : m_alloc(), m_key_compare(), m_root(), m_node_count(0) {}
 	RB_tree(
 		const key_compare&	  comp,
 		const allocator_type& alloc = allocator_type())
-		: m_alloc(alloc), m_key_compare(comp), m_root(), m_node_count()
+		: m_alloc(alloc), m_key_compare(comp), m_root(), m_node_count(0)
 	{}
 	RB_tree(const RB_tree& other)
 		: m_alloc(other.m_alloc), m_key_compare(other.m_key_compare)
@@ -263,10 +264,10 @@ public:
 		m_node_count = other.m_node_count;
 	}
 
-	void insert(value_type value)
+	ft::pair<iterator, bool> insert(const value_type& value)
 	{
 		node_type node = m_new_node(value);
-		m_insert(node);
+		return m_insert(node);
 	}
 
 private:
@@ -275,40 +276,109 @@ private:
 	node_type	   m_root;
 	size_type	   m_node_count;
 
+	static const_reference s_value(const_node_type node)
+	{
+		return node->value;
+	}
+
+	static const key_type& s_key(const_node_type node)
+	{
+		return KeyOfValue()(s_value(node));
+	}
+
 	node_type m_new_node(value_type value);
 
-	void m_insert(node_type node);
-	void m_erase(node_type node);
+	ft::pair<iterator, bool> m_insert(node_type node);
+	void					 m_erase(node_type node);
 };
 
 // implementation of Red-Black tree
 
-template <class Key, class Value, class Compare, class Allocator>
-typename RB_tree<Key, Value, Compare, Allocator>::node_type
-RB_tree<Key, Value, Compare, Allocator>::m_new_node(value_type value)
+template <
+	class Key,
+	class Value,
+	class KeyOfValue,
+	class Compare,
+	class Allocator>
+typename RB_tree<Key, Value, KeyOfValue, Compare, Allocator>::node_type
+RB_tree<Key, Value, KeyOfValue, Compare, Allocator>::m_new_node(
+	value_type value)
 {
 	node_type node = m_alloc.allocate(1);
+	// TODO: moc into function
+	allocator_type alloc = allocator_type(m_alloc);
+	alloc.construct(&node->value, value);
 	node->color = RED;
-	node->value = value;
 	node->parent = NULL;
 	node->left = NULL;
 	node->right = NULL;
+	return node;
 }
 
-template <class Key, class Value, class Compare, class Allocator>
-void RB_tree<Key, Value, Compare, Allocator>::m_erase(node_type node)
+template <
+	class Key,
+	class Value,
+	class KeyOfValue,
+	class Compare,
+	class Allocator>
+void RB_tree<Key, Value, KeyOfValue, Compare, Allocator>::m_erase(
+	node_type node)
 {
 	// TODO: delete subtree
 	(void) node;
 }
 
-template <class Key, class Value, class Compare, class Allocator>
-void RB_tree<Key, Value, Compare, Allocator>::m_insert(node_type node)
+template <
+	class Key,
+	class Value,
+	class KeyOfValue,
+	class Compare,
+	class Allocator>
+ft::pair<
+	typename RB_tree<Key, Value, KeyOfValue, Compare, Allocator>::iterator,
+	bool>
+RB_tree<Key, Value, KeyOfValue, Compare, Allocator>::m_insert(node_type node)
 {
 	if (!m_root)
 	{
 		m_root = node;
+		++m_node_count;
+		return ft::make_pair(iterator(node), true);
 	}
+	node_type parent = m_root;
+	while (parent && m_key_compare(s_key(node), s_key(parent)))
+	{
+		if (m_key_compare(s_key(node), s_key(parent)))
+		{
+#ifdef DEBUG
+			std::cout << "move left" << std::endl;
+#endif
+			parent = parent->left;
+		}
+		else
+		{
+			parent = parent->right;
+		}
+	}
+	if (m_key_compare(s_key(node), s_key(parent->parent)))
+	{
+		parent->left = node;
+		node->parent = parent;
+	}
+	else if (m_key_compare(s_key(parent->parent), s_key(node)))
+	{
+		parent->right = node;
+		node->parent = parent;
+	}
+	else
+	{
+		std::cout << "not unique" << std::endl;
+	}
+
+
+		++m_node_count;
+	// TODO: return right bool
+	return ft::make_pair(iterator(node), true);
 }
 
 #endif // TREE_HPP

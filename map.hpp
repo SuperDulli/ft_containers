@@ -32,7 +32,12 @@ private:
 	typedef
 		typename Allocator::template rebind<value_type>::other pair_alloc_type;
 
-	typedef RB_tree<key_type, value_type, key_compare, pair_alloc_type>
+	typedef RB_tree<
+		key_type,
+		value_type,
+		ft::SelectFirst<value_type>,
+		key_compare,
+		pair_alloc_type>
 		tree_type;
 
 	tree_type m_tree;
@@ -147,7 +152,7 @@ public:
 // constructor
 
 template <class Key, class T, class Compare, class Allocator>
-map<Key, T, Compare, Allocator>::map() : m_tree()
+map<Key, T, Compare, Allocator>::map()
 {
 #ifdef DEBUG
 	std::cout << "map default constructor" << std::endl;
@@ -160,7 +165,22 @@ map<Key, T, Compare, Allocator>::~map()
 #ifdef DEBUG
 	std::cout << "map destructor" << std::endl;
 #endif
+	clear();
+}
+
+// modifiers
+
+template <class Key, class T, class Compare, class Allocator>
+void map<Key, T, Compare, Allocator>::clear()
+{
 	// TODO: clear map
+}
+
+template <class Key, class T, class Compare, class Allocator>
+ft::pair<typename map<Key, T, Compare, Allocator>::iterator, bool>
+map<Key, T, Compare, Allocator>::insert(const value_type& value)
+{
+	return m_tree.insert(value);
 }
 
 // relational operators
