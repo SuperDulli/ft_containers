@@ -40,6 +40,7 @@ private:
 		pair_alloc_type>
 		tree_type;
 
+public: // TODO: make tree private
 	tree_type m_tree;
 
 public:

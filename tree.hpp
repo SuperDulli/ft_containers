@@ -270,7 +270,8 @@ public:
 		return m_insert(node);
 	}
 
-private:
+	// private:
+public: // TODO: make tree mamber private
 	node_allocator m_alloc;
 	key_compare	   m_key_compare;
 	node_type	   m_root;
@@ -345,40 +346,109 @@ RB_tree<Key, Value, KeyOfValue, Compare, Allocator>::m_insert(node_type node)
 		++m_node_count;
 		return ft::make_pair(iterator(node), true);
 	}
-	node_type parent = m_root;
-	while (parent && m_key_compare(s_key(node), s_key(parent)))
+	node_type tmp = m_root;
+	node_type previous = m_root;
+	while (tmp)
 	{
-		if (m_key_compare(s_key(node), s_key(parent)))
+		if (m_key_compare(s_key(node), s_key(tmp)))
 		{
 #ifdef DEBUG
 			std::cout << "move left" << std::endl;
 #endif
-			parent = parent->left;
+			previous = tmp;
+			tmp = tmp->left;
 		}
 		else
 		{
-			parent = parent->right;
+			previous = tmp;
+			tmp = tmp->right;
 		}
 	}
-	if (m_key_compare(s_key(node), s_key(parent->parent)))
+	if (m_key_compare(s_key(node), s_key(previous)))
 	{
-		parent->left = node;
-		node->parent = parent;
+		previous->left = node;
+		node->parent = previous;
 	}
-	else if (m_key_compare(s_key(parent->parent), s_key(node)))
+	else if (m_key_compare(s_key(previous), s_key(node)))
 	{
-		parent->right = node;
-		node->parent = parent;
+		previous->right = node;
+		node->parent = previous;
 	}
 	else
 	{
 		std::cout << "not unique" << std::endl;
 	}
 
-
-		++m_node_count;
+	++m_node_count;
 	// TODO: return right bool
 	return ft::make_pair(iterator(node), true);
+}
+
+// https://www.baeldung.com/java-print-binary-tree-diagram
+
+template <typename Value>
+std::ostream& traverseNodes(
+	std::ostream&		 os,
+	RB_tree_node<Value>* node,
+	const std::string&	 padding,
+	const std::string&	 pointer,
+	bool				 hasRightSibling)
+{
+	if (!node)
+		return os;
+
+	os << std::endl << padding << pointer;
+	os << Color::Modifier(
+		(node->color == RED) ? Color::FG_RED : Color::FG_BLACK);
+	os << node->value << Color::Modifier();
+
+	std::string paddingForBoth = padding;
+	if (hasRightSibling)
+		paddingForBoth += "│  ";
+	else
+		paddingForBoth += "   ";
+
+	std::string pointerRight = "└──";
+	std::string pointerLeft = (node->right) ? "├──" : "└──";
+
+	traverseNodes(os, node->left, paddingForBoth, pointerLeft, node->right);
+	traverseNodes(os, node->right, paddingForBoth, pointerRight, false);
+
+	return os;
+}
+
+template <typename Value>
+std::ostream& operator<<(std::ostream& os, RB_tree_node<Value>* node)
+{
+	if (!node)
+		return os;
+
+	os << Color::Modifier(
+		(node->color == RED) ? Color::FG_RED : Color::FG_BLACK);
+	os << node->value << Color::Modifier();
+
+	std::string pointerRight = "└──";
+	std::string pointerLeft = (node->right) ? "├──" : "└──";
+
+	traverseNodes(os, node->left, "", pointerLeft, node->right);
+	traverseNodes(os, node->right, "", pointerRight, false);
+
+	return os;
+}
+
+template <
+	class Key,
+	class Value,
+	class KeyOfValue,
+	class Compare,
+	class Allocator>
+std::ostream& operator<<(
+	std::ostream&											   os,
+	const RB_tree<Key, Value, KeyOfValue, Compare, Allocator>& tree)
+{
+	os << "Red-Black tree(node_count=" << tree.m_node_count << ")" << std::endl;
+	os << tree.m_root;
+	return os;
 }
 
 #endif // TREE_HPP

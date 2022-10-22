@@ -28,9 +28,18 @@ bool insert()
 
 	ft::map<int, int> empty;
 
-	empty.insert(ft::make_pair(120, 42));
-	empty.insert(ft::make_pair(333, 42));
-	empty.insert(ft::make_pair(3, 42));
+	empty.insert(ft::make_pair(120, 0));
+	empty.insert(ft::make_pair(7, 0));
+	empty.insert(ft::make_pair(3, 0));
+	empty.insert(ft::make_pair(15, 0));
+	empty.insert(ft::make_pair(16, 0));
+	empty.insert(ft::make_pair(14, 0));
+	empty.insert(ft::make_pair(200, 0));
+	empty.insert(ft::make_pair(150, 0));
+
+#if defined(DEBUG) && !defined(USE_STL)
+	std::cout << empty.m_tree << std::endl;
+#endif
 
 	return result;
 }
