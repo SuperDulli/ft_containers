@@ -34,6 +34,7 @@ mine
 mine_debug
 stl
 stl_debug
+test_rb_tree
 
 *.txt
 test_main.cpp

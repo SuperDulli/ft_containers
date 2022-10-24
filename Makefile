@@ -44,6 +44,7 @@ fclean: clean
 	$(RM) -f $(NAME_STL)
 	$(RM) -f $(NAME_DEBUG)
 	$(RM) -f $(NAME_STL_DEBUG)
+	$(RM) -f test_rb_tree
 	$(RM) -f mine.txt
 	$(RM) -f theirs.txt
 
@@ -75,6 +76,9 @@ test: $(NAME)
 
 test_debug: $(NAME_DEBUG)
 	./$^
+
+test_rb_tree: tests/test_rb_tree.cpp Color.cpp tree.hpp utility.hpp debug_utility.hpp
+	$(CXX) $(CXXFLAGS) -g -DDEBUG=1 tests/test_rb_tree.cpp Color.cpp -o $@
 
 $(NAME): $(OBJS) $(SRCS) $(HEADERS)
 	$(CXX) $(CXXFLAGS) $(OBJS) -o $@

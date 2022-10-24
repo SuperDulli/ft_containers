@@ -3,25 +3,32 @@
 #include <string>
 
 #include <functional> // less
+#include <utility>	  // pair
 
 #include "../debug_utility.hpp"
+#include "../utility.hpp" // selectFirst
 
 #include "../tree.hpp"
-// #ifdef USE_STL // CREATE A REAL STL EXAMPLE
-// #include <map>
-// namespace ft = std;
-// #else
-// #include "../tree.hpp"
-// #endif
-
 
 namespace test_tree
 {
+typedef RB_tree<
+	int,
+	ft::pair<const int, int>,
+	ft::SelectFirst< ft::pair<const int, int> >,
+	std::less<int> >
+	tree_type;
+
 bool construction()
 {
 	bool result = true;
 
-	RB_tree<int, int, std::less<int> > empty;
+	RB_tree<
+		int,
+		std::pair<const int, int>,
+		ft::SelectFirst< ft::pair<const int, int> >,
+		std::less<int> >
+		empty;
 
 	return result;
 }
@@ -30,9 +37,36 @@ bool insert()
 {
 	bool result = true;
 
-	RB_tree<int, ft::pair<int, int>, std::less<int> > empty;
+	tree_type empty;
 
-	empty.insert(ft::make_pair<int, int>(3, 42));
+	empty.insert(ft::make_pair<const int, int>(120, 0));
+	empty.insert(ft::make_pair(7, 0));
+	empty.insert(ft::make_pair(3, 0));
+	empty.insert(ft::make_pair(15, 0));
+	empty.insert(ft::make_pair(16, 0));
+	empty.insert(ft::make_pair(14, 0));
+	empty.insert(ft::make_pair(200, 0));
+	empty.insert(ft::make_pair(150, 0));
+	empty.insert(ft::make_pair(250, 0));
+
+	// iteration
+	tree_type::iterator it;
+	it = empty.begin();
+	while (it != empty.end())
+	{
+		std::cout << *it << std::endl;
+		++it;
+	}
+
+	// reverse iteration
+	it = empty.end();
+	while (it != empty.begin())
+	{
+		--it;
+		std::cout << *it << std::endl;
+	}
+
+	// delete
 
 	return result;
 }
@@ -48,4 +82,45 @@ bool all()
 	// debug::run_test("relational operators", test_relational_operators);
 	return success;
 }
-} // namespace test_map
+} // namespace test_tree
+
+int main()
+{
+	bool result = true;
+
+	result = result && debug::run_test("tree", test_tree::all);
+
+	if (result)
+		std::cout << Color::Modifier(Color::FG_GREEN) << "All Test passed."
+				  << Color::Modifier() << std::endl;
+	else
+		std::cout << Color::Modifier(Color::FG_RED)
+				  << "At least one Test failed." << Color::Modifier()
+				  << std::endl;
+	return (result ? 0 : 1);
+}
+
+bool debug::run_test(const std::string& name, bool (*test_f)(void))
+{
+	std::cout << "running Test: " << name << std::endl;
+	bool result = (test_f) ();
+	test_result(name, result);
+
+	return result;
+}
+
+void debug::test_result(const std::string& name, bool result)
+{
+	std::cout << "Test(" << name << "): ";
+	if (result)
+	{
+		std::cout << Color::Modifier(Color::FG_GREEN) << "passed."
+				  << Color::Modifier();
+	}
+	else
+	{
+		std::cout << Color::Modifier(Color::FG_RED) << "failed."
+				  << Color::Modifier();
+	}
+	std::cout << std::endl;
+}

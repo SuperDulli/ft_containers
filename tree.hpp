@@ -3,7 +3,9 @@
 
 #include "iterator.hpp"
 #include "pair.hpp"
+#include "utility.hpp"
 #include <memory> // allocator
+#include <string>
 
 enum RB_tree_color
 {
@@ -203,6 +205,20 @@ struct RB_tree_const_iterator
 	}
 };
 
+// comparing iterators
+
+template <typename T>
+bool operator==(const RB_tree_iterator<T>& lhs, const RB_tree_const_iterator<T>& rhs)
+{
+	return lhs.m_node == rhs.m_node;
+}
+
+template <typename T>
+bool operator!=(const RB_tree_iterator<T>& lhs, const RB_tree_const_iterator<T>& rhs)
+{
+	return lhs.m_node != rhs.m_node;
+}
+
 // tree
 
 template <
@@ -238,12 +254,17 @@ public:
 	typedef ft::reverse_iterator<const_iterator> const_reverse_iterator;
 
 public:
-	RB_tree() : m_alloc(), m_key_compare(), m_root(), m_node_count(0) {}
+	RB_tree() : m_alloc(), m_key_compare(), m_header(), m_node_count(0)
+	{
+		m_initalize();
+	}
 	RB_tree(
 		const key_compare&	  comp,
 		const allocator_type& alloc = allocator_type())
-		: m_alloc(alloc), m_key_compare(comp), m_root(), m_node_count(0)
-	{}
+		: m_alloc(alloc), m_key_compare(comp), m_header(), m_node_count(0)
+	{
+		m_initalize();
+	}
 	RB_tree(const RB_tree& other)
 		: m_alloc(other.m_alloc), m_key_compare(other.m_key_compare)
 	{
@@ -252,15 +273,15 @@ public:
 
 	~RB_tree()
 	{
-		m_erase(m_root);
+		// m_clear();
 	}
 
 	RB_tree& operator=(const RB_tree& other)
 	{
-		m_erase(m_root);
+		// m_clear();
 		m_alloc = other.m_alloc;
 		m_key_compare = other.m_key_compare;
-		m_root = other.m_root;
+		m_header = other.m_header;
 		m_node_count = other.m_node_count;
 	}
 
@@ -270,12 +291,24 @@ public:
 		return m_insert(node);
 	}
 
+	// iterator
+
+	iterator begin()
+	{
+		return iterator(RB_tree_node<Value>::minimum(m_header.left));
+	}
+
+	iterator end()
+	{
+		return iterator(&m_header);
+	}
+
 	// private:
 public: // TODO: make tree mamber private
-	node_allocator m_alloc;
-	key_compare	   m_key_compare;
-	node_type	   m_root;
-	size_type	   m_node_count;
+	node_allocator		m_alloc;
+	key_compare			m_key_compare;
+	RB_tree_node<Value> m_header; // special node for iterator purposes
+	size_type			m_node_count;
 
 	static const_reference s_value(const_node_type node)
 	{
@@ -287,14 +320,45 @@ public: // TODO: make tree mamber private
 		return KeyOfValue()(s_value(node));
 	}
 
+	void m_initalize()
+	{
+		m_header.color = RED;
+		m_header.parent = NULL;
+		m_header.left = NULL;
+		m_header.right = NULL;
+	}
+
+	node_type m_root()
+	{
+		return m_header.left;
+	}
+
+	const_node_type m_root() const
+	{
+		return m_header.left;
+	}
+
+	void m_set_root(node_type node)
+	{
+		m_header.left = node;
+		node->parent = &m_header;
+	}
+
 	node_type m_new_node(value_type value);
 	void	  m_recolor(node_type node);
 
 	ft::pair<iterator, bool> m_insert(node_type node);
-	void					 m_erase(node_type node);
+	void					 m_erase(iterator pos);
 
 	void m_left_rotate(node_type node);
 	void m_right_rotate(node_type node);
+
+	node_type m_find(key_type key);
+
+	void m_transplant(node_type u, node_type v);
+	void m_remove(node_type node);
+
+	// iterator m_remove(key_type key);
 };
 
 // implementation of Red-Black tree
@@ -340,11 +404,11 @@ template <
 	class KeyOfValue,
 	class Compare,
 	class Allocator>
-void RB_tree<Key, Value, KeyOfValue, Compare, Allocator>::m_erase(
-	node_type node)
+void RB_tree<Key, Value, KeyOfValue, Compare, Allocator>::m_erase(iterator pos)
 {
-	// TODO: delete subtree
-	(void) node;
+	node_type node = *pos;
+	m_remove(node);
+	m_alloc.deallocate(node);
 }
 
 template <
@@ -358,15 +422,15 @@ ft::pair<
 	bool>
 RB_tree<Key, Value, KeyOfValue, Compare, Allocator>::m_insert(node_type node)
 {
-	if (!m_root)
+	if (!m_root())
 	{
-		m_root = node;
+		m_set_root(node);
 		++m_node_count;
 		node->color = BLACK;
 		return ft::make_pair(iterator(node), true);
 	}
-	node_type tmp = m_root;
-	node_type previous = m_root;
+	node_type tmp = m_root();
+	node_type previous = m_root();
 	while (tmp)
 	{
 		if (m_key_compare(s_key(node), s_key(tmp)))
@@ -405,7 +469,7 @@ RB_tree<Key, Value, KeyOfValue, Compare, Allocator>::m_insert(node_type node)
 #endif
 
 	// fix color of the nodes
-	while (node != m_root && node->parent->color == RED)
+	while (node != m_root() && node->parent->color == RED)
 	{
 		if (node->parent->parent && node->parent == node->parent->parent->left)
 		{
@@ -468,7 +532,7 @@ RB_tree<Key, Value, KeyOfValue, Compare, Allocator>::m_insert(node_type node)
 			}
 		}
 	}
-	m_root->color = BLACK;
+	m_root()->color = BLACK;
 
 #ifdef DEBUG
 	std::cout << *this << std::endl;
@@ -493,7 +557,7 @@ void RB_tree<Key, Value, KeyOfValue, Compare, Allocator>::m_left_rotate(
 		y->left->parent = node;
 	y->parent = node->parent;
 	if (!node->parent)
-		m_root = y;
+		m_set_root(y);
 	else if (node == node->parent->left)
 		node->parent->left = y;
 	else
@@ -517,7 +581,7 @@ void RB_tree<Key, Value, KeyOfValue, Compare, Allocator>::m_right_rotate(
 		y->right->parent = node;
 	y->parent = node->parent;
 	if (!node->parent)
-		m_root = y;
+		m_set_root(y);
 	else if (node == node->parent->right)
 		node->parent->right = y;
 	else
@@ -525,6 +589,116 @@ void RB_tree<Key, Value, KeyOfValue, Compare, Allocator>::m_right_rotate(
 	y->right = node;
 	node->parent = y;
 }
+
+template <
+	class Key,
+	class Value,
+	class KeyOfValue,
+	class Compare,
+	class Allocator>
+typename RB_tree<Key, Value, KeyOfValue, Compare, Allocator>::node_type
+RB_tree<Key, Value, KeyOfValue, Compare, Allocator>::m_find(key_type key)
+{
+	node_type result = m_root();
+	bool	  found = false;
+	while (result && found)
+	{
+		if (m_key_compare(key, s_key(result)))
+		{
+			result = result->left;
+		}
+		else if (m_key_compare(s_key(result), key))
+		{
+			result = result->right;
+		}
+		else
+		{
+			found = true;
+		}
+	}
+	return result;
+}
+
+template <
+	class Key,
+	class Value,
+	class KeyOfValue,
+	class Compare,
+	class Allocator>
+void RB_tree<Key, Value, KeyOfValue, Compare, Allocator>::m_transplant(
+	node_type u,
+	node_type v)
+{
+	if (!u->parent)
+		m_set_root(v);
+	else if (u == u->parent->left)
+		u->parent->left = v;
+	else
+		u->parent->right = v;
+	if (v)
+		v->parent = u->parent;
+}
+
+template <
+	class Key,
+	class Value,
+	class KeyOfValue,
+	class Compare,
+	class Allocator>
+void RB_tree<Key, Value, KeyOfValue, Compare, Allocator>::m_remove(
+	node_type node)
+{
+	node_type	  y = node;
+	node_type	  x;
+	RB_tree_color y_original_color = y->color;
+	if (!node->left) // only right child
+	{
+		x = node->right;
+		m_transplant(node, x);
+	}
+	else if (!node->right) // only left child
+	{
+		x = node->left;
+		m_transplant(node, x);
+	}
+	else // both childern
+	{
+		y = RB_tree_node<Value>::minimum(node->right);
+		y_original_color = y->color;
+		x = y->right;
+		if (y->parent == node) // y is direct child of node
+		{
+			x->parent = y;
+		}
+		else
+		{
+			m_transplant(y, x);
+			y->right = node->right;
+			y->right->parent = y;
+		}
+		m_transplant(y, x);
+		y->left = node->left;
+		y->left->parent = y;
+		y->color = node->color;
+	}
+	if (y_original_color == BLACK)
+	{
+		// TODO: mov into function
+		std::cout << "delete fixup" << std::endl;
+	}
+}
+
+// template <
+// 	class Key,
+// 	class Value,
+// 	class KeyOfValue,
+// 	class Compare,
+// 	class Allocator>
+// typename RB_tree<Key, Value, KeyOfValue, Compare, Allocator>::iterator
+// RB_tree<Key, Value, KeyOfValue, Compare, Allocator>::m_remove(key_type key)
+// {
+
+// }
 
 // https://www.baeldung.com/java-print-binary-tree-diagram
 
@@ -560,7 +734,7 @@ std::ostream& traverseNodes(
 }
 
 template <typename Value>
-std::ostream& operator<<(std::ostream& os, RB_tree_node<Value>* node)
+std::ostream& operator<<(std::ostream& os, const RB_tree_node<Value>* node)
 {
 	if (!node)
 		return os;
@@ -589,7 +763,7 @@ std::ostream& operator<<(
 	const RB_tree<Key, Value, KeyOfValue, Compare, Allocator>& tree)
 {
 	os << "Red-Black tree(node_count=" << tree.m_node_count << ")" << std::endl;
-	os << tree.m_root;
+	os << tree.m_root();
 	return os;
 }
 
