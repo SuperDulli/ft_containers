@@ -68,6 +68,10 @@ bool insert()
 
 	// delete
 
+	empty.erase(empty.begin());
+
+	std::cout << empty << std::endl;
+
 	return result;
 }
 

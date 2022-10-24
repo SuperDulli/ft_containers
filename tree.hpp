@@ -208,13 +208,17 @@ struct RB_tree_const_iterator
 // comparing iterators
 
 template <typename T>
-bool operator==(const RB_tree_iterator<T>& lhs, const RB_tree_const_iterator<T>& rhs)
+bool operator==(
+	const RB_tree_iterator<T>&		 lhs,
+	const RB_tree_const_iterator<T>& rhs)
 {
 	return lhs.m_node == rhs.m_node;
 }
 
 template <typename T>
-bool operator!=(const RB_tree_iterator<T>& lhs, const RB_tree_const_iterator<T>& rhs)
+bool operator!=(
+	const RB_tree_iterator<T>&		 lhs,
+	const RB_tree_const_iterator<T>& rhs)
 {
 	return lhs.m_node != rhs.m_node;
 }
@@ -291,6 +295,19 @@ public:
 		return m_insert(node);
 	}
 
+	void erase(iterator pos)
+	{
+		node_type node = pos.m_node;
+		m_remove(node);
+		get_allocator().destroy(&node->value);
+		m_alloc.deallocate(node, 1);
+	}
+
+	allocator_type get_allocator() const
+	{
+		return allocator_type(m_alloc);
+	}
+
 	// iterator
 
 	iterator begin()
@@ -348,7 +365,6 @@ public: // TODO: make tree mamber private
 	void	  m_recolor(node_type node);
 
 	ft::pair<iterator, bool> m_insert(node_type node);
-	void					 m_erase(iterator pos);
 
 	void m_left_rotate(node_type node);
 	void m_right_rotate(node_type node);
@@ -374,9 +390,7 @@ RB_tree<Key, Value, KeyOfValue, Compare, Allocator>::m_new_node(
 	value_type value)
 {
 	node_type node = m_alloc.allocate(1);
-	// TODO: moc into function
-	allocator_type alloc = allocator_type(m_alloc);
-	alloc.construct(&node->value, value);
+	get_allocator().construct(&node->value, value);
 	node->color = RED;
 	node->parent = NULL;
 	node->left = NULL;
@@ -396,19 +410,6 @@ void RB_tree<Key, Value, KeyOfValue, Compare, Allocator>::m_recolor(
 	node->color = (node->color == RED) ? BLACK : RED;
 	node->left->color = (node->color == BLACK) ? RED : BLACK;
 	node->right->color = (node->color == BLACK) ? RED : BLACK;
-}
-
-template <
-	class Key,
-	class Value,
-	class KeyOfValue,
-	class Compare,
-	class Allocator>
-void RB_tree<Key, Value, KeyOfValue, Compare, Allocator>::m_erase(iterator pos)
-{
-	node_type node = *pos;
-	m_remove(node);
-	m_alloc.deallocate(node);
 }
 
 template <
