@@ -36,6 +36,7 @@ bool insert()
 	empty.insert(ft::make_pair(14, 0));
 	empty.insert(ft::make_pair(200, 0));
 	empty.insert(ft::make_pair(150, 0));
+	empty.insert(ft::make_pair(250, 0));
 
 #if defined(DEBUG) && !defined(USE_STL)
 	std::cout << empty.m_tree << std::endl;

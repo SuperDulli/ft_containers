@@ -288,9 +288,13 @@ public: // TODO: make tree mamber private
 	}
 
 	node_type m_new_node(value_type value);
+	void	  m_recolor(node_type node);
 
 	ft::pair<iterator, bool> m_insert(node_type node);
 	void					 m_erase(node_type node);
+
+	void m_left_rotate(node_type node);
+	void m_right_rotate(node_type node);
 };
 
 // implementation of Red-Black tree
@@ -322,6 +326,20 @@ template <
 	class KeyOfValue,
 	class Compare,
 	class Allocator>
+void RB_tree<Key, Value, KeyOfValue, Compare, Allocator>::m_recolor(
+	node_type node)
+{
+	node->color = (node->color == RED) ? BLACK : RED;
+	node->left->color = (node->color == BLACK) ? RED : BLACK;
+	node->right->color = (node->color == BLACK) ? RED : BLACK;
+}
+
+template <
+	class Key,
+	class Value,
+	class KeyOfValue,
+	class Compare,
+	class Allocator>
 void RB_tree<Key, Value, KeyOfValue, Compare, Allocator>::m_erase(
 	node_type node)
 {
@@ -344,6 +362,7 @@ RB_tree<Key, Value, KeyOfValue, Compare, Allocator>::m_insert(node_type node)
 	{
 		m_root = node;
 		++m_node_count;
+		node->color = BLACK;
 		return ft::make_pair(iterator(node), true);
 	}
 	node_type tmp = m_root;
@@ -380,8 +399,131 @@ RB_tree<Key, Value, KeyOfValue, Compare, Allocator>::m_insert(node_type node)
 	}
 
 	++m_node_count;
+
+#ifdef DEBUG
+	std::cout << *this << std::endl;
+#endif
+
+	// fix color of the nodes
+	while (node != m_root && node->parent->color == RED)
+	{
+		if (node->parent->parent && node->parent == node->parent->parent->left)
+		{
+			// node->parent is left child
+			node_type uncle = node->parent->parent->right;
+			if (uncle && uncle->color == RED)
+			{
+				// case 1
+				std::cout << "case 1 (left)" << std::endl;
+				node_type grandparent = node->parent->parent;
+				// while (grandparent && grandparent->color == RED)
+				// {
+				// 	m_recolor(grandparent);
+				// 	if (!grandparent->parent)
+				// 		break;
+				// 	grandparent = grandparent->parent->parent;
+				// }
+				m_recolor(grandparent);
+				node = grandparent;
+			}
+			else
+			{
+				if (node == node->parent->right)
+				{
+					// case 2
+					std::cout << "case 2 (left)" << std::endl;
+					node = node->parent;
+					m_left_rotate(node);
+				}
+				// case 3
+				std::cout << "case 3 (left)" << std::endl;
+				m_right_rotate(node->parent->parent);
+				m_recolor(node->parent);
+			}
+		}
+		else
+		{
+			node_type uncle = node->parent->parent->left;
+			if (uncle && uncle->color == RED)
+			{
+				// case 1
+				std::cout << "case 1 (right)" << std::endl;
+				node_type grandparent = node->parent->parent;
+				m_recolor(grandparent);
+				node = grandparent;
+			}
+			else
+			{
+				if (node == node->parent->left)
+				{
+					// case 2
+					std::cout << "case 2 (right)" << std::endl;
+					node = node->parent;
+					m_right_rotate(node);
+				}
+				// case 3
+				std::cout << "case 3 (right)" << std::endl;
+				m_left_rotate(node->parent->parent);
+				m_recolor(node->parent);
+			}
+		}
+	}
+	m_root->color = BLACK;
+
+#ifdef DEBUG
+	std::cout << *this << std::endl;
+#endif
+
 	// TODO: return right bool
 	return ft::make_pair(iterator(node), true);
+}
+
+template <
+	class Key,
+	class Value,
+	class KeyOfValue,
+	class Compare,
+	class Allocator>
+void RB_tree<Key, Value, KeyOfValue, Compare, Allocator>::m_left_rotate(
+	node_type node)
+{
+	node_type y = node->right;
+	node->right = y->left;
+	if (y->left)
+		y->left->parent = node;
+	y->parent = node->parent;
+	if (!node->parent)
+		m_root = y;
+	else if (node == node->parent->left)
+		node->parent->left = y;
+	else
+		node->parent->right = y;
+	y->left = node;
+	node->parent = y;
+}
+
+template <
+	class Key,
+	class Value,
+	class KeyOfValue,
+	class Compare,
+	class Allocator>
+void RB_tree<Key, Value, KeyOfValue, Compare, Allocator>::m_right_rotate(
+	node_type node)
+{
+	node_type y = node->left;
+	node->left = y->right;
+	if (y->right)
+		y->right->parent = node;
+	y->parent = node->parent;
+	if (!node->parent)
+		m_root = y;
+	else if (node == node->parent->right)
+		node->parent->right = y;
+	else
+		node->parent->left = y;
+	y->right = node;
+	node->parent = y;
 }
 
 // https://www.baeldung.com/java-print-binary-tree-diagram
