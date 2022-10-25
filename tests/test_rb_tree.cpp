@@ -17,7 +17,9 @@ typedef RB_tree<
 	ft::pair<const int, int>,
 	ft::SelectFirst< ft::pair<const int, int> >,
 	std::less<int> >
-	tree_type;
+	map_tree_type;
+
+typedef RB_tree< int, int, ft::Identity<int>, std::less<int> > set_tree_type;
 
 bool construction()
 {
@@ -37,30 +39,39 @@ bool insert()
 {
 	bool result = true;
 
-	tree_type empty;
+	// map_tree_type empty;
 
-	empty.insert(ft::make_pair<const int, int>(120, 0));
-	empty.insert(ft::make_pair(7, 0));
-	empty.insert(ft::make_pair(3, 0));
-	empty.insert(ft::make_pair(15, 0));
-	empty.insert(ft::make_pair(16, 0));
-	empty.insert(ft::make_pair(14, 0));
-	empty.insert(ft::make_pair(200, 0));
-	empty.insert(ft::make_pair(150, 0));
-	empty.insert(ft::make_pair(250, 0));
+	// empty.insert(ft::make_pair<const int, int>(120, 0));
+	// empty.insert(ft::make_pair(7, 0));
+	// empty.insert(ft::make_pair(3, 0));
+	// empty.insert(ft::make_pair(15, 0));
+	// empty.insert(ft::make_pair(16, 0));
+	// empty.insert(ft::make_pair(14, 0));
+	// empty.insert(ft::make_pair(200, 0));
+	// empty.insert(ft::make_pair(150, 0));
+	// empty.insert(ft::make_pair(250, 0));
+
+	set_tree_type set_tree;
+
+	set_tree.insert(50);
+	set_tree.insert(5);
+	set_tree.insert(25);
+	set_tree.insert(100);
+	set_tree.insert(75);
+	set_tree.insert(90);
 
 	// iteration
-	tree_type::iterator it;
-	it = empty.begin();
-	while (it != empty.end())
+	set_tree_type::iterator it;
+	it = set_tree.begin();
+	while (it != set_tree.end())
 	{
 		std::cout << *it << std::endl;
 		++it;
 	}
 
 	// reverse iteration
-	it = empty.end();
-	while (it != empty.begin())
+	it = set_tree.end();
+	while (it != set_tree.begin())
 	{
 		--it;
 		std::cout << *it << std::endl;
@@ -68,9 +79,11 @@ bool insert()
 
 	// delete
 
-	empty.erase(empty.begin());
+	set_tree.erase(set_tree.begin());
 
-	std::cout << empty << std::endl;
+	std::cout << set_tree << std::endl;
+
+	result = result && set_tree.verify();
 
 	return result;
 }

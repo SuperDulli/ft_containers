@@ -327,7 +327,7 @@ public: // TODO: make tree mamber private
 	node_allocator		m_alloc;
 	key_compare			m_key_compare;
 	RB_tree_node<Value> m_header; // special node for iterator purposes
-	node_type			 NIL;
+	node_type			NIL;
 	size_type			m_node_count;
 
 	static const_reference s_value(const_node_type node)
@@ -659,7 +659,7 @@ void RB_tree<Key, Value, KeyOfValue, Compare, Allocator>::m_transplant(
 	// 	v = &m_arbitrary_parent;
 	// }
 	if (v)
-	v->parent = u->parent;
+		v->parent = u->parent;
 }
 
 template <
@@ -718,20 +718,20 @@ void RB_tree<Key, Value, KeyOfValue, Compare, Allocator>::m_remove(
 
 /**
  * @brief restores the properties of the red black tree.
- * 
+ *
  * w is sibling of node.
  * 4 cases:
  * 1. w is red.
  * 2. w is black and its both children are black.
  * 3. w is black and its right child is black and left child is red.
  * 4. w is black and its right child is red.
- * 
- * @tparam Key 
- * @tparam Value 
- * @tparam KeyOfValue 
- * @tparam Compare 
- * @tparam Allocator 
- * @param node 
+ *
+ * @tparam Key
+ * @tparam Value
+ * @tparam KeyOfValue
+ * @tparam Compare
+ * @tparam Allocator
+ * @param node
  */
 template <
 	class Key,
@@ -755,14 +755,16 @@ void RB_tree<Key, Value, KeyOfValue, Compare, Allocator>::m_remove_fixup(
 				m_left_rotate(node->parent);
 				w = node->parent->right;
 			}
-			if (w->left->color == BLACK && w->right->color == BLACK) // case 2
+			if ((!w->left || w->left->color == BLACK) &&
+				(!w->right || w->right->color == BLACK)) // case 2
 			{
 				w->color = RED;
 				node = node->parent;
 			}
 			else // case 3 and 4
 			{
-				if ((w->right && w->right->color == BLACK) || !w->right) // case 3
+				if ((w->right && w->right->color == BLACK) ||
+					!w->right) // case 3
 				{
 					w->left->color = BLACK;
 					w->color = RED;
@@ -790,7 +792,8 @@ void RB_tree<Key, Value, KeyOfValue, Compare, Allocator>::m_remove_fixup(
 				m_right_rotate(node->parent);
 				w = node->parent->left;
 			}
-			if (w->right->color == BLACK && w->left->color == BLACK) // case 2
+			if ((!w->right || w->right->color == BLACK) &&
+				(!w->left || w->left->color == BLACK))  // case 2
 			{
 				w->color = RED;
 				node = node->parent;
@@ -815,7 +818,6 @@ void RB_tree<Key, Value, KeyOfValue, Compare, Allocator>::m_remove_fixup(
 				node = m_root();
 			}
 		}
-	
 	}
 
 	node->color = BLACK;
