@@ -4,6 +4,8 @@
 #include "iterator.hpp"
 #include "pair.hpp"
 #include "utility.hpp"
+#include <iomanip>
+#include <iostream>
 #include <memory> // allocator
 #include <string>
 
@@ -325,6 +327,7 @@ public: // TODO: make tree mamber private
 	node_allocator		m_alloc;
 	key_compare			m_key_compare;
 	RB_tree_node<Value> m_header; // special node for iterator purposes
+	node_type			 NIL;
 	size_type			m_node_count;
 
 	static const_reference s_value(const_node_type node)
@@ -343,6 +346,12 @@ public: // TODO: make tree mamber private
 		m_header.parent = NULL;
 		m_header.left = NULL;
 		m_header.right = NULL;
+
+		NIL = m_alloc.allocate(1);
+		NIL->color = BLACK;
+		NIL->parent = NULL;
+		NIL->left = NULL;
+		NIL->right = NULL;
 	}
 
 	node_type m_root()
@@ -373,8 +382,17 @@ public: // TODO: make tree mamber private
 
 	void m_transplant(node_type u, node_type v);
 	void m_remove(node_type node);
+	void m_remove_fixup(node_type node);
 
 	// iterator m_remove(key_type key);
+
+public:
+	// debug
+
+	bool verify() const;
+
+private:
+	ft::pair<bool, int> m_check_subtree(const_node_type node) const;
 };
 
 // implementation of Red-Black tree
@@ -636,8 +654,12 @@ void RB_tree<Key, Value, KeyOfValue, Compare, Allocator>::m_transplant(
 		u->parent->left = v;
 	else
 		u->parent->right = v;
+	// if (!v)
+	// {
+	// 	v = &m_arbitrary_parent;
+	// }
 	if (v)
-		v->parent = u->parent;
+	v->parent = u->parent;
 }
 
 template <
@@ -655,12 +677,16 @@ void RB_tree<Key, Value, KeyOfValue, Compare, Allocator>::m_remove(
 	if (!node->left) // only right child
 	{
 		x = node->right;
+		if (!x)
+		{
+			x = NIL;
+		}
 		m_transplant(node, x);
 	}
 	else if (!node->right) // only left child
 	{
 		x = node->left;
-		m_transplant(node, x);
+		m_transplant(node, node->left);
 	}
 	else // both childern
 	{
@@ -682,11 +708,180 @@ void RB_tree<Key, Value, KeyOfValue, Compare, Allocator>::m_remove(
 		y->left->parent = y;
 		y->color = node->color;
 	}
-	if (y_original_color == BLACK)
+	if (y_original_color == BLACK && x)
 	{
 		// TODO: mov into function
 		std::cout << "delete fixup" << std::endl;
+		m_remove_fixup(x);
 	}
+}
+
+/**
+ * @brief restores the properties of the red black tree.
+ * 
+ * w is sibling of node.
+ * 4 cases:
+ * 1. w is red.
+ * 2. w is black and its both children are black.
+ * 3. w is black and its right child is black and left child is red.
+ * 4. w is black and its right child is red.
+ * 
+ * @tparam Key 
+ * @tparam Value 
+ * @tparam KeyOfValue 
+ * @tparam Compare 
+ * @tparam Allocator 
+ * @param node 
+ */
+template <
+	class Key,
+	class Value,
+	class KeyOfValue,
+	class Compare,
+	class Allocator>
+void RB_tree<Key, Value, KeyOfValue, Compare, Allocator>::m_remove_fixup(
+	node_type node)
+{
+	node_type w; // sibling of node
+	while (node != m_root() && node->color == BLACK)
+	{
+		if (node == node->parent->left)
+		{
+			w = node->parent->right;
+			if (w->color == RED) // case 1
+			{
+				w->color = BLACK;
+				node->parent->color = RED;
+				m_left_rotate(node->parent);
+				w = node->parent->right;
+			}
+			if (w->left->color == BLACK && w->right->color == BLACK) // case 2
+			{
+				w->color = RED;
+				node = node->parent;
+			}
+			else // case 3 and 4
+			{
+				if ((w->right && w->right->color == BLACK) || !w->right) // case 3
+				{
+					w->left->color = BLACK;
+					w->color = RED;
+					m_right_rotate(w);
+					w = node->parent->right;
+				}
+				// case 4
+				w->color = node->parent->color;
+				node->parent->color = BLACK;
+				if (w->right)
+					w->right->color = BLACK;
+				m_left_rotate(node->parent);
+				if (node == NIL)
+					node->parent->left = NULL;
+				node = m_root();
+			}
+		}
+		else
+		{
+			w = node->parent->left;
+			if (w->color == RED) // case 1
+			{
+				w->color = BLACK;
+				node->parent->color = RED;
+				m_right_rotate(node->parent);
+				w = node->parent->left;
+			}
+			if (w->right->color == BLACK && w->left->color == BLACK) // case 2
+			{
+				w->color = RED;
+				node = node->parent;
+			}
+			else // case 3 and 4
+			{
+				if ((w->left && w->left->color == BLACK) || !w->right) // case 3
+				{
+					w->right->color = BLACK;
+					w->color = RED;
+					m_left_rotate(w);
+					w = node->parent->left;
+				}
+				// case 4
+				w->color = node->parent->color;
+				node->parent->color = BLACK;
+				if (w->left)
+					w->left->color = BLACK;
+				m_right_rotate(node->parent);
+				if (node == NIL)
+					node->parent->right = NULL;
+				node = m_root();
+			}
+		}
+	
+	}
+
+	node->color = BLACK;
+}
+
+/**
+ * @brief checks wheter the tree is a valid red black tree.
+ *
+ * Properties:
+ * 1. Every node is either red or black.
+ * 2. All leaf nodes are black.
+ * 3. A red node does not have a red child.
+ * 4. Every path from a node to any of its descentant leaf nodes goes through
+ * 		the same number of black nodes.
+ */
+template <
+	class Key,
+	class Value,
+	class KeyOfValue,
+	class Compare,
+	class Allocator>
+bool RB_tree<Key, Value, KeyOfValue, Compare, Allocator>::verify() const
+{
+	return m_check_subtree(m_root()).first;
+}
+
+/**
+ * @brief check if the sub tree is a valid red black tree and count the number
+ * of black nodes.
+ *
+ * @return ft::pair<bool, int> valid tree & number of black nodes
+ */
+template <
+	class Key,
+	class Value,
+	class KeyOfValue,
+	class Compare,
+	class Allocator>
+ft::pair<bool, int>
+RB_tree<Key, Value, KeyOfValue, Compare, Allocator>::m_check_subtree(
+	const_node_type node) const
+{
+	int blackCount;
+
+	if (!node) // leaf
+		return ft::make_pair(true, 1);
+	if (node->parent && !node->parent->parent && node->color != BLACK) // root
+		return ft::make_pair(false, 0);
+	if (node->color == RED) // check #3
+	{
+		blackCount = 0;
+		if ((node->left && node->left->color == RED) ||
+			(node->right && node->right->color == RED))
+		{
+			return ft::make_pair(false, 0);
+		}
+	}
+	else
+		blackCount = 1;
+
+	ft::pair<bool, int> left = m_check_subtree(node->left);
+	ft::pair<bool, int> right = m_check_subtree(node->right);
+
+	if (left.first && right.first && left.second == right.second)
+		return ft::make_pair(true, blackCount + left.second);
+	return ft::make_pair(false, blackCount + left.second);
 }
 
 // template <
@@ -763,7 +958,9 @@ std::ostream& operator<<(
 	std::ostream&											   os,
 	const RB_tree<Key, Value, KeyOfValue, Compare, Allocator>& tree)
 {
-	os << "Red-Black tree(node_count=" << tree.m_node_count << ")" << std::endl;
+	os << std::boolalpha;
+	os << "Red-Black tree(node_count=" << tree.m_node_count
+	   << ", valid=" << tree.verify() << ")" << std::endl;
 	os << tree.m_root();
 	return os;
 }
