@@ -36,5 +36,10 @@ stl
 stl_debug
 test_rb_tree
 
+# vs code
+.vscode/
+
+*.dSYM
+
 *.txt
 test_main.cpp
