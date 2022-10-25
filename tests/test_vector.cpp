@@ -59,7 +59,7 @@ bool copy()
 #if DEBUG
 	std::cout << "try self assignment:" << std::endl;
 #endif
-	x = x; // should not copy anything
+	// x = x; // should not copy anything - TODO: does not compile on Mac
 	y = x;
 	result = y == x;
 	x[2] = 0;

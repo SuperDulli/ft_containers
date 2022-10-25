@@ -35,5 +35,10 @@ mine_debug
 stl
 stl_debug
 
+# vs code
+.vscode/
+
+*.dSYM
+
 *.txt
 test_main.cpp
