@@ -127,7 +127,8 @@ public:
 	iterator				 insert(iterator pos, const value_type& value);
 	template <class InputIterator>
 	void	  insert(InputIterator first, InputIterator last);
-	iterator  erase(iterator pos);
+	void	  erase(iterator pos);
+	void	  erase(iterator first, iterator last);
 	size_type erase(const key_type& key);
 	void	  swap(map& other);
 
