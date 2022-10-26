@@ -289,6 +289,7 @@ public:
 		m_key_compare = other.m_key_compare;
 		m_header = other.m_header;
 		m_node_count = other.m_node_count;
+		return *this;
 	}
 
 	ft::pair<iterator, bool> insert(const value_type& value)
@@ -303,6 +304,19 @@ public:
 		m_remove(node);
 		get_allocator().destroy(&node->value);
 		m_alloc.deallocate(node, 1);
+	}
+
+	void erase(iterator first, iterator last)
+	{
+		if (first == begin() && last == end())
+		{
+			std::cout << "clear" << std::endl;
+		}
+		while (first != last)
+		{
+			erase(first);
+			++first;
+		}
 	}
 
 	allocator_type get_allocator() const
@@ -460,10 +474,15 @@ RB_tree<Key, Value, KeyOfValue, Compare, Allocator>::m_insert(node_type node)
 			previous = tmp;
 			tmp = tmp->left;
 		}
-		else
+		else if (m_key_compare(s_key(tmp), s_key(node)))
 		{
 			previous = tmp;
 			tmp = tmp->right;
+		}
+		else
+		{
+			std::cout << "not unique" << std::endl;
+			return ft::make_pair(iterator(previous), false);
 		}
 	}
 	if (m_key_compare(s_key(node), s_key(previous)))
@@ -479,6 +498,7 @@ RB_tree<Key, Value, KeyOfValue, Compare, Allocator>::m_insert(node_type node)
 	else
 	{
 		std::cout << "not unique" << std::endl;
+		return ft::make_pair(iterator(previous), false);
 	}
 
 	++m_node_count;
@@ -742,6 +762,8 @@ template <
 void RB_tree<Key, Value, KeyOfValue, Compare, Allocator>::m_remove_fixup(
 	node_type node)
 {
+	node_type deleted_node = node;
+	bool	  isNIL = (deleted_node == NIL) ? true : false;
 	node_type w; // sibling of node
 	while (node != m_root() && node->color == BLACK)
 	{
@@ -777,10 +799,12 @@ void RB_tree<Key, Value, KeyOfValue, Compare, Allocator>::m_remove_fixup(
 				if (w->right)
 					w->right->color = BLACK;
 				m_left_rotate(node->parent);
-				if (node == NIL)
-					node->parent->left = NULL;
+				// if (node == NIL)
+				// 	node->parent->left = NULL;
 				node = m_root();
 			}
+			if (isNIL)
+				deleted_node->parent->left = NULL;
 		}
 		else
 		{
@@ -793,7 +817,7 @@ void RB_tree<Key, Value, KeyOfValue, Compare, Allocator>::m_remove_fixup(
 				w = node->parent->left;
 			}
 			if ((!w->right || w->right->color == BLACK) &&
-				(!w->left || w->left->color == BLACK))  // case 2
+				(!w->left || w->left->color == BLACK)) // case 2
 			{
 				w->color = RED;
 				node = node->parent;
@@ -813,10 +837,12 @@ void RB_tree<Key, Value, KeyOfValue, Compare, Allocator>::m_remove_fixup(
 				if (w->left)
 					w->left->color = BLACK;
 				m_right_rotate(node->parent);
-				if (node == NIL)
-					node->parent->right = NULL;
+				// if (node == NIL)
+				// 	node->parent->right = NULL;
 				node = m_root();
 			}
+			if (isNIL)
+				deleted_node->parent->right = NULL;
 		}
 	}
 

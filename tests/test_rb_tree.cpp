@@ -53,12 +53,32 @@ bool insert()
 
 	set_tree_type set_tree;
 
-	set_tree.insert(50);
-	set_tree.insert(5);
-	set_tree.insert(25);
-	set_tree.insert(100);
-	set_tree.insert(75);
-	set_tree.insert(90);
+	// set_tree.insert(50);
+	// set_tree.insert(5);
+	// set_tree.insert(25);
+	// set_tree.insert(100);
+	// set_tree.insert(75);
+	// set_tree.insert(90);
+
+	// unique
+	// set_tree.insert(1);
+	// set_tree.insert(1);
+
+	// unique complex
+	set_tree.insert(83);
+	set_tree.insert(86);
+	set_tree.insert(77);
+	set_tree.insert(15);
+	set_tree.insert(93);
+	set_tree.insert(35);
+	set_tree.insert(86);
+	set_tree.insert(92);
+	set_tree.insert(49);
+	set_tree.insert(21);
+
+	// insert_random(set_tree, 10);
+
+	std::cout << set_tree << std::endl;
 
 	// iteration
 	set_tree_type::iterator it;
@@ -90,14 +110,14 @@ bool insert()
 
 bool all()
 {
-	bool success = true;
+	bool result = true;
 
 	std::cout << "-- Test Red-Black tree --" << std::endl;
-	debug::run_test("tree construction", test_tree::construction);
-	debug::run_test("tree insert", test_tree::insert);
+	result = result && debug::run_test("tree construction", test_tree::construction);
+	result = result && debug::run_test("tree insert", test_tree::insert);
 
 	// debug::run_test("relational operators", test_relational_operators);
-	return success;
+	return result;
 }
 } // namespace test_tree
 

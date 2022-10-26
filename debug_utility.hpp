@@ -10,6 +10,9 @@ namespace ft = std;
 #include "vector.hpp"
 #endif
 
+#include <stdlib.h> // rand
+#include <time.h>
+
 #include "Color.hpp"
 #include <iostream>
 #include <string>
@@ -47,6 +50,21 @@ std::ostream& operator<<(std::ostream& os, const ft::vector<T>& vec)
 		}
 	}
 	return os;
+}
+
+template <class C>
+void insert_random(C& container, size_t count)
+{
+	ft::vector<int> ints;
+	for (size_t i = 0; i < count; i++)
+	{
+	int rand_number = rand() % 100;
+		container.insert(rand_number);
+		ints.push_back(rand_number);
+	}
+
+	std::cout << "inserted: " << ints << std::endl;
+
 }
 
 #endif // DEBUG_UTILITY_HPP
