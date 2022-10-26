@@ -298,6 +298,18 @@ public:
 		return m_insert(node);
 	}
 
+	// TODO: insert with hint
+
+	template <class InputIterator>
+	void insert(InputIterator first, InputIterator last)
+	{
+		while (first != last)
+		{
+			insert(*first);
+			++first;
+		}
+	}
+
 	void erase(iterator pos)
 	{
 		node_type node = pos.m_node;
@@ -322,6 +334,11 @@ public:
 	allocator_type get_allocator() const
 	{
 		return allocator_type(m_alloc);
+	}
+
+	size_type get_node_count() const
+	{
+		return m_node_count;
 	}
 
 	// iterator
@@ -468,9 +485,6 @@ RB_tree<Key, Value, KeyOfValue, Compare, Allocator>::m_insert(node_type node)
 	{
 		if (m_key_compare(s_key(node), s_key(tmp)))
 		{
-#ifdef DEBUG
-			std::cout << "move left" << std::endl;
-#endif
 			previous = tmp;
 			tmp = tmp->left;
 		}
@@ -481,7 +495,6 @@ RB_tree<Key, Value, KeyOfValue, Compare, Allocator>::m_insert(node_type node)
 		}
 		else
 		{
-			std::cout << "not unique" << std::endl;
 			return ft::make_pair(iterator(previous), false);
 		}
 	}
@@ -497,17 +510,12 @@ RB_tree<Key, Value, KeyOfValue, Compare, Allocator>::m_insert(node_type node)
 	}
 	else
 	{
-		std::cout << "not unique" << std::endl;
 		return ft::make_pair(iterator(previous), false);
 	}
 
 	++m_node_count;
 
-#ifdef DEBUG
-	std::cout << *this << std::endl;
-#endif
-
-	// fix color of the nodes
+	// fix color of the nodes TODO: move to function
 	while (node != m_root() && node->parent->color == RED)
 	{
 		if (node->parent->parent && node->parent == node->parent->parent->left)
@@ -517,7 +525,7 @@ RB_tree<Key, Value, KeyOfValue, Compare, Allocator>::m_insert(node_type node)
 			if (uncle && uncle->color == RED)
 			{
 				// case 1
-				std::cout << "case 1 (left)" << std::endl;
+				// std::cout << "case 1 (left)" << std::endl;
 				node_type grandparent = node->parent->parent;
 				// while (grandparent && grandparent->color == RED)
 				// {
@@ -534,12 +542,12 @@ RB_tree<Key, Value, KeyOfValue, Compare, Allocator>::m_insert(node_type node)
 				if (node == node->parent->right)
 				{
 					// case 2
-					std::cout << "case 2 (left)" << std::endl;
+					// std::cout << "case 2 (left)" << std::endl;
 					node = node->parent;
 					m_left_rotate(node);
 				}
 				// case 3
-				std::cout << "case 3 (left)" << std::endl;
+				// std::cout << "case 3 (left)" << std::endl;
 				m_right_rotate(node->parent->parent);
 				m_recolor(node->parent);
 			}
@@ -550,7 +558,7 @@ RB_tree<Key, Value, KeyOfValue, Compare, Allocator>::m_insert(node_type node)
 			if (uncle && uncle->color == RED)
 			{
 				// case 1
-				std::cout << "case 1 (right)" << std::endl;
+				// std::cout << "case 1 (right)" << std::endl;
 				node_type grandparent = node->parent->parent;
 				m_recolor(grandparent);
 				node = grandparent;
@@ -560,22 +568,18 @@ RB_tree<Key, Value, KeyOfValue, Compare, Allocator>::m_insert(node_type node)
 				if (node == node->parent->left)
 				{
 					// case 2
-					std::cout << "case 2 (right)" << std::endl;
+					// std::cout << "case 2 (right)" << std::endl;
 					node = node->parent;
 					m_right_rotate(node);
 				}
 				// case 3
-				std::cout << "case 3 (right)" << std::endl;
+				// std::cout << "case 3 (right)" << std::endl;
 				m_left_rotate(node->parent->parent);
 				m_recolor(node->parent);
 			}
 		}
 	}
 	m_root()->color = BLACK;
-
-#ifdef DEBUG
-	std::cout << *this << std::endl;
-#endif
 
 	// TODO: return right bool
 	return ft::make_pair(iterator(node), true);
@@ -733,6 +737,13 @@ void RB_tree<Key, Value, KeyOfValue, Compare, Allocator>::m_remove(
 		// TODO: mov into function
 		std::cout << "delete fixup" << std::endl;
 		m_remove_fixup(x);
+	}
+	if (x == NIL)
+	{
+		if (x == x->parent->left)
+			x->parent->left = NULL;
+		else
+			x->parent->right = NULL;
 	}
 }
 
@@ -987,7 +998,7 @@ std::ostream& operator<<(
 	const RB_tree<Key, Value, KeyOfValue, Compare, Allocator>& tree)
 {
 	os << std::boolalpha;
-	os << "Red-Black tree(node_count=" << tree.m_node_count
+	os << "Red-Black tree(node_count=" << tree.get_node_count()
 	   << ", valid=" << tree.verify() << ")" << std::endl;
 	os << tree.m_root();
 	return os;

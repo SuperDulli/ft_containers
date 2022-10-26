@@ -35,6 +35,75 @@ bool construction()
 	return result;
 }
 
+bool insert_simple()
+{
+	std::cout << "insert one by one (total=6)" << std::endl;
+	set_tree_type set_tree;
+
+	set_tree.insert(50);
+	set_tree.insert(5);
+	set_tree.insert(25);
+	set_tree.insert(100);
+	set_tree.insert(75);
+	set_tree.insert(90);
+
+	std::cout << set_tree << std::endl;
+	return (set_tree.verify() && set_tree.get_node_count() == 6);
+}
+
+bool insert_unique()
+{
+	std::cout << "insert the same key twice" << std::endl;
+	set_tree_type unique;
+	unique.insert(1);
+	unique.insert(1);
+
+	std::cout << unique << std::endl;
+	return (unique.verify() && unique.get_node_count() == 1);
+}
+
+bool insert_unique_complex()
+{
+	std::cout << "insert the same key twice (on accident)" << std::endl;
+	set_tree_type unique_complex;
+	unique_complex.insert(83);
+	unique_complex.insert(86);
+	unique_complex.insert(77);
+	unique_complex.insert(15);
+	unique_complex.insert(93);
+	unique_complex.insert(35);
+	unique_complex.insert(86);
+	unique_complex.insert(92);
+	unique_complex.insert(49);
+	unique_complex.insert(21);
+
+	std::cout << unique_complex << std::endl;
+	return (unique_complex.verify() && unique_complex.get_node_count() == 9);
+}
+
+bool insert_range()
+{
+	std::cout << "insert a range" << std::endl;
+	int				ints[] = {88, 64, 5, 89, 78, 17, 95, 8, 61, 0};
+	ft::vector<int> numbers(ints, ints + 10);
+	set_tree_type	range;
+
+	range.insert(numbers.begin(), numbers.end());
+
+	std::cout << range << std::endl;
+	return (range.verify() && range.get_node_count() == numbers.size());
+}
+
+bool insert_random()
+{
+	std::cout << "insert 10 random numbers" << std::endl;
+	set_tree_type random;
+	insert_random(random, 10);
+
+	std::cout << random << std::endl;
+	return random.verify();
+}
+
 bool insert()
 {
 	bool result = true;
@@ -51,59 +120,36 @@ bool insert()
 	// empty.insert(ft::make_pair(150, 0));
 	// empty.insert(ft::make_pair(250, 0));
 
-	set_tree_type set_tree;
+	result = result && debug::run_test("insert simple", insert_simple);
+	result = result && debug::run_test("insert unique", insert_unique);
+	result = result && debug::run_test("insert unique_complex", insert_unique_complex);
+	result = result && debug::run_test("insert range", insert_range);
+	result = result && debug::run_test("insert random", insert_random);
 
-	// set_tree.insert(50);
-	// set_tree.insert(5);
-	// set_tree.insert(25);
-	// set_tree.insert(100);
-	// set_tree.insert(75);
-	// set_tree.insert(90);
+	// // iteration
+	// set_tree_type::iterator it;
+	// it = set_tree.begin();
+	// while (it != set_tree.end())
+	// {
+	// 	std::cout << *it << std::endl;
+	// 	++it;
+	// }
 
-	// unique
-	// set_tree.insert(1);
-	// set_tree.insert(1);
+	// // reverse iteration
+	// it = set_tree.end();
+	// while (it != set_tree.begin())
+	// {
+	// 	--it;
+	// 	std::cout << *it << std::endl;
+	// }
 
-	// unique complex
-	set_tree.insert(83);
-	set_tree.insert(86);
-	set_tree.insert(77);
-	set_tree.insert(15);
-	set_tree.insert(93);
-	set_tree.insert(35);
-	set_tree.insert(86);
-	set_tree.insert(92);
-	set_tree.insert(49);
-	set_tree.insert(21);
+	// // delete
 
-	// insert_random(set_tree, 10);
+	// set_tree.erase(set_tree.begin());
 
-	std::cout << set_tree << std::endl;
+	// std::cout << set_tree << std::endl;
 
-	// iteration
-	set_tree_type::iterator it;
-	it = set_tree.begin();
-	while (it != set_tree.end())
-	{
-		std::cout << *it << std::endl;
-		++it;
-	}
-
-	// reverse iteration
-	it = set_tree.end();
-	while (it != set_tree.begin())
-	{
-		--it;
-		std::cout << *it << std::endl;
-	}
-
-	// delete
-
-	set_tree.erase(set_tree.begin());
-
-	std::cout << set_tree << std::endl;
-
-	result = result && set_tree.verify();
+	// result = result && set_tree.verify();
 
 	return result;
 }
@@ -113,7 +159,8 @@ bool all()
 	bool result = true;
 
 	std::cout << "-- Test Red-Black tree --" << std::endl;
-	result = result && debug::run_test("tree construction", test_tree::construction);
+	result =
+		result && debug::run_test("tree construction", test_tree::construction);
 	result = result && debug::run_test("tree insert", test_tree::insert);
 
 	// debug::run_test("relational operators", test_relational_operators);
@@ -124,6 +171,8 @@ bool all()
 int main()
 {
 	bool result = true;
+
+	srand(time(NULL));
 
 	result = result && debug::run_test("tree", test_tree::all);
 

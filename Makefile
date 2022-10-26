@@ -110,4 +110,4 @@ compare: $(NAME_DEBUG) $(NAME_STL_DEBUG)
 	./$(NAME_STL_DEBUG) > theirs.txt 2>&1
 	diff -y --color=always mine.txt theirs.txt
 
-.PHONY: all clean fclean re show debug leaks test valgrind
+.PHONY: all clean fclean re show debug leaks test valgrind test_rb_tree
