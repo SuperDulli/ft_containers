@@ -48,7 +48,7 @@ bool insert_simple()
 	set_tree.insert(90);
 
 	std::cout << set_tree << std::endl;
-	return (set_tree.verify() && set_tree.get_node_count() == 6);
+	return (set_tree.verify() && set_tree.size() == 6);
 }
 
 bool insert_unique()
@@ -59,7 +59,7 @@ bool insert_unique()
 	unique.insert(1);
 
 	std::cout << unique << std::endl;
-	return (unique.verify() && unique.get_node_count() == 1);
+	return (unique.verify() && unique.size() == 1);
 }
 
 bool insert_unique_complex()
@@ -78,7 +78,7 @@ bool insert_unique_complex()
 	unique_complex.insert(21);
 
 	std::cout << unique_complex << std::endl;
-	return (unique_complex.verify() && unique_complex.get_node_count() == 9);
+	return (unique_complex.verify() && unique_complex.size() == 9);
 }
 
 bool insert_range()
@@ -91,14 +91,15 @@ bool insert_range()
 	range.insert(numbers.begin(), numbers.end());
 
 	std::cout << range << std::endl;
-	return (range.verify() && range.get_node_count() == numbers.size());
+	return (range.verify() && range.size() == numbers.size());
 }
 
 bool insert_random()
 {
-	std::cout << "insert 10 random numbers" << std::endl;
+	const int count = 50;
+	std::cout << "insert " << count << " random numbers" << std::endl;
 	set_tree_type random;
-	insert_random(random, 10);
+	insert_random(random, count);
 
 	std::cout << random << std::endl;
 	return random.verify();

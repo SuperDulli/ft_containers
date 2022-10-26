@@ -294,11 +294,30 @@ public:
 
 	ft::pair<iterator, bool> insert(const value_type& value)
 	{
-		node_type node = m_new_node(value);
-		return m_insert(node);
+		// node_type node = m_new_node(value);
+		return m_insert(value);
 	}
 
 	// TODO: insert with hint
+	// iterator insert(iterator pos, const value_type& value)
+	// {
+	// 	node_type node = m_new_node(value);
+	// 	if (pos == end())
+	// 	{
+	// 		node_type right = RB_tree_node<Value>::maximum(m_header.left);
+	// 		if (size() > 0 && m_key_compare(s_key(right), s_key(node)))
+	// 		{
+	// 			right->right = node;
+	// 			node->parent = right;
+	// 			++m_node_count;
+	// 			return iterator(node);
+	// 		}
+	// 		else
+	// 			return m_insert(node).first;
+	// 	}
+	// 	else if ()
+	// 		return iterator();
+	// }
 
 	template <class InputIterator>
 	void insert(InputIterator first, InputIterator last)
@@ -336,7 +355,7 @@ public:
 		return allocator_type(m_alloc);
 	}
 
-	size_type get_node_count() const
+	size_type size() const
 	{
 		return m_node_count;
 	}
@@ -404,7 +423,9 @@ public: // TODO: make tree mamber private
 	node_type m_new_node(value_type value);
 	void	  m_recolor(node_type node);
 
-	ft::pair<iterator, bool> m_insert(node_type node);
+	ft::pair<iterator, bool> m_insert(value_type value);
+	void					 m_insert_fixup(node_type node);
+	iterator				 m_add_child(node_type parent, value_type value);
 
 	void m_left_rotate(node_type node);
 	void m_right_rotate(node_type node);
@@ -470,10 +491,12 @@ template <
 ft::pair<
 	typename RB_tree<Key, Value, KeyOfValue, Compare, Allocator>::iterator,
 	bool>
-RB_tree<Key, Value, KeyOfValue, Compare, Allocator>::m_insert(node_type node)
+RB_tree<Key, Value, KeyOfValue, Compare, Allocator>::m_insert(value_type value)
 {
+	iterator it;
 	if (!m_root())
 	{
+		node_type node = m_new_node(value);
 		m_set_root(node);
 		++m_node_count;
 		node->color = BLACK;
@@ -483,12 +506,12 @@ RB_tree<Key, Value, KeyOfValue, Compare, Allocator>::m_insert(node_type node)
 	node_type previous = m_root();
 	while (tmp)
 	{
-		if (m_key_compare(s_key(node), s_key(tmp)))
+		if (m_key_compare(KeyOfValue()(value), s_key(tmp)))
 		{
 			previous = tmp;
 			tmp = tmp->left;
 		}
-		else if (m_key_compare(s_key(tmp), s_key(node)))
+		else if (m_key_compare(s_key(tmp), KeyOfValue()(value)))
 		{
 			previous = tmp;
 			tmp = tmp->right;
@@ -498,23 +521,47 @@ RB_tree<Key, Value, KeyOfValue, Compare, Allocator>::m_insert(node_type node)
 			return ft::make_pair(iterator(previous), false);
 		}
 	}
-	if (m_key_compare(s_key(node), s_key(previous)))
+	it = m_add_child(previous, value);
+	m_insert_fixup(it.m_node);
+
+	return ft::make_pair(it, true);
+}
+
+template <
+	class Key,
+	class Value,
+	class KeyOfValue,
+	class Compare,
+	class Allocator>
+typename RB_tree<Key, Value, KeyOfValue, Compare, Allocator>::iterator
+RB_tree<Key, Value, KeyOfValue, Compare, Allocator>::m_add_child(
+	node_type  parent,
+	value_type value)
+{
+	node_type node = m_new_node(value);
+	if (m_key_compare(KeyOfValue()(value), s_key(parent)))
 	{
-		previous->left = node;
-		node->parent = previous;
-	}
-	else if (m_key_compare(s_key(previous), s_key(node)))
-	{
-		previous->right = node;
-		node->parent = previous;
+		parent->left = node;
+		node->parent = parent;
 	}
 	else
 	{
-		return ft::make_pair(iterator(previous), false);
+		parent->right = node;
+		node->parent = parent;
 	}
-
 	++m_node_count;
+	return (iterator(node));
+}
 
+template <
+	class Key,
+	class Value,
+	class KeyOfValue,
+	class Compare,
+	class Allocator>
+void RB_tree<Key, Value, KeyOfValue, Compare, Allocator>::m_insert_fixup(
+	node_type node)
+{
 	// fix color of the nodes TODO: move to function
 	while (node != m_root() && node->parent->color == RED)
 	{
@@ -527,13 +574,6 @@ RB_tree<Key, Value, KeyOfValue, Compare, Allocator>::m_insert(node_type node)
 				// case 1
 				// std::cout << "case 1 (left)" << std::endl;
 				node_type grandparent = node->parent->parent;
-				// while (grandparent && grandparent->color == RED)
-				// {
-				// 	m_recolor(grandparent);
-				// 	if (!grandparent->parent)
-				// 		break;
-				// 	grandparent = grandparent->parent->parent;
-				// }
 				m_recolor(grandparent);
 				node = grandparent;
 			}
@@ -580,9 +620,6 @@ RB_tree<Key, Value, KeyOfValue, Compare, Allocator>::m_insert(node_type node)
 		}
 	}
 	m_root()->color = BLACK;
-
-	// TODO: return right bool
-	return ft::make_pair(iterator(node), true);
 }
 
 template <
@@ -998,7 +1035,7 @@ std::ostream& operator<<(
 	const RB_tree<Key, Value, KeyOfValue, Compare, Allocator>& tree)
 {
 	os << std::boolalpha;
-	os << "Red-Black tree(node_count=" << tree.get_node_count()
+	os << "Red-Black tree(node_count=" << tree.size()
 	   << ", valid=" << tree.verify() << ")" << std::endl;
 	os << tree.m_root();
 	return os;
