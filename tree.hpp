@@ -34,14 +34,14 @@ struct RB_tree_node {
 
 	static const RB_tree_node* minimum(const RB_tree_node* node)
 	{
-		while (node->left != NULL)
+		while (node && node->left != NULL)
 			node = node->left;
 		return node;
 	}
 
 	static RB_tree_node* maximum(RB_tree_node* node)
 	{
-		while (node->right != NULL)
+		while (node && node->right != NULL)
 			node = node->right;
 		return node;
 	}
@@ -298,26 +298,54 @@ public:
 		return m_insert(value);
 	}
 
-	// TODO: insert with hint
-	// iterator insert(iterator pos, const value_type& value)
-	// {
-	// 	node_type node = m_new_node(value);
-	// 	if (pos == end())
-	// 	{
-	// 		node_type right = RB_tree_node<Value>::maximum(m_header.left);
-	// 		if (size() > 0 && m_key_compare(s_key(right), s_key(node)))
-	// 		{
-	// 			right->right = node;
-	// 			node->parent = right;
-	// 			++m_node_count;
-	// 			return iterator(node);
-	// 		}
-	// 		else
-	// 			return m_insert(node).first;
-	// 	}
-	// 	else if ()
-	// 		return iterator();
-	// }
+	iterator insert(iterator pos, const value_type& value)
+	{
+		iterator result;
+		if (pos == end())
+		{
+			node_type right = RB_tree_node<Value>::maximum(m_header.left);
+			if (size() > 0 && m_key_compare(s_key(right), KeyOfValue()(value)))
+			{
+				result = m_add_child(right, value);
+				m_insert_fixup(result.m_node);
+				return result;
+			}
+			else
+				return m_insert(value).first;
+		}
+		else if (m_key_compare(KeyOfValue()(value), s_key(pos.m_node)))
+		{
+			// try insert before the hint
+			iterator before = pos;
+			if (pos == begin())
+			{
+				result = m_add_child(pos.m_node, value);
+				m_insert_fixup(result.m_node);
+				return result;
+			}
+			else if (m_key_compare(
+						 s_key((--before).m_node), KeyOfValue()(value)))
+			{
+				if (!(before.m_node)->right)
+				{
+					result = m_add_child(before.m_node, value);
+					m_insert_fixup(result.m_node);
+					return result;
+				}
+				else if (!(pos.m_node)->left)
+				{
+					result = m_add_child(pos.m_node, value);
+					m_insert_fixup(result.m_node);
+					return result;
+				}
+			}
+		}
+		// ignore hint
+#ifdef DEBUG
+		std::cout << "hint ignored" << std::endl;
+#endif
+		return m_insert(value).first;
+	}
 
 	template <class InputIterator>
 	void insert(InputIterator first, InputIterator last)
@@ -360,16 +388,46 @@ public:
 		return m_node_count;
 	}
 
+	// lookup
+
+	iterator find(const key_type& key)
+	{
+		node_type node = m_find(key);
+		if (node)
+			return iterator(node);
+		return end();
+	}
+
+	size_type count(const key_type& key)
+	{
+		node_type node = m_find(key);
+		if (node)
+			return 1;
+		return 0;
+	}
+
 	// iterator
 
 	iterator begin()
 	{
+		if (!m_header.left)
+			return end();
 		return iterator(RB_tree_node<Value>::minimum(m_header.left));
+	}
+
+	iterator begin() const
+	{
+		return const_iterator(begin());
 	}
 
 	iterator end()
 	{
 		return iterator(&m_header);
+	}
+
+	iterator end() const
+	{
+		return const_iterator(end());
 	}
 
 	// private:
@@ -681,7 +739,7 @@ RB_tree<Key, Value, KeyOfValue, Compare, Allocator>::m_find(key_type key)
 {
 	node_type result = m_root();
 	bool	  found = false;
-	while (result && found)
+	while (result && !found)
 	{
 		if (m_key_compare(key, s_key(result)))
 		{
@@ -696,6 +754,8 @@ RB_tree<Key, Value, KeyOfValue, Compare, Allocator>::m_find(key_type key)
 			found = true;
 		}
 	}
+	if (!found)
+		return NULL;
 	return result;
 }
 
@@ -1035,7 +1095,7 @@ std::ostream& operator<<(
 	const RB_tree<Key, Value, KeyOfValue, Compare, Allocator>& tree)
 {
 	os << std::boolalpha;
-	os << "Red-Black tree(node_count=" << tree.size()
+	os << "Red-Black tree(size=" << tree.size()
 	   << ", valid=" << tree.verify() << ")" << std::endl;
 	os << tree.m_root();
 	return os;

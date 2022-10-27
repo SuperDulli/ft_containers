@@ -105,6 +105,57 @@ bool insert_random()
 	return random.verify();
 }
 
+bool insert_hint()
+{
+	std::cout << "insert with a hint" << std::endl;
+	set_tree_type	hint_tree;
+	int				ints[] = {88, 64, 5, 89, 78, 17, 95, 8, 61, 0};
+	ft::vector<int> numbers(ints, ints + 10);
+
+	hint_tree.insert(numbers.begin(), numbers.end());
+	std::cout << hint_tree << std::endl;
+
+	set_tree_type::iterator hint = hint_tree.find(17);
+	hint = hint_tree.insert(hint, 16);
+	std::cout << hint_tree << std::endl;
+
+	hint = hint_tree.insert(hint, 15);
+	std::cout << hint_tree << std::endl;
+
+	std::cout << "wrong hint:" << std::endl;
+	hint_tree.insert(hint, 5);
+	std::cout << hint_tree << std::endl;
+
+	std::cout << "wrong hint:" << std::endl;
+	hint = hint_tree.find(17);
+	hint_tree.insert(hint, 18);
+	std::cout << hint_tree << std::endl;
+
+	std::cout << "hint == begin:" << std::endl;
+	hint = hint_tree.begin();
+	hint_tree.insert(hint, -1);
+	std::cout << hint_tree << std::endl;
+
+	std::cout << "hint == end:" << std::endl;
+	hint = hint_tree.end();
+	hint_tree.insert(hint, 100);
+	std::cout << hint_tree << std::endl;
+
+	std::cout << "hint == begin (empty tree):" << std::endl;
+	set_tree_type empty;
+	hint = empty.begin();
+	empty.insert(hint, 42);
+	std::cout << empty << std::endl;
+
+	std::cout << "hint == begin (empty tree):" << std::endl;
+	set_tree_type empty2;
+	hint = empty2.begin();
+	empty2.insert(hint, 42);
+	std::cout << empty2 << std::endl;
+
+	return hint_tree.verify() && empty.verify() && empty2.verify();
+}
+
 bool insert()
 {
 	bool result = true;
@@ -123,9 +174,11 @@ bool insert()
 
 	result = result && debug::run_test("insert simple", insert_simple);
 	result = result && debug::run_test("insert unique", insert_unique);
-	result = result && debug::run_test("insert unique_complex", insert_unique_complex);
+	result = result &&
+			 debug::run_test("insert unique_complex", insert_unique_complex);
 	result = result && debug::run_test("insert range", insert_range);
 	result = result && debug::run_test("insert random", insert_random);
+	result = result && debug::run_test("insert hint", insert_hint);
 
 	// // iteration
 	// set_tree_type::iterator it;
