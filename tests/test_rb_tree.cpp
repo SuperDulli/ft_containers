@@ -210,7 +210,7 @@ bool insert()
 
 set_tree_type create_random_test_tree()
 {
-	const int	  count = 50;
+	const int	  count = 20;
 	set_tree_type random;
 	insert_random(random, count);
 
@@ -229,35 +229,55 @@ set_tree_type create_test_tree(const ft::vector<int>& numbers)
 	return tree;
 }
 
+bool erase_pos(set_tree_type& tree, set_tree_type::iterator pos)
+{
+	bool					 result;
+	set_tree_type::size_type tree_prev_size = tree.size();
+	int						 removed_value = pos.m_node->value;
+
+	std::cout << "erase value@pos=" << removed_value << std::endl;
+	tree.erase(pos);
+	std::cout << tree << std::endl;
+	result = tree.verify() && tree.size() == tree_prev_size - 1 &&
+			 tree.count(removed_value) == 0;
+
+	return result;
+}
+
 bool erase_pos()
 {
 	bool result = true;
 	// erasing sth on empty tree does not work - iterators not valid (end is not
 	// dereferencable)
-	const int	  count = 50;
-	int			  ints[] = {77, 21, 32, 81, 43, 23, 0,	95, 33, 35, 97, 44, 78,
-							8,	42, 38, 78, 22, 27, 59, 3,	15, 24, 64, 43, 10,
-							55, 33, 57, 72, 78, 34, 93, 10, 68, 88, 85, 68, 35,
-							70, 56, 33, 67, 86, 93, 9,	24, 71, 84, 3};
-	ft::vector<int>			 numbers(ints, ints + count);
-	// set_tree_type tree = create_random_test_tree();
-	set_tree_type tree = create_test_tree(numbers);
-	set_tree_type::size_type tree_prev_size = tree.size();
+	const int count = 50;
+	int		  ints[] = {77, 21, 32, 81, 43, 23, 0,	95, 33, 35, 97, 44, 78,
+						8,	42, 38, 78, 22, 27, 59, 3,	15, 24, 64, 43, 10,
+						55, 33, 57, 72, 78, 34, 93, 10, 68, 88, 85, 68, 35,
+						70, 56, 33, 67, 86, 93, 9,	24, 71, 84, 3};
+	ft::vector<int> numbers(ints, ints + count);
+	set_tree_type	tree = create_random_test_tree();
+	// set_tree_type tree = create_test_tree(numbers);
+	// set_tree_type::size_type tree_prev_size = tree.size();
 
 	std::cout << "erase begin" << std::endl;
-	tree.erase(tree.begin());
-	std::cout << tree << std::endl;
-	result = result && tree.verify() && tree.size() == --tree_prev_size;
+	result = result && erase_pos(tree, tree.begin());
 
 	std::cout << "erase last" << std::endl;
-	tree.erase(--tree.end()); // end is not valid to erase
-	std::cout << tree << std::endl;
-	result = result && tree.verify() && tree.size() == --tree_prev_size;
+	result = result && erase_pos(tree,--tree.end()); // end is not valid to erase
 
-	std::cout << "erase sth" << std::endl;
-	tree.erase(++tree.begin());
-	std::cout << tree << std::endl;
-	result = result && tree.verify() && tree.size() == --tree_prev_size;
+	std::cout << "erase root=" << tree.m_root()->value << std::endl;
+	result = result && erase_pos(tree,set_tree_type::iterator(tree.m_root()));
+
+	for (int i = 0; i < 5; i++)
+	{
+		set_tree_type::iterator	 pos = tree.begin();
+		set_tree_type::size_type offset = rand() % tree.size();
+		for (set_tree_type::size_type j = 0; j < offset; j++)
+			++pos;
+
+		std::cout << "erase sth" << std::endl;
+		result = result && erase_pos(tree, pos);
+	}
 
 	// TODO: test more cases
 

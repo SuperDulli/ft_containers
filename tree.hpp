@@ -845,9 +845,9 @@ void RB_tree<Key, Value, KeyOfValue, Compare, Allocator>::m_remove(
 	}
 	if (y_original_color == BLACK && x)
 	{
-		// TODO: mov into function
+		// TODO: delete debug print
 		std::cout << "delete fixup" << std::endl;
-		std::cout << *this << std::endl;
+		// std::cout << *this << std::endl;
 		m_remove_fixup(x);
 	}
 	if (x == NIL)
