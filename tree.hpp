@@ -456,10 +456,20 @@ public: // TODO: make tree mamber private
 		m_header.right = NULL;
 
 		NIL = m_alloc.allocate(1);
+		// NIL->color = BLACK;
+		// NIL->parent = NULL;
+		// NIL->left = NULL;
+		// NIL->right = NULL;
+		m_set_NIL(NIL);
+	}
+
+	void m_set_NIL(node_type& node)
+	{
 		NIL->color = BLACK;
 		NIL->parent = NULL;
 		NIL->left = NULL;
 		NIL->right = NULL;
+		node = NIL;
 	}
 
 	node_type m_root()
@@ -800,7 +810,7 @@ void RB_tree<Key, Value, KeyOfValue, Compare, Allocator>::m_remove(
 		x = node->right;
 		if (!x)
 		{
-			x = NIL;
+			m_set_NIL(x);
 		}
 		m_transplant(node, x);
 	}
@@ -814,6 +824,10 @@ void RB_tree<Key, Value, KeyOfValue, Compare, Allocator>::m_remove(
 		y = RB_tree_node<Value>::minimum(node->right);
 		y_original_color = y->color;
 		x = y->right;
+		if (!x)
+		{
+			m_set_NIL(x);
+		}
 		if (y->parent == node) // y is direct child of node
 		{
 			x->parent = y;
@@ -824,7 +838,7 @@ void RB_tree<Key, Value, KeyOfValue, Compare, Allocator>::m_remove(
 			y->right = node->right;
 			y->right->parent = y;
 		}
-		m_transplant(y, x);
+		m_transplant(node, y);
 		y->left = node->left;
 		y->left->parent = y;
 		y->color = node->color;
@@ -833,6 +847,7 @@ void RB_tree<Key, Value, KeyOfValue, Compare, Allocator>::m_remove(
 	{
 		// TODO: mov into function
 		std::cout << "delete fixup" << std::endl;
+		std::cout << *this << std::endl;
 		m_remove_fixup(x);
 	}
 	if (x == NIL)
@@ -842,6 +857,7 @@ void RB_tree<Key, Value, KeyOfValue, Compare, Allocator>::m_remove(
 		else
 			x->parent->right = NULL;
 	}
+	--m_node_count;
 }
 
 /**
@@ -870,8 +886,6 @@ template <
 void RB_tree<Key, Value, KeyOfValue, Compare, Allocator>::m_remove_fixup(
 	node_type node)
 {
-	node_type deleted_node = node;
-	bool	  isNIL = (deleted_node == NIL) ? true : false;
 	node_type w; // sibling of node
 	while (node != m_root() && node->color == BLACK)
 	{
@@ -907,12 +921,8 @@ void RB_tree<Key, Value, KeyOfValue, Compare, Allocator>::m_remove_fixup(
 				if (w->right)
 					w->right->color = BLACK;
 				m_left_rotate(node->parent);
-				// if (node == NIL)
-				// 	node->parent->left = NULL;
 				node = m_root();
 			}
-			if (isNIL)
-				deleted_node->parent->left = NULL;
 		}
 		else
 		{
@@ -945,12 +955,8 @@ void RB_tree<Key, Value, KeyOfValue, Compare, Allocator>::m_remove_fixup(
 				if (w->left)
 					w->left->color = BLACK;
 				m_right_rotate(node->parent);
-				// if (node == NIL)
-				// 	node->parent->right = NULL;
 				node = m_root();
 			}
-			if (isNIL)
-				deleted_node->parent->right = NULL;
 		}
 	}
 

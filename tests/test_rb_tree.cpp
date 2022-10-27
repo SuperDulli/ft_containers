@@ -208,6 +208,83 @@ bool insert()
 	return result;
 }
 
+set_tree_type create_random_test_tree()
+{
+	const int	  count = 50;
+	set_tree_type random;
+	insert_random(random, count);
+
+	std::cout << random << std::endl;
+
+	return random;
+}
+
+set_tree_type create_test_tree(const ft::vector<int>& numbers)
+{
+	set_tree_type tree;
+	tree.insert(numbers.begin(), numbers.end());
+
+	std::cout << tree << std::endl;
+
+	return tree;
+}
+
+bool erase_pos()
+{
+	bool result = true;
+	// erasing sth on empty tree does not work - iterators not valid (end is not
+	// dereferencable)
+	const int	  count = 50;
+	int			  ints[] = {77, 21, 32, 81, 43, 23, 0,	95, 33, 35, 97, 44, 78,
+							8,	42, 38, 78, 22, 27, 59, 3,	15, 24, 64, 43, 10,
+							55, 33, 57, 72, 78, 34, 93, 10, 68, 88, 85, 68, 35,
+							70, 56, 33, 67, 86, 93, 9,	24, 71, 84, 3};
+	ft::vector<int>			 numbers(ints, ints + count);
+	// set_tree_type tree = create_random_test_tree();
+	set_tree_type tree = create_test_tree(numbers);
+	set_tree_type::size_type tree_prev_size = tree.size();
+
+	std::cout << "erase begin" << std::endl;
+	tree.erase(tree.begin());
+	std::cout << tree << std::endl;
+	result = result && tree.verify() && tree.size() == --tree_prev_size;
+
+	std::cout << "erase last" << std::endl;
+	tree.erase(--tree.end()); // end is not valid to erase
+	std::cout << tree << std::endl;
+	result = result && tree.verify() && tree.size() == --tree_prev_size;
+
+	std::cout << "erase sth" << std::endl;
+	tree.erase(++tree.begin());
+	std::cout << tree << std::endl;
+	result = result && tree.verify() && tree.size() == --tree_prev_size;
+
+	// TODO: test more cases
+
+	return result;
+}
+
+bool erase_range()
+{
+	return true;
+}
+
+bool erase_key()
+{
+	return true;
+}
+
+bool erase()
+{
+	bool result = true;
+
+	result = result && debug::run_test("erase pos", erase_pos);
+	result = result && debug::run_test("erase range", erase_range);
+	result = result && debug::run_test("erase key", erase_key);
+
+	return result;
+}
+
 bool all()
 {
 	bool result = true;
@@ -216,6 +293,7 @@ bool all()
 	result =
 		result && debug::run_test("tree construction", test_tree::construction);
 	result = result && debug::run_test("tree insert", test_tree::insert);
+	result = result && debug::run_test("tree erase", test_tree::erase);
 
 	// debug::run_test("relational operators", test_relational_operators);
 	return result;
