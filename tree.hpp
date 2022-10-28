@@ -371,16 +371,15 @@ public:
 	{
 		node_type node = pos.m_node;
 		m_remove(node);
-		get_allocator().destroy(&node->value);
-		m_alloc.deallocate(node, 1);
+		m_destroy_node(node);
 	}
 
 	void erase(iterator first, iterator last)
 	{
 		if (first == begin() && last == end())
 		{
-			std::cout << "clear" << std::endl;
-			// TODO: optimize this case by calling clear
+			clear();
+			return ;
 		}
 		while (first != last)
 		{
@@ -389,6 +388,13 @@ public:
 			// invalid after erase
 			// ++first; // segfault
 		}
+	}
+
+	void clear()
+	{
+		m_erase(m_root());
+		m_header.left = NULL;
+		m_node_count = 0;
 	}
 
 	size_type erase(const key_type& key)
@@ -511,6 +517,7 @@ public: // TODO: make tree mamber private
 	}
 
 	node_type m_new_node(value_type value);
+	void m_destroy_node(node_type node);
 	void	  m_recolor(node_type node);
 
 	ft::pair<iterator, bool> m_insert(value_type value);
@@ -526,7 +533,7 @@ public: // TODO: make tree mamber private
 	void m_remove(node_type node);
 	void m_remove_fixup(node_type node);
 
-	// iterator m_remove(key_type key);
+	void m_erase(node_type node);
 
 public:
 	// debug
@@ -556,6 +563,19 @@ RB_tree<Key, Value, KeyOfValue, Compare, Allocator>::m_new_node(
 	node->left = NULL;
 	node->right = NULL;
 	return node;
+}
+
+template <
+	class Key,
+	class Value,
+	class KeyOfValue,
+	class Compare,
+	class Allocator>
+void RB_tree<Key, Value, KeyOfValue, Compare, Allocator>::m_destroy_node(
+	node_type node)
+{
+	get_allocator().destroy(&node->value);
+	m_alloc.deallocate(node, 1);
 }
 
 template <
@@ -984,6 +1004,29 @@ void RB_tree<Key, Value, KeyOfValue, Compare, Allocator>::m_remove_fixup(
 	}
 
 	node->color = BLACK;
+}
+
+/**
+ * @brief remove subtree without rebalance
+ *
+ * @param node root of the subtree
+ */
+template <
+	class Key,
+	class Value,
+	class KeyOfValue,
+	class Compare,
+	class Allocator>
+void RB_tree<Key, Value, KeyOfValue, Compare, Allocator>::m_erase(
+	node_type node)
+{
+	while (node)
+	{
+		m_erase(node->right);
+		node_type y = node->left;
+		m_destroy_node(node);
+		node = y;
+	}
 }
 
 /**
