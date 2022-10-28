@@ -289,12 +289,13 @@ public:
 
 	~RB_tree()
 	{
-		// m_clear();
+		clear();
+		m_destroy_node(NIL);
 	}
 
 	RB_tree& operator=(const RB_tree& other)
 	{
-		// m_clear();
+		clear();
 		m_alloc = other.m_alloc;
 		m_key_compare = other.m_key_compare;
 		m_header = other.m_header;
