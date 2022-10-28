@@ -249,26 +249,39 @@ bool erase_pos()
 	bool result = true;
 	// erasing sth on empty tree does not work - iterators not valid (end is not
 	// dereferencable)
-	const int count = 50;
-	int		  ints[] = {77, 21, 32, 81, 43, 23, 0,	95, 33, 35, 97, 44, 78,
-						8,	42, 38, 78, 22, 27, 59, 3,	15, 24, 64, 43, 10,
-						55, 33, 57, 72, 78, 34, 93, 10, 68, 88, 85, 68, 35,
-						70, 56, 33, 67, 86, 93, 9,	24, 71, 84, 3};
+	const int count = 20;
+	// int		  ints[] = {99, 8, 28, 45, 33, 22, 99, 50, 97, 8,
+	// 					48, 7, 31, 48, 78, 87, 27, 31, 4,  79};
+	int ints[] = {53, 4,  28, 83, 76, 7, 26, 74, 97, 64,
+				  22, 42, 83, 1,  64, 9, 64, 29, 58, 0};
+	// const int count = 50;
+	// int		  ints[] = {77, 21, 32, 81, 43, 23, 0,	95, 33, 35, 97, 44, 78,
+	// 					8,	42, 38, 78, 22, 27, 59, 3,	15, 24, 64, 43, 10,
+	// 					55, 33, 57, 72, 78, 34, 93, 10, 68, 88, 85, 68, 35,
+	// 					70, 56, 33, 67, 86, 93, 9,	24, 71, 84, 3};
 	ft::vector<int> numbers(ints, ints + count);
 	set_tree_type	tree = create_random_test_tree();
 	// set_tree_type tree = create_test_tree(numbers);
-	// set_tree_type::size_type tree_prev_size = tree.size();
+
+	std::cout << "erase root=" << tree.m_root()->value << std::endl;
+	result = result && erase_pos(tree, set_tree_type::iterator(tree.m_root()));
 
 	std::cout << "erase begin" << std::endl;
 	result = result && erase_pos(tree, tree.begin());
 
 	std::cout << "erase last" << std::endl;
-	result = result && erase_pos(tree,--tree.end()); // end is not valid to erase
+	result =
+		result && erase_pos(tree, --tree.end()); // end is not valid to erase
 
-	std::cout << "erase root=" << tree.m_root()->value << std::endl;
-	result = result && erase_pos(tree,set_tree_type::iterator(tree.m_root()));
+	std::cout << "erase last2" << std::endl;
+	result =
+		result && erase_pos(tree, --tree.end()); // end is not valid to erase
 
-	for (int i = 0; i < 5; i++)
+	std::cout << "erase last3" << std::endl;
+	result =
+		result && erase_pos(tree, --tree.end()); // end is not valid to erase
+
+	for (int i = 0; i < 10; i++)
 	{
 		set_tree_type::iterator	 pos = tree.begin();
 		set_tree_type::size_type offset = rand() % tree.size();
@@ -284,9 +297,83 @@ bool erase_pos()
 	return result;
 }
 
+bool erase_range(
+	set_tree_type&			tree,
+	set_tree_type::iterator first,
+	set_tree_type::iterator last)
+{
+	bool result = true;
+
+	set_tree_type::size_type tree_prev_size = tree.size();
+	int						 removed_count = ft::distance(first, last);
+	ft::vector<int>			 removed_values(first, last);
+
+	std::cout << "erase " << removed_count << " values ("
+			  << *removed_values.begin() << " -> " << *(--removed_values.end())
+			  << ")" << std::endl;
+	tree.erase(first, last);
+	std::cout << tree << std::endl;
+	result = tree.verify() && tree.size() == tree_prev_size - removed_count;
+
+	// check that all values got removed
+	for (ft::vector<int>::iterator it = removed_values.begin();
+		 it != removed_values.end();
+		 ++it)
+	{
+		result = result && tree.count(*it) == 0;
+	}
+
+	return result;
+}
+
 bool erase_range()
 {
-	return true;
+	bool	  result = true;
+	const int count = 50;
+	int		  ints[] = {77, 21, 32, 81, 43, 23, 0,	95, 33, 35, 97, 44, 78,
+						8,	42, 38, 78, 22, 27, 59, 3,	15, 24, 64, 43, 10,
+						55, 33, 57, 72, 78, 34, 93, 10, 68, 88, 85, 68, 35,
+						70, 56, 33, 67, 86, 93, 9,	24, 71, 84, 3};
+	ft::vector<int> numbers(ints, ints + count);
+	set_tree_type	tree = create_random_test_tree();
+	// set_tree_type tree = create_test_tree(numbers);
+	set_tree_type::iterator first;
+	set_tree_type::iterator last;
+
+	std::cout << "erase [begin, begin+3) " << std::endl;
+	first = tree.begin();
+	last = tree.begin();
+	for (size_t i = 0; i < 3; i++)
+		++last;
+	result = result && erase_range(tree, first, last);
+
+	std::cout << "erase [begin+3, begin+7) " << std::endl;
+	first = tree.begin();
+	last = tree.begin();
+	for (size_t i = 0; i < 3; i++)
+	{
+		++first;
+		++last;
+		++last;
+	}
+	++last;
+	result = result && erase_range(tree, first, last);
+
+	std::cout << "erase [end-4, end) " << std::endl;
+	first = tree.end();
+	last = tree.end();
+	for (size_t i = 0; i < 4; i++)
+	{
+		--first;
+	}
+	result = result && erase_range(tree, first, last);
+
+	std::cout << "erase [begin, end) " << std::endl;
+	first = tree.begin();
+	last = tree.end();
+	result = result && erase_range(tree, first, last);
+
+	return result;
 }
 
 bool erase_key()

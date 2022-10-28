@@ -62,13 +62,23 @@ struct RB_tree_node {
 		return node->parent;
 	}
 
-	static RB_tree_node* previous(const RB_tree_node* node)
+	static const RB_tree_node* next(const RB_tree_node* node)
+	{
+		return next(const_cast<RB_tree_node*>(node));
+	}
+
+	static RB_tree_node* previous(RB_tree_node* node)
 	{
 		if (node->left)
 			return maximum(node->left);
 		while (node->parent && node == node->parent->left)
 			node = node->parent;
 		return node->parent;
+	}
+
+	static const RB_tree_node* previous(const RB_tree_node* node)
+	{
+		return previous(const_cast<RB_tree_node*>(node));
 	}
 };
 
@@ -370,11 +380,14 @@ public:
 		if (first == begin() && last == end())
 		{
 			std::cout << "clear" << std::endl;
+			// TODO: optimize this case by calling clear
 		}
 		while (first != last)
 		{
-			erase(first);
-			++first;
+			erase(first++);
+			// important to use postfix increment because iterator becomes
+			// invalid after erase
+			// ++first; // segfault
 		}
 	}
 
@@ -415,9 +428,9 @@ public:
 		return iterator(RB_tree_node<Value>::minimum(m_header.left));
 	}
 
-	iterator begin() const
+	const_iterator begin() const
 	{
-		return const_iterator(begin());
+		return const_iterator(RB_tree_node<Value>::minimum(m_header.left));
 	}
 
 	iterator end()
@@ -425,9 +438,9 @@ public:
 		return iterator(&m_header);
 	}
 
-	iterator end() const
+	const_iterator end() const
 	{
-		return const_iterator(end());
+		return const_iterator(&m_header);
 	}
 
 	// private:
@@ -907,8 +920,8 @@ void RB_tree<Key, Value, KeyOfValue, Compare, Allocator>::m_remove_fixup(
 			}
 			else // case 3 and 4
 			{
-				if ((w->right && w->right->color == BLACK) ||
-					!w->right) // case 3
+				if (!w->right ||
+					(w->right && w->right->color == BLACK)) // case 3
 				{
 					w->left->color = BLACK;
 					w->color = RED;
@@ -942,7 +955,8 @@ void RB_tree<Key, Value, KeyOfValue, Compare, Allocator>::m_remove_fixup(
 			}
 			else // case 3 and 4
 			{
-				if ((w->left && w->left->color == BLACK) || !w->right) // case 3
+				if ((!w->left ||
+					 (w->left && w->left->color == BLACK))) // case 3
 				{
 					w->right->color = BLACK;
 					w->color = RED;
@@ -1101,9 +1115,18 @@ std::ostream& operator<<(
 	const RB_tree<Key, Value, KeyOfValue, Compare, Allocator>& tree)
 {
 	os << std::boolalpha;
-	os << "Red-Black tree(size=" << tree.size()
-	   << ", valid=" << tree.verify() << ")" << std::endl;
-	os << tree.m_root();
+	os << "Red-Black tree(size=" << tree.size() << ", valid=" << tree.verify()
+	   << ")" << std::endl;
+	if (tree.size() == 0)
+		return os;
+	os << tree.m_root() << std::endl;
+	for (typename RB_tree<Key, Value, KeyOfValue, Compare, Allocator>::const_iterator
+			 it = tree.begin();
+		 it != tree.end();
+		 ++it)
+	{
+		os << *it << ", ";
+	}
 	return os;
 }
 
