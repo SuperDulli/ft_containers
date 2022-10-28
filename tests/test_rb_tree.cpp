@@ -376,9 +376,46 @@ bool erase_range()
 	return result;
 }
 
+bool erase_key(set_tree_type& tree, int key, set_tree_type::size_type expected)
+{
+	bool					 result;
+	set_tree_type::size_type tree_prev_size = tree.size();
+	set_tree_type::size_type element_removed;
+
+	std::cout << "erase key=" << key << std::endl;
+	element_removed = tree.erase(key);
+	std::cout << tree << std::endl;
+	result = element_removed == expected;
+	result = result && tree.verify() &&
+			 tree.size() == tree_prev_size - element_removed &&
+			 tree.count(key) == 0;
+
+	return result;
+}
+
 bool erase_key()
 {
-	return true;
+	bool	  result = true;
+	const int count = 50;
+	int		  ints[] = {77, 21, 32, 81, 43, 23, 0,	95, 33, 35, 97, 44, 78,
+						8,	42, 38, 78, 22, 27, 59, 3,	15, 24, 64, 43, 10,
+						55, 33, 57, 72, 78, 34, 93, 10, 68, 88, 85, 68, 35,
+						70, 56, 33, 67, 86, 93, 9,	24, 71, 84, 3};
+	ft::vector<int> numbers(ints, ints + count);
+	set_tree_type	tree = create_random_test_tree();
+	// set_tree_type tree = create_test_tree(numbers);
+
+	int key;
+
+	key = -1;
+	std::cout << "erasing a key that does not exist:" << std::endl;
+	result = result && erase_key(tree, key, 0);
+
+	key = *tree.begin();
+	std::cout << "erasing a key that exist:" << std::endl;
+	result = result && erase_key(tree, key, 1);
+
+	return result;
 }
 
 bool erase()

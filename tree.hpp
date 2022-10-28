@@ -391,6 +391,15 @@ public:
 		}
 	}
 
+	size_type erase(const key_type& key)
+	{
+		iterator pos = find(key);
+		if (pos == end())
+			return 0;
+		erase(pos);
+		return 1;
+	}
+
 	allocator_type get_allocator() const
 	{
 		return allocator_type(m_alloc);
