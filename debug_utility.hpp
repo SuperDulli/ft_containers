@@ -46,7 +46,7 @@ std::ostream& operator<<(std::ostream& os, const ft::vector<T>& vec)
 		// typename ft::vector<T>::iterator it; // TODO: why not this?
 		for (it = vec.begin(); it != vec.end(); ++it)
 		{
-			std::cout << *it << " ";
+			std::cout << *it << ", ";
 		}
 	}
 	return os;
