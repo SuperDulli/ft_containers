@@ -391,13 +391,6 @@ public:
 		}
 	}
 
-	void clear()
-	{
-		m_erase(m_root());
-		m_header.left = NULL;
-		m_node_count = 0;
-	}
-
 	size_type erase(const key_type& key)
 	{
 		iterator pos = find(key);
@@ -405,6 +398,39 @@ public:
 			return 0;
 		erase(pos);
 		return 1;
+	}
+
+	void clear()
+	{
+		m_erase(m_root());
+		m_root() = NULL;
+		m_node_count = 0;
+	}
+
+	void swap(RB_tree<Key, Value, KeyOfValue, Compare, Allocator>& other)
+	{
+		// if (!m_root())
+		// {
+		// 	if (other.m_root())
+		// 	{
+		// 		m_set_root(other.m_root());
+		// 		other.m_root() = NULL;
+		// 	}
+		// }
+		// else if (!other.m_root())
+		// {
+		// 	other.m_root() = m_root();
+		// 	m_root() = NULL;
+		// }
+		// else
+		// {
+		// 	ft::swap(m_root(), other.m_root());
+		// }
+		ft::swap(m_header, other.m_header);
+		ft::swap(m_node_count, other.m_node_count);
+		ft::swap(m_key_compare, other.m_key_compare);
+		ft::swap(NIL, other.NIL);
+		ft::swap(m_alloc, other.m_alloc);
 	}
 
 	allocator_type get_allocator() const
@@ -501,7 +527,7 @@ public: // TODO: make tree mamber private
 		node = NIL;
 	}
 
-	node_type m_root()
+	node_type& m_root()
 	{
 		return m_header.left;
 	}
@@ -513,7 +539,7 @@ public: // TODO: make tree mamber private
 
 	void m_set_root(node_type node)
 	{
-		m_header.left = node;
+		m_root() = node;
 		node->parent = &m_header;
 	}
 

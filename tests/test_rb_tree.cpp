@@ -208,13 +208,20 @@ bool insert()
 	return result;
 }
 
-set_tree_type create_random_test_tree()
+set_tree_type create_random_test_tree(int count)
 {
-	const int	  count = 20;
 	set_tree_type random;
 	insert_random(random, count);
 
 	std::cout << random << std::endl;
+
+	return random;
+}
+
+set_tree_type create_random_test_tree()
+{
+	const int	  count = 20;
+	set_tree_type random = create_random_test_tree(count);
 
 	return random;
 }
@@ -429,6 +436,38 @@ bool erase()
 	return result;
 }
 
+bool clear()
+{
+	bool	  result;
+	set_tree_type	tree = create_random_test_tree();
+
+	tree.clear();
+	std::cout << tree << std::endl;
+	result = tree.size() == 0 && tree.verify() && tree.begin() == tree.end();
+
+	return result;
+}
+
+bool swap()
+{
+	bool result = true;
+	std::cout << "left tree " << std::endl;;
+	set_tree_type	tree_left = create_random_test_tree(5);
+	std::cout << "right tree " << std::endl;;
+	set_tree_type	tree_right = create_random_test_tree(10);
+	set_tree_type	empty;
+	// set_tree_type::iterator it_left = tree_left.begin();
+	// set_tree_type::iterator end_left = tree_left.end();
+	// set_tree_type::iterator it_right = tree_right.begin();
+	// set_tree_type::iterator end_right = tree_right.end();
+
+	tree_left.swap(tree_right);
+
+	std::cout << tree_left << std::endl;
+
+	return result;
+}
+
 bool all()
 {
 	bool result = true;
@@ -438,6 +477,8 @@ bool all()
 		result && debug::run_test("tree construction", test_tree::construction);
 	result = result && debug::run_test("tree insert", test_tree::insert);
 	result = result && debug::run_test("tree erase", test_tree::erase);
+	result = result && debug::run_test("tree clear", test_tree::clear);
+	result = result && debug::run_test("tree swap", test_tree::swap);
 
 	// debug::run_test("relational operators", test_relational_operators);
 	return result;
