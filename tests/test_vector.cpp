@@ -585,6 +585,9 @@ bool resize()
 	std::cout << std::endl;
 #endif
 
+// TODO: test resize(currentSize) should not do anything;
+// TODO: test resize(0) should effectivly clear the vector;
+
 	return result;
 }
 
