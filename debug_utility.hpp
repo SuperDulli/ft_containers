@@ -22,6 +22,8 @@ namespace debug
 
 bool run_test(const std::string& name, bool (*test_f)(void));
 void test_result(const std::string& name, bool result);
+template <class C>
+void insert_random(C& container, size_t count);
 
 } // namespace debug
 
@@ -52,8 +54,19 @@ std::ostream& operator<<(std::ostream& os, const ft::vector<T>& vec)
 	return os;
 }
 
+template <typename InputIterator>
+void printIterValues(InputIterator first, InputIterator last)
+{
+	while (first != last)
+	{
+		std::cout << *first << ", ";
+		++first;
+	}
+	std::cout << std::endl;
+}
+
 template <class C>
-void insert_random(C& container, size_t count)
+void debug::insert_random(C& container, size_t count)
 {
 	ft::vector<int> ints;
 	for (size_t i = 0; i < count; i++)

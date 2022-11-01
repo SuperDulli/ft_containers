@@ -12,25 +12,29 @@
 
 namespace test_tree
 {
-typedef RB_tree<
+typedef ft::RB_tree<
 	int,
 	ft::pair<const int, int>,
 	ft::SelectFirst< ft::pair<const int, int> >,
 	std::less<int> >
 	map_tree_type;
 
-typedef RB_tree< int, int, ft::Identity<int>, std::less<int> > set_tree_type;
+typedef ft::RB_tree< int, int, ft::Identity<int>, std::less<int> > set_tree_type;
 
 bool construction()
 {
 	bool result = true;
 
-	RB_tree<
+	ft::RB_tree<
 		int,
 		std::pair<const int, int>,
 		ft::SelectFirst< ft::pair<const int, int> >,
 		std::less<int> >
 		empty;
+
+	// TODO: test other constructors
+
+	// test copy of emtpy
 
 	return result;
 }
@@ -99,7 +103,7 @@ bool insert_random()
 	const int count = 50;
 	std::cout << "insert " << count << " random numbers" << std::endl;
 	set_tree_type random;
-	insert_random(random, count);
+	debug::insert_random(random, count);
 
 	std::cout << random << std::endl;
 	return random.verify();
@@ -211,7 +215,7 @@ bool insert()
 set_tree_type create_random_test_tree(int count)
 {
 	set_tree_type random;
-	insert_random(random, count);
+	debug::insert_random(random, count);
 
 	std::cout << random << std::endl;
 
@@ -448,6 +452,28 @@ bool clear()
 	return result;
 }
 
+bool swap(const set_tree_type& left_tree, const set_tree_type& right_tree)
+{
+	bool result;
+
+	set_tree_type left(left_tree);
+	set_tree_type right(right_tree);
+
+	// set_tree_type::const_iterator it_left = left.begin();
+	// set_tree_type::const_iterator end_left = left.end();
+	// set_tree_type::const_iterator it_right = right.begin();
+	// set_tree_type::const_iterator end_right = right.end();
+
+	left.swap(right);
+	// TODO: figure out how to use this correctly
+	// std::cout << "iterate using the begin-iterator from before swap (left):" << std::left;
+	// printIterValues(it_left, right_tree.end());
+	std::cout << "left tree after swap:\n" << left << std::endl;
+	result = left == right_tree && right == left_tree;
+
+	return result;
+}
+
 bool swap()
 {
 	bool result = true;
@@ -456,14 +482,16 @@ bool swap()
 	std::cout << "right tree " << std::endl;;
 	set_tree_type	tree_right = create_random_test_tree(10);
 	set_tree_type	empty;
-	// set_tree_type::iterator it_left = tree_left.begin();
-	// set_tree_type::iterator end_left = tree_left.end();
-	// set_tree_type::iterator it_right = tree_right.begin();
-	// set_tree_type::iterator end_right = tree_right.end();
 
-	tree_left.swap(tree_right);
+	std::cout << "swap left and right tree" << std::endl;
+	result = result && test_tree::swap(tree_left, tree_right);
 
-	std::cout << tree_left << std::endl;
+	// TODO: test with empty tree
+	std::cout << "swap empty and right tree" << std::endl;
+	result = result && test_tree::swap(empty, tree_right);
+
+	std::cout << "swap left and empty tree" << std::endl;
+	result = result && test_tree::swap(tree_left, empty);
 
 	return result;
 }

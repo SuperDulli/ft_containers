@@ -9,6 +9,9 @@
 #include <memory> // allocator
 #include <string>
 
+namespace ft
+{
+
 enum RB_tree_color
 {
 	RED = false,
@@ -282,8 +285,9 @@ public:
 		m_initalize();
 	}
 	RB_tree(const RB_tree& other)
-		: m_alloc(other.m_alloc), m_key_compare(other.m_key_compare)
+		: m_alloc(other.m_alloc), m_key_compare(other.m_key_compare), m_header()
 	{
+		m_initalize();
 		*this = other;
 	}
 
@@ -293,15 +297,7 @@ public:
 		m_destroy_node(NIL);
 	}
 
-	RB_tree& operator=(const RB_tree& other)
-	{
-		clear();
-		m_alloc = other.m_alloc;
-		m_key_compare = other.m_key_compare;
-		m_header = other.m_header;
-		m_node_count = other.m_node_count;
-		return *this;
-	}
+	RB_tree& operator=(const RB_tree& other);
 
 	ft::pair<iterator, bool> insert(const value_type& value)
 	{
@@ -380,7 +376,7 @@ public:
 		if (first == begin() && last == end())
 		{
 			clear();
-			return ;
+			return;
 		}
 		while (first != last)
 		{
@@ -409,24 +405,25 @@ public:
 
 	void swap(RB_tree<Key, Value, KeyOfValue, Compare, Allocator>& other)
 	{
-		// if (!m_root())
-		// {
-		// 	if (other.m_root())
-		// 	{
-		// 		m_set_root(other.m_root());
-		// 		other.m_root() = NULL;
-		// 	}
-		// }
-		// else if (!other.m_root())
-		// {
-		// 	other.m_root() = m_root();
-		// 	m_root() = NULL;
-		// }
-		// else
-		// {
-		// 	ft::swap(m_root(), other.m_root());
-		// }
-		ft::swap(m_header, other.m_header);
+		if (!m_root())
+		{
+			if (other.m_root())
+			{
+				this->m_set_root(other.m_root());
+				other.m_root() = NULL;
+			}
+		}
+		else if (!other.m_root())
+		{
+			other.m_set_root(m_root());
+			m_root() = NULL;
+		}
+		else
+		{
+			ft::swap(m_root(), other.m_root());
+			this->m_set_root(m_root());
+			other.m_set_root(other.m_root());
+		}
 		ft::swap(m_node_count, other.m_node_count);
 		ft::swap(m_key_compare, other.m_key_compare);
 		ft::swap(NIL, other.NIL);
@@ -472,6 +469,8 @@ public:
 
 	const_iterator begin() const
 	{
+		if (!m_header.left)
+			return end();
 		return const_iterator(RB_tree_node<Value>::minimum(m_header.left));
 	}
 
@@ -544,7 +543,9 @@ public: // TODO: make tree mamber private
 	}
 
 	node_type m_new_node(value_type value);
-	void m_destroy_node(node_type node);
+	void	  m_destroy_node(node_type node);
+	node_type m_clone_node(const_node_type value);
+	node_type m_copy(const_node_type node, node_type parent);
 	void	  m_recolor(node_type node);
 
 	ft::pair<iterator, bool> m_insert(value_type value);
@@ -579,6 +580,28 @@ template <
 	class KeyOfValue,
 	class Compare,
 	class Allocator>
+RB_tree<Key, Value, KeyOfValue, Compare, Allocator>&
+RB_tree<Key, Value, KeyOfValue, Compare, Allocator>::operator=(
+	const RB_tree<Key, Value, KeyOfValue, Compare, Allocator>& other)
+{
+	if (this == &other)
+		return *this;
+	if (this->m_root())
+		clear();
+	m_alloc = other.m_alloc;
+	m_key_compare = other.m_key_compare;
+	m_node_count = other.m_node_count;
+	if (other.m_root())
+		this->m_set_root(m_copy(other.m_root(), &m_header));
+	return *this;
+}
+
+template <
+	class Key,
+	class Value,
+	class KeyOfValue,
+	class Compare,
+	class Allocator>
 typename RB_tree<Key, Value, KeyOfValue, Compare, Allocator>::node_type
 RB_tree<Key, Value, KeyOfValue, Compare, Allocator>::m_new_node(
 	value_type value)
@@ -603,6 +626,54 @@ void RB_tree<Key, Value, KeyOfValue, Compare, Allocator>::m_destroy_node(
 {
 	get_allocator().destroy(&node->value);
 	m_alloc.deallocate(node, 1);
+}
+
+template <
+	class Key,
+	class Value,
+	class KeyOfValue,
+	class Compare,
+	class Allocator>
+typename RB_tree<Key, Value, KeyOfValue, Compare, Allocator>::node_type
+RB_tree<Key, Value, KeyOfValue, Compare, Allocator>::m_clone_node(
+	const_node_type node)
+{
+	node_type clone = m_new_node(node->value);
+	clone->color = node->color;
+	return clone;
+}
+
+template <
+	class Key,
+	class Value,
+	class KeyOfValue,
+	class Compare,
+	class Allocator>
+typename RB_tree<Key, Value, KeyOfValue, Compare, Allocator>::node_type
+RB_tree<Key, Value, KeyOfValue, Compare, Allocator>::m_copy(
+	const_node_type node,
+	node_type		parent)
+{
+	node_type copy = m_clone_node(node);
+	copy->parent = parent;
+	if (node->right)
+	{
+		copy->right = m_copy(node->right, copy);
+	}
+	parent = copy;
+	node = node->left;
+	while (node)
+	{
+		node_type y = m_clone_node(node);
+		parent->left = y;
+		y->parent = parent;
+		if (node->right)
+			y->right = m_copy(node->right, y);
+		parent = y;
+		node = node->left;
+	}
+
+	return copy;
 }
 
 template <
@@ -1119,6 +1190,91 @@ RB_tree<Key, Value, KeyOfValue, Compare, Allocator>::m_check_subtree(
 	return ft::make_pair(false, blackCount + left.second);
 }
 
+// non member functions
+
+// relational operators
+
+template <
+	class Key,
+	class Value,
+	class KeyOfValue,
+	class Compare,
+	class Allocator>
+bool operator==(
+	const ft::RB_tree<Key, Value, KeyOfValue, Compare, Allocator>& lhs,
+	const ft::RB_tree<Key, Value, KeyOfValue, Compare, Allocator>& rhs)
+{
+	return (
+		lhs.size() == rhs.size() &&
+		ft::equal(lhs.begin(), lhs.end(), rhs.begin()));
+}
+
+template <
+	class Key,
+	class Value,
+	class KeyOfValue,
+	class Compare,
+	class Allocator>
+bool operator!=(
+	const ft::RB_tree<Key, Value, KeyOfValue, Compare, Allocator>& lhs,
+	const ft::RB_tree<Key, Value, KeyOfValue, Compare, Allocator>& rhs)
+{
+	return (!(lhs == rhs));
+}
+
+template <
+	class Key,
+	class Value,
+	class KeyOfValue,
+	class Compare,
+	class Allocator>
+bool operator<(
+	const ft::RB_tree<Key, Value, KeyOfValue, Compare, Allocator>& lhs,
+	const ft::RB_tree<Key, Value, KeyOfValue, Compare, Allocator>& rhs)
+{
+	return ft::lexicographical_compare(
+		lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
+}
+
+template <
+	class Key,
+	class Value,
+	class KeyOfValue,
+	class Compare,
+	class Allocator>
+bool operator<=(
+	const ft::RB_tree<Key, Value, KeyOfValue, Compare, Allocator>& lhs,
+	const ft::RB_tree<Key, Value, KeyOfValue, Compare, Allocator>& rhs)
+{
+	return (!(rhs < lhs));
+}
+
+template <
+	class Key,
+	class Value,
+	class KeyOfValue,
+	class Compare,
+	class Allocator>
+bool operator>(
+	const ft::RB_tree<Key, Value, KeyOfValue, Compare, Allocator>& lhs,
+	const ft::RB_tree<Key, Value, KeyOfValue, Compare, Allocator>& rhs)
+{
+	return (rhs < lhs);
+}
+
+template <
+	class Key,
+	class Value,
+	class KeyOfValue,
+	class Compare,
+	class Allocator>
+bool operator>=(
+	const ft::RB_tree<Key, Value, KeyOfValue, Compare, Allocator>& lhs,
+	const ft::RB_tree<Key, Value, KeyOfValue, Compare, Allocator>& rhs)
+{
+	return (!(lhs < rhs));
+}
+
 // template <
 // 	class Key,
 // 	class Value,
@@ -1126,7 +1282,8 @@ RB_tree<Key, Value, KeyOfValue, Compare, Allocator>::m_check_subtree(
 // 	class Compare,
 // 	class Allocator>
 // typename RB_tree<Key, Value, KeyOfValue, Compare, Allocator>::iterator
-// RB_tree<Key, Value, KeyOfValue, Compare, Allocator>::m_remove(key_type key)
+// RB_tree<Key, Value, KeyOfValue, Compare, Allocator>::m_remove(key_type
+// key)
 // {
 
 // }
@@ -1199,8 +1356,8 @@ std::ostream& operator<<(
 	if (tree.size() == 0)
 		return os;
 	os << tree.m_root() << std::endl;
-	for (typename RB_tree<Key, Value, KeyOfValue, Compare, Allocator>::const_iterator
-			 it = tree.begin();
+	for (typename RB_tree<Key, Value, KeyOfValue, Compare, Allocator>::
+			 const_iterator it = tree.begin();
 		 it != tree.end();
 		 ++it)
 	{
@@ -1208,5 +1365,7 @@ std::ostream& operator<<(
 	}
 	return os;
 }
+
+} // namespace ft
 
 #endif // TREE_HPP
