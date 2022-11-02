@@ -75,7 +75,7 @@ std::ostream& operator<<(
 	   << std::endl;
 	if (tree.size() == 0)
 		return os;
-	os << tree.m_root() << std::endl;
+	os << tree.get_root() << std::endl;
 	for (typename ft::RB_tree<Key, Value, KeyOfValue, Compare, Allocator>::
 			 const_iterator it = tree.begin();
 		 it != tree.end();

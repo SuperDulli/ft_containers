@@ -169,7 +169,7 @@ struct RB_tree_const_iterator
 	RB_tree_const_iterator(const iterator& it) : m_node(it.m_node)
 	{
 #ifdef DEBUG
-		// std::cout << "RB tree iterator conversion" << std::endl;
+	// std::cout << "RB tree iterator conversion" << std::endl;
 #endif
 	}
 
@@ -494,8 +494,6 @@ public:
 	ft::pair<const_iterator, const_iterator>
 	equal_range(const key_type& key) const;
 
-	// ft::pair<iterator, iterator> equal_range
-
 	// iterator
 
 	iterator begin()
@@ -522,8 +520,7 @@ public:
 		return const_iterator(&m_header);
 	}
 
-	// private:
-public: // TODO: make tree mamber private
+private:
 	node_allocator		m_alloc;
 	key_compare			m_key_compare;
 	RB_tree_node<Value> m_header; // special node for iterator purposes
@@ -619,6 +616,14 @@ public:
 	// debug
 
 	bool verify() const;
+	node_type& get_root()
+	{
+		return m_root();
+	}
+	const_node_type get_root() const
+	{
+		return m_root();
+	}
 
 private:
 	ft::pair<bool, int> m_check_subtree(const_node_type node) const;

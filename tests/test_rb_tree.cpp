@@ -335,8 +335,8 @@ bool erase_pos()
 	set_tree_type	tree = create_random_test_tree();
 	// set_tree_type tree = create_test_tree(numbers);
 
-	std::cout << "erase root=" << tree.m_root()->value << std::endl;
-	result = result && erase_pos(tree, set_tree_type::iterator(tree.m_root()));
+	std::cout << "erase root=" << tree.get_root()->value << std::endl;
+	result = result && erase_pos(tree, set_tree_type::iterator(tree.get_root()));
 
 	std::cout << "erase begin" << std::endl;
 	result = result && erase_pos(tree, tree.begin());
