@@ -75,6 +75,8 @@ std::ostream& operator<<(std::ostream& os, const ft::vector<T>& vec)
 	return os;
 }
 
+// TODO: do sth similar for map and set
+
 template <typename InputIterator>
 void printIterValues(InputIterator first, InputIterator last)
 {

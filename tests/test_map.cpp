@@ -2,6 +2,8 @@
 #include <iostream>
 #include <string>
 
+#include <vector> // for getting iterators
+
 #include "../debug_utility.hpp"
 
 #ifdef USE_STL // CREATE A REAL STL EXAMPLE
@@ -19,7 +21,30 @@ bool construction()
 {
 	bool result = true;
 
+	// default
 	ft::map<int, int> empty;
+	result = result && empty.empty() && empty.size() == 0;
+
+	// range
+	const int count = 20;
+	int		  ints[] = {99, 8, 28, 45, 33, 22, 99, 50, 97, 8,
+						48, 7, 31, 48, 78, 87, 27, 31, 4,  79};
+	ft::vector< ft::pair<int, int> > number_pairs;
+	for (size_t i = 0; i < count; i++)
+	{
+		number_pairs.push_back(ft::make_pair(ints[i], i));
+	}
+	ft::map<int, int> range(number_pairs.begin(), number_pairs.end());
+	result = result && !range.empty() && range.size() != 0;
+
+	// TODO: empty with custom compare and/or allocator
+	// TODO: complex objects
+
+	ft::map<int, int> empty_copy(empty);
+	result = result && empty_copy == empty;
+
+	ft::map<int, int> copy(range);
+	result = result && copy == range;
 
 	return result;
 }

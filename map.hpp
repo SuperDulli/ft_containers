@@ -25,8 +25,6 @@ public:
 
 	typedef Compare	  key_compare;
 	typedef Allocator allocator_type;
-	// typedef value_type&			   reference;
-	// typedef const value_type&	   const_reference;
 
 private:
 	typedef
@@ -40,7 +38,6 @@ private:
 		pair_alloc_type>
 		tree_type;
 
-public: // TODO: make tree private
 	tree_type m_tree;
 
 public:
@@ -149,15 +146,60 @@ public:
 
 	key_compare	  key_comp() const;
 	value_compare value_comp() const;
+
+	// map comparison
+
+	template <typename Key1, typename T1, typename Compare1, typename A1>
+	friend bool operator==(
+		const map<Key1, T1, Compare1, A1>&,
+		const map<Key1, T1, Compare1, A1>&);
+	template <typename Key1, typename T1, typename Compare1, typename A1>
+	friend bool operator<(
+		const map<Key1, T1, Compare1, A1>&,
+		const map<Key1, T1, Compare1, A1>&);
 };
 
 // constructor
 
 template <class Key, class T, class Compare, class Allocator>
-map<Key, T, Compare, Allocator>::map()
+map<Key, T, Compare, Allocator>::map() : m_tree()
 {
 #ifdef DEBUG
 	std::cout << "map default constructor" << std::endl;
+#endif
+}
+
+template <class Key, class T, class Compare, class Allocator>
+map<Key, T, Compare, Allocator>::map(
+	const key_compare&	  comp,
+	const allocator_type& alloc)
+	: m_tree(comp, alloc)
+{
+#ifdef DEBUG
+	std::cout << "map empty constructor" << std::endl;
+#endif
+}
+
+template <class Key, class T, class Compare, class Allocator>
+template <class InputIterator>
+map<Key, T, Compare, Allocator>::map(
+	InputIterator		  first,
+	InputIterator		  last,
+	const key_compare&	  key_compare,
+	const allocator_type& alloc)
+	: m_tree(key_compare, alloc)
+{
+#ifdef DEBUG
+	std::cout << "map range constructor" << std::endl;
+#endif
+	m_tree.insert(first, last);
+}
+
+template <class Key, class T, class Compare, class Allocator>
+map<Key, T, Compare, Allocator>::map(const map& other) : m_tree(other.m_tree)
+{
+#ifdef DEBUG
+	std::cout << "map copy constructor" << std::endl;
 #endif
 }
 
@@ -168,6 +210,121 @@ map<Key, T, Compare, Allocator>::~map()
 	std::cout << "map destructor" << std::endl;
 #endif
 	clear();
+}
+
+template <class Key, class T, class Compare, class Allocator>
+map<Key, T, Compare, Allocator>&
+map<Key, T, Compare, Allocator>::operator=(const map& other)
+{
+#ifdef DEBUG
+	std::cout << "map operator= (copy assignment)" << std::endl;
+#endif
+	if (this != &other)
+	{
+#ifdef DEBUG
+		std::cout << "maps are not identical (copying elemements)" << std::endl;
+#endif
+		map tmp(other);
+		swap(tmp);
+		return *this;
+	}
+	return *this;
+}
+
+template <class Key, class T, class Compare, class Allocator>
+typename map<Key, T, Compare, Allocator>::allocator_type
+map<Key, T, Compare, Allocator>::get_allocator() const
+{
+	return m_tree.get_allocator();
+}
+
+// element access
+
+// template <class Key, class T, class Compare, class Allocator>
+
+// T&		 map<Key, T, Compare, Allocator>::at(const key_type& key)
+// {
+// 	return m_tree
+// }
+
+// const T& at(const key_type& key) const;
+// T&		 operator[](const key_type& key);
+
+// iterators
+
+template <class Key, class T, class Compare, class Allocator>
+typename map<Key, T, Compare, Allocator>::iterator
+map<Key, T, Compare, Allocator>::begin()
+{
+	return m_tree.begin();
+}
+
+template <class Key, class T, class Compare, class Allocator>
+typename map<Key, T, Compare, Allocator>::const_iterator
+map<Key, T, Compare, Allocator>::begin() const
+{
+	return m_tree.begin();
+}
+
+template <class Key, class T, class Compare, class Allocator>
+typename map<Key, T, Compare, Allocator>::iterator
+map<Key, T, Compare, Allocator>::end()
+{
+	return m_tree.end();
+}
+
+template <class Key, class T, class Compare, class Allocator>
+typename map<Key, T, Compare, Allocator>::const_iterator
+map<Key, T, Compare, Allocator>::end() const
+{
+	return m_tree.end();
+}
+
+template <class Key, class T, class Compare, class Allocator>
+typename map<Key, T, Compare, Allocator>::reverse_iterator
+map<Key, T, Compare, Allocator>::rbegin()
+{
+	return m_tree.rbegin();
+}
+template <class Key, class T, class Compare, class Allocator>
+typename map<Key, T, Compare, Allocator>::const_reverse_iterator
+map<Key, T, Compare, Allocator>::rbegin() const
+{
+	return m_tree.rbegin();
+}
+template <class Key, class T, class Compare, class Allocator>
+typename map<Key, T, Compare, Allocator>::reverse_iterator
+map<Key, T, Compare, Allocator>::rend()
+{
+	return m_tree.rend();
+}
+template <class Key, class T, class Compare, class Allocator>
+typename map<Key, T, Compare, Allocator>::const_reverse_iterator
+map<Key, T, Compare, Allocator>::rend() const
+{
+	return m_tree.rend();
+}
+
+// capacity
+
+template <class Key, class T, class Compare, class Allocator>
+bool map<Key, T, Compare, Allocator>::empty() const
+{
+	return m_tree.empty();
+}
+
+template <class Key, class T, class Compare, class Allocator>
+typename map<Key, T, Compare, Allocator>::size_type
+map<Key, T, Compare, Allocator>::size() const
+{
+	return m_tree.size();
+}
+
+template <class Key, class T, class Compare, class Allocator>
+typename map<Key, T, Compare, Allocator>::size_type
+map<Key, T, Compare, Allocator>::max_size() const
+{
+	return m_tree.max_size();
 }
 
 // modifiers
