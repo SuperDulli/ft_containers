@@ -13,6 +13,8 @@ namespace ft = std;
 
 namespace test_vector
 {
+using ::operator<<; // use operators from the gloabal namespace
+
 bool construction()
 {
 	ft::vector<int> empty;

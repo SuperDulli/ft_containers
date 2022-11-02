@@ -77,7 +77,7 @@ test: $(NAME)
 test_debug: $(NAME_DEBUG)
 	./$^
 
-test_rb_tree: tests/test_rb_tree.cpp Color.cpp tree.hpp pair.hpp utility.hpp debug_utility.hpp
+test_rb_tree: tests/test_rb_tree.cpp Color.cpp tree.hpp pair.hpp utility.hpp debug_utility.hpp debug_tree_utility.hpp
 	$(CXX) $(CXXFLAGS) -g -DDEBUG=1 tests/test_rb_tree.cpp Color.cpp -o $@
 
 $(NAME): $(OBJS) $(SRCS) $(HEADERS)

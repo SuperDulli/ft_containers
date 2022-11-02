@@ -6,6 +6,7 @@
 #include <utility>	  // pair
 
 #include "../debug_utility.hpp"
+#include "../debug_tree_utility.hpp"
 #include "../utility.hpp" // selectFirst
 
 #include "../tree.hpp"

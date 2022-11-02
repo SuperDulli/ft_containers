@@ -13,6 +13,8 @@ namespace ft = std;
 
 namespace test_map
 {
+	using ::operator<<; // use operators from the gloabal namespace
+
 bool construction()
 {
 	bool result = true;
@@ -39,7 +41,7 @@ bool insert()
 	empty.insert(ft::make_pair(250, 0));
 
 #if defined(DEBUG) && !defined(USE_STL)
-	std::cout << empty.m_tree << std::endl;
+	// std::cout << empty.m_tree << std::endl;
 #endif
 
 	return result;
