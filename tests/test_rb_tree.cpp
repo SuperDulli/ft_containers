@@ -558,6 +558,97 @@ bool swap()
 	return result;
 }
 
+bool lower_bound(set_tree_type& tree, int bound)
+{
+	const set_tree_type c_tree(tree);
+
+	set_tree_type::iterator		  it_low;
+	set_tree_type::const_iterator c_it_low;
+
+	std::cout << "find first key that is not before " << bound << ":"
+			  << std::endl;
+	it_low = tree.lower_bound(bound);
+	c_it_low = c_tree.lower_bound(bound);
+
+	if (it_low == tree.end() && c_it_low == c_tree.end())
+	{
+		std::cout << "all keys are before " << bound << std::endl;
+		return true;
+	}
+	std::cout << "it_low: " << *it_low << std::endl;
+	std::cout << "c_it_low: " << *c_it_low << std::endl;
+	return (*it_low >= bound && *c_it_low >= bound);
+}
+
+bool lower_bound()
+{
+	bool result = true;
+
+	set_tree_type empty;
+	set_tree_type tree = create_random_test_tree(10);
+	int			  bound;
+
+	bound = 0;
+	result = result && lower_bound(tree, bound);
+
+	bound = 50;
+	result = result && lower_bound(tree, bound);
+
+	bound = 500;
+	result = result && lower_bound(tree, bound);
+
+	std::cout << "test with empty tree:" << std::endl;
+	bound = 500;
+	result = result && lower_bound(empty, bound);
+
+	return result;
+}
+
+bool upper_bound(set_tree_type& tree, int bound)
+{
+	const set_tree_type c_tree(tree);
+
+	set_tree_type::iterator		  it_high;
+	set_tree_type::const_iterator c_it_high;
+
+	std::cout << "find first key that is after " << bound << ":" << std::endl;
+	it_high = tree.upper_bound(bound);
+	c_it_high = c_tree.upper_bound(bound);
+
+	if (it_high == tree.end() && c_it_high == c_tree.end())
+	{
+		std::cout << "no keys after " << bound << std::endl;
+		return true;
+	}
+	std::cout << "it_low: " << *it_high << std::endl;
+	std::cout << "c_it_low: " << *c_it_high << std::endl;
+	return (bound < *it_high && bound < *c_it_high);
+}
+
+bool upper_bound()
+{
+	bool result = true;
+
+	set_tree_type empty;
+	set_tree_type tree = create_random_test_tree(10);
+	int			  bound;
+
+	bound = 0;
+	result = result && upper_bound(tree, bound);
+
+	bound = 50;
+	result = result && upper_bound(tree, bound);
+
+	bound = 500;
+	result = result && upper_bound(tree, bound);
+
+	std::cout << "test with empty tree:" << std::endl;
+	bound = 50;
+	result = result && upper_bound(empty, bound);
+
+	return result;
+}
+
 bool all()
 {
 	bool result = true;
@@ -569,6 +660,10 @@ bool all()
 	result = result && debug::run_test("tree erase", test_tree::erase);
 	result = result && debug::run_test("tree clear", test_tree::clear);
 	result = result && debug::run_test("tree swap", test_tree::swap);
+	result =
+		result && debug::run_test("tree lower_bound", test_tree::lower_bound);
+	result =
+		result && debug::run_test("tree upper_bound", test_tree::upper_bound);
 
 	// debug::run_test("relational operators", test_relational_operators);
 	return result;

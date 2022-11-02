@@ -470,6 +470,28 @@ public:
 		return 0;
 	}
 
+	iterator lower_bound(const key_type& key)
+	{
+		return m_lower_bound(m_root(), end().m_node, key);
+	}
+
+	const_iterator lower_bound(const key_type& key) const
+	{
+		return m_lower_bound(m_root(), end().m_node, key);
+	}
+
+	iterator upper_bound(const key_type& key)
+	{
+		return m_upper_bound(m_root(), end().m_node, key);
+	}
+
+	const_iterator upper_bound(const key_type& key) const
+	{
+		return m_upper_bound(m_root(), end().m_node, key);
+	}
+
+	// ft::pair<iterator, iterator> equal_range
+
 	// iterator
 
 	iterator begin()
@@ -574,6 +596,20 @@ public: // TODO: make tree mamber private
 	void m_remove_fixup(node_type node);
 
 	void m_erase(node_type node);
+
+	iterator
+	m_lower_bound(node_type left, node_type right, const key_type& key);
+	const_iterator m_lower_bound(
+		const_node_type left,
+		const_node_type right,
+		const key_type& key) const;
+
+	iterator
+	m_upper_bound(node_type left, node_type right, const key_type& key);
+	const_iterator m_upper_bound(
+		const_node_type left,
+		const_node_type right,
+		const key_type& key) const;
 
 public:
 	// debug
@@ -1139,6 +1175,114 @@ void RB_tree<Key, Value, KeyOfValue, Compare, Allocator>::m_erase(
 	}
 }
 
+template <
+	class Key,
+	class Value,
+	class KeyOfValue,
+	class Compare,
+	class Allocator>
+typename RB_tree<Key, Value, KeyOfValue, Compare, Allocator>::iterator
+RB_tree<Key, Value, KeyOfValue, Compare, Allocator>::m_lower_bound(
+	node_type		left,
+	node_type		right,
+	const key_type& key)
+{
+	while (left)
+	{
+		if (!m_key_compare(s_key(left), key))
+		{
+			right = left;
+			left = right->left;
+		}
+		else
+		{
+			left = left->right;
+		}
+	}
+	return iterator(right);
+}
+
+template <
+	class Key,
+	class Value,
+	class KeyOfValue,
+	class Compare,
+	class Allocator>
+typename RB_tree<Key, Value, KeyOfValue, Compare, Allocator>::const_iterator
+RB_tree<Key, Value, KeyOfValue, Compare, Allocator>::m_lower_bound(
+	const_node_type left,
+	const_node_type right,
+	const key_type& key) const
+{
+	while (left)
+	{
+		if (!m_key_compare(s_key(left), key))
+		{
+			right = left;
+			left = right->left;
+		}
+		else
+		{
+			left = left->right;
+		}
+	}
+	return const_iterator(right);
+}
+
+template <
+	class Key,
+	class Value,
+	class KeyOfValue,
+	class Compare,
+	class Allocator>
+typename RB_tree<Key, Value, KeyOfValue, Compare, Allocator>::iterator
+RB_tree<Key, Value, KeyOfValue, Compare, Allocator>::m_upper_bound(
+	node_type		left,
+	node_type		right,
+	const key_type& key)
+{
+	while (left)
+	{
+		if (m_key_compare(key, s_key(left)))
+		{
+			right = left;
+			left = right->left;
+		}
+		else
+		{
+			left = left->right;
+		}
+	}
+	return iterator(right);
+}
+
+template <
+	class Key,
+	class Value,
+	class KeyOfValue,
+	class Compare,
+	class Allocator>
+typename RB_tree<Key, Value, KeyOfValue, Compare, Allocator>::const_iterator
+RB_tree<Key, Value, KeyOfValue, Compare, Allocator>::m_upper_bound(
+	const_node_type left,
+	const_node_type right,
+	const key_type& key) const
+{
+	while (left)
+	{
+		if (m_key_compare(key, s_key(left)))
+		{
+			right = left;
+			left = right->left;
+		}
+		else
+		{
+			left = left->right;
+		}
+	}
+	return const_iterator(right);
+}
+
 /**
  * @brief checks wheter the tree is a valid red black tree.
  *
@@ -1146,8 +1290,8 @@ void RB_tree<Key, Value, KeyOfValue, Compare, Allocator>::m_erase(
  * 1. Every node is either red or black.
  * 2. All leaf nodes are black.
  * 3. A red node does not have a red child.
- * 4. Every path from a node to any of its descentant leaf nodes goes through
- * 		the same number of black nodes.
+ * 4. Every path from a node to any of its descentant leaf nodes goes
+ * through the same number of black nodes.
  */
 template <
 	class Key,
