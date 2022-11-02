@@ -649,6 +649,88 @@ bool upper_bound()
 	return result;
 }
 
+void printIterName(const set_tree_type& tree, set_tree_type::const_iterator it)
+{
+	if (it == tree.end())
+		std::cout << "end()";
+	else if (it == tree.begin())
+		std::cout << "begin()";
+	else
+		std::cout << *it;
+}
+
+bool equal_range(set_tree_type& tree, int key)
+{
+	bool				result = true;
+	const set_tree_type c_tree(tree);
+
+	ft::pair<set_tree_type::iterator, set_tree_type::iterator> pair;
+	ft::pair<set_tree_type::const_iterator, set_tree_type::const_iterator>
+		c_pair;
+
+	std::cout << "find range containg all elements equal to " << key
+			  << ". (first not less, last greater than):" << std::endl;
+	pair = tree.equal_range(key);
+	c_pair = c_tree.equal_range(key);
+
+	std::cout << "[";
+	printIterName(tree, pair.first);
+	std::cout << ", ";
+	printIterName(tree, pair.second);
+	std::cout << ")" << std::endl;
+	std::cout << "[";
+	printIterName(c_tree, c_pair.first);
+	std::cout << ", ";
+	printIterName(c_tree, c_pair.second);
+	std::cout << ")" << std::endl;
+
+	if (pair.first != tree.end())
+		result = result && *pair.first >= key;
+
+	if (pair.second != tree.end())
+		result = result && *pair.second > key;
+
+	if (c_pair.first != c_tree.end())
+		result = result && *c_pair.first >= key;
+
+	if (c_pair.second != c_tree.end())
+		result = result && *c_pair.second > key;
+
+	// the range should either include zero or one element
+	set_tree_type::iterator::difference_type distance =
+		ft::distance(pair.first, pair.second);
+	set_tree_type::const_iterator::difference_type c_distance =
+		ft::distance(c_pair.first, c_pair.second);
+
+	result = result && (distance == 0 || distance == 1);
+	result = result && (c_distance == 0 || c_distance == 1);
+
+	return result;
+}
+
+bool equal_range()
+{
+	bool		  result = true;
+	set_tree_type empty;
+	set_tree_type tree = create_random_test_tree(10);
+	int			  key;
+
+	key = 0;
+	result = result && equal_range(tree, key);
+
+	key = 50;
+	result = result && equal_range(tree, key);
+
+	key = 500;
+	result = result && equal_range(tree, key);
+
+	std::cout << "test with empty tree:" << std::endl;
+	key = 50;
+	result = result && equal_range(empty, key);
+
+	return result;
+}
+
 bool all()
 {
 	bool result = true;
@@ -664,6 +746,8 @@ bool all()
 		result && debug::run_test("tree lower_bound", test_tree::lower_bound);
 	result =
 		result && debug::run_test("tree upper_bound", test_tree::upper_bound);
+	result =
+		result && debug::run_test("tree equal_range", test_tree::equal_range);
 
 	// debug::run_test("relational operators", test_relational_operators);
 	return result;

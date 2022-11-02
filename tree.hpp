@@ -169,7 +169,7 @@ struct RB_tree_const_iterator
 	RB_tree_const_iterator(const iterator& it) : m_node(it.m_node)
 	{
 #ifdef DEBUG
-		std::cout << "RB tree iterator conversion" << std::endl;
+		// std::cout << "RB tree iterator conversion" << std::endl;
 #endif
 	}
 
@@ -489,6 +489,10 @@ public:
 	{
 		return m_upper_bound(m_root(), end().m_node, key);
 	}
+
+	ft::pair<iterator, iterator> equal_range(const key_type& key);
+	ft::pair<const_iterator, const_iterator>
+	equal_range(const key_type& key) const;
 
 	// ft::pair<iterator, iterator> equal_range
 
@@ -1281,6 +1285,84 @@ RB_tree<Key, Value, KeyOfValue, Compare, Allocator>::m_upper_bound(
 		}
 	}
 	return const_iterator(right);
+}
+
+template <
+	class Key,
+	class Value,
+	class KeyOfValue,
+	class Compare,
+	class Allocator>
+ft::pair<
+	typename RB_tree<Key, Value, KeyOfValue, Compare, Allocator>::iterator,
+	typename RB_tree<Key, Value, KeyOfValue, Compare, Allocator>::iterator>
+RB_tree<Key, Value, KeyOfValue, Compare, Allocator>::equal_range(
+	const key_type& key)
+{
+	node_type left = m_root();
+	node_type right = end().m_node;
+	while (left)
+	{
+		if (m_key_compare(s_key(left), key))
+			left = left->right;
+		else if (m_key_compare(key, s_key(left)))
+		{
+			right = left;
+			left = left->left;
+		}
+		else
+		{
+			node_type left_up(left);
+			node_type right_up(right);
+			right = left;
+			left = left->left;
+			left_up = left_up->right;
+			return ft::make_pair(
+				m_lower_bound(left, right, key),
+				m_upper_bound(left_up, right_up, key));
+		}
+	}
+	return ft::make_pair(iterator(right), iterator(right));
+}
+
+template <
+	class Key,
+	class Value,
+	class KeyOfValue,
+	class Compare,
+	class Allocator>
+ft::pair<
+	typename RB_tree<Key, Value, KeyOfValue, Compare, Allocator>::
+		const_iterator,
+	typename RB_tree<Key, Value, KeyOfValue, Compare, Allocator>::
+		const_iterator>
+RB_tree<Key, Value, KeyOfValue, Compare, Allocator>::equal_range(
+	const key_type& key) const
+{
+	const_node_type left = m_root();
+	const_node_type right = end().m_node;
+	while (left)
+	{
+		if (m_key_compare(s_key(left), key))
+			left = left->right;
+		else if (m_key_compare(key, s_key(left)))
+		{
+			right = left;
+			left = left->left;
+		}
+		else
+		{
+			const_node_type left_up(left);
+			const_node_type right_up(right);
+			right = left;
+			left = left->left;
+			left_up = left_up->right;
+			return ft::make_pair(
+				m_lower_bound(left, right, key),
+				m_upper_bound(left_up, right_up, key));
+		}
+	}
+	return ft::make_pair(const_iterator(right), const_iterator(right));
 }
 
 /**
