@@ -12,30 +12,86 @@
 
 namespace test_tree
 {
+
+using ::operator<<; // use operators from the gloabal namespace
+
 typedef ft::RB_tree<
 	int,
-	ft::pair<const int, int>,
-	ft::SelectFirst< ft::pair<const int, int> >,
+	ft::pair<const int, float>,
+	ft::SelectFirst< ft::pair<const int, float> >,
 	std::less<int> >
 	map_tree_type;
 
-typedef ft::RB_tree< int, int, ft::Identity<int>, std::less<int> > set_tree_type;
+typedef ft::RB_tree< int, int, ft::Identity<int>, std::less<int> >
+	set_tree_type;
+
+// TODO: move to seperate file(s)
+struct Point {
+	double x, y;
+	Point() : x(), y() {}
+	Point(double _x, double _y) : x(_x), y(_y) {}
+};
+
+std::ostream& operator<<(std::ostream& os, const Point& point)
+{
+	os << "Point(x=" << point.x << ", y=" << point.y << ")";
+	return os;
+}
+
+struct PointCmp {
+	bool operator()(const Point& lhs, const Point& rhs) const
+	{
+		return lhs.x < rhs.x; // NB. intentionally ignores y
+	}
+};
+typedef ft::RB_tree< Point, Point, ft::Identity<Point>, PointCmp >
+	point_tree_type;
+
+typedef ft::RB_tree<
+	Point,
+	ft::pair<const Point, double>,
+	ft::SelectFirst< ft::pair<const Point, double> >,
+	PointCmp >
+	point_map_tree_type;
 
 bool construction()
 {
 	bool result = true;
 
-	ft::RB_tree<
-		int,
-		std::pair<const int, int>,
-		ft::SelectFirst< ft::pair<const int, int> >,
-		std::less<int> >
-		empty;
+	set_tree_type empty;
+	set_tree_type empty_copy(empty);
+
+	result = result && empty.size() == 0 && empty_copy.size() == 0 &&
+			 empty == empty_copy;
+
+	empty.insert(5);
+
+	set_tree_type copy(empty);
+
+	result = result && empty.size() == 1 && empty_copy.size() == 0 &&
+			 copy.size() == 1 && empty != empty_copy;
 
 	// TODO: test other constructors
+	map_tree_type map_tree;
 
-	// test copy of emtpy
+	map_tree.insert(ft::make_pair(1, 1.f));
+	map_tree.insert(ft::make_pair(2, 4.f));
+	map_tree.insert(ft::make_pair(3, 9.f));
+	std::cout << "map tree:\n" << map_tree << std::endl;
 
+	point_tree_type point_tree;
+	point_tree.insert(Point(5, -12));
+	point_tree.insert(Point(3, -42));
+	point_tree.insert(Point(1, 1));
+	point_tree.insert(Point(42, 0));
+	std::cout << "point tree:\n" << point_tree << std::endl;
+
+	point_map_tree_type point_map_tree;
+	point_map_tree.insert(ft::make_pair(Point(5, -12), 13));
+	point_map_tree.insert(ft::make_pair(Point(3, -42), 44));
+	point_map_tree.insert(ft::make_pair(Point(1, 1), 1));
+	point_map_tree.insert(ft::make_pair(Point(42, 0), 42));
+	std::cout << "point map tree:\n" << point_map_tree << std::endl;
 	return result;
 }
 
@@ -442,8 +498,8 @@ bool erase()
 
 bool clear()
 {
-	bool	  result;
-	set_tree_type	tree = create_random_test_tree();
+	bool		  result;
+	set_tree_type tree = create_random_test_tree();
 
 	tree.clear();
 	std::cout << tree << std::endl;
@@ -466,8 +522,8 @@ bool swap(const set_tree_type& left_tree, const set_tree_type& right_tree)
 
 	left.swap(right);
 	// TODO: figure out how to use this correctly
-	// std::cout << "iterate using the begin-iterator from before swap (left):" << std::left;
-	// printIterValues(it_left, right_tree.end());
+	// std::cout << "iterate using the begin-iterator from before swap (left):"
+	// << std::left; printIterValues(it_left, right_tree.end());
 	std::cout << "left tree after swap:\n" << left << std::endl;
 	result = left == right_tree && right == left_tree;
 
@@ -477,11 +533,13 @@ bool swap(const set_tree_type& left_tree, const set_tree_type& right_tree)
 bool swap()
 {
 	bool result = true;
-	std::cout << "left tree " << std::endl;;
-	set_tree_type	tree_left = create_random_test_tree(5);
-	std::cout << "right tree " << std::endl;;
-	set_tree_type	tree_right = create_random_test_tree(10);
-	set_tree_type	empty;
+	std::cout << "left tree " << std::endl;
+	;
+	set_tree_type tree_left = create_random_test_tree(5);
+	std::cout << "right tree " << std::endl;
+	;
+	set_tree_type tree_right = create_random_test_tree(10);
+	set_tree_type empty;
 
 	std::cout << "swap left and right tree" << std::endl;
 	result = result && test_tree::swap(tree_left, tree_right);
