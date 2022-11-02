@@ -435,9 +435,21 @@ public:
 		return allocator_type(m_alloc);
 	}
 
+	// capacity
+
+	bool empty() const
+	{
+		return begin() == end();
+	}
+
 	size_type size() const
 	{
 		return m_node_count;
+	}
+
+	size_type max_size() const
+	{
+		return get_allocator().max_size();
 	}
 
 	// lookup

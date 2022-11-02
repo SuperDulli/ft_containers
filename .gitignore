@@ -42,4 +42,5 @@ test_rb_tree
 *.dSYM
 
 *.txt
+*.ans
 test_main.cpp

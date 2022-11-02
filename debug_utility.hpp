@@ -118,8 +118,9 @@ std::ostream& operator<<(
 	const ft::RB_tree<Key, Value, KeyOfValue, Compare, Allocator>& tree)
 {
 	os << std::boolalpha;
-	os << "Red-Black tree(size=" << tree.size() << ", valid=" << tree.verify()
-	   << ")" << std::endl;
+	os << "Red-Black tree(size=" << tree.size()
+	   << ", max_size=" << tree.max_size() << ", valid=" << tree.verify() << ")"
+	   << std::endl;
 	if (tree.size() == 0)
 		return os;
 	os << tree.m_root() << std::endl;

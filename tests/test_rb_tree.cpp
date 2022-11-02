@@ -62,14 +62,14 @@ bool construction()
 	set_tree_type empty_copy(empty);
 
 	result = result && empty.size() == 0 && empty_copy.size() == 0 &&
-			 empty == empty_copy;
+			 empty == empty_copy && empty.empty() && empty_copy.empty();
 
 	empty.insert(5);
 
 	set_tree_type copy(empty);
 
 	result = result && empty.size() == 1 && empty_copy.size() == 0 &&
-			 copy.size() == 1 && empty != empty_copy;
+			 copy.size() == 1 && empty != empty_copy && !copy.empty();
 
 	// TODO: test other constructors
 	map_tree_type map_tree;
@@ -78,6 +78,7 @@ bool construction()
 	map_tree.insert(ft::make_pair(2, 4.f));
 	map_tree.insert(ft::make_pair(3, 9.f));
 	std::cout << "map tree:\n" << map_tree << std::endl;
+	result = result && !map_tree.empty();
 
 	point_tree_type point_tree;
 	point_tree.insert(Point(5, -12));
@@ -85,6 +86,7 @@ bool construction()
 	point_tree.insert(Point(1, 1));
 	point_tree.insert(Point(42, 0));
 	std::cout << "point tree:\n" << point_tree << std::endl;
+	result = result && !point_tree.empty();
 
 	point_map_tree_type point_map_tree;
 	point_map_tree.insert(ft::make_pair(Point(5, -12), 13));
@@ -92,6 +94,8 @@ bool construction()
 	point_map_tree.insert(ft::make_pair(Point(1, 1), 1));
 	point_map_tree.insert(ft::make_pair(Point(42, 0), 42));
 	std::cout << "point map tree:\n" << point_map_tree << std::endl;
+	result = result && !point_map_tree.empty();
+
 	return result;
 }
 
