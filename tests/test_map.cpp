@@ -153,29 +153,47 @@ bool insert_hint()
 	return result;
 }
 
+bool insert_range()
+{
+	const int count = 10;
+	int				ints[] = {88, 64, 5, 89, 78, 17, 95, 8, 61, 0};
+	ft::vector< ft::pair<int, int> > number_pairs;
+	for (size_t i = 0; i < count; i++)
+	{
+		number_pairs.push_back(ft::make_pair(ints[i], i));
+	}
+	ft::map<int, int>	range;
+
+	range.insert(number_pairs.begin(), number_pairs.end());
+
+#ifdef DEBUG
+	std::cout << range << std::endl;
+#endif
+	// number_pairs could contain duplicates
+	return (!range.empty() && range.size() <= number_pairs.size());
+}
+
+bool insert_random()
+{
+	ft::map<int, int>	random;
+
+	debug::insert_random_pair(random, 20);
+
+#ifdef DEBUG
+	std::cout << random << std::endl;
+#endif
+	// could try to insert duplicates
+	return (!random.empty() && random.size() <= 20);
+}
+
 bool insert()
 {
 	bool result = true;
 
 	result = result && debug::run_test("insert simple", insert_simple);
 	result = result && debug::run_test("insert hint", insert_hint);
-
-	ft::map<int, int> empty;
-
-	// empty.insert(ft::make_pair(120, 0));
-	// empty.insert(ft::make_pair(7, 0));
-	// empty.insert(ft::make_pair(3, 0));
-	// empty.insert(ft::make_pair(15, 0));
-	// empty.insert(ft::make_pair(16, 0));
-	// empty.insert(ft::make_pair(14, 0));
-	// empty.insert(ft::make_pair(200, 0));
-	// empty.insert(ft::make_pair(150, 0));
-	// empty.insert(ft::make_pair(250, 0));
-	debug::insert_random_pair(empty, 20);
-
-#ifdef DEBUG
-	std::cout << empty << std::endl;
-#endif
+	result = result && debug::run_test("insert range", insert_range);
+	result = result && debug::run_test("insert random", insert_random);
 
 	return result;
 }
