@@ -108,6 +108,6 @@ $(INTRA_MAIN):
 compare: $(NAME_DEBUG) $(NAME_STL_DEBUG)
 	./$< > mine.txt 2>&1
 	./$(NAME_STL_DEBUG) > theirs.txt 2>&1
-	diff -y --color=always mine.txt theirs.txt
+	diff -y --width=200 --color=always mine.txt theirs.txt
 
 .PHONY: all clean fclean re show debug leaks test valgrind test_rb_tree

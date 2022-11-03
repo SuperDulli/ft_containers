@@ -15,7 +15,18 @@ namespace ft = std;
 
 namespace test_map
 {
-	using ::operator<<; // use operators from the gloabal namespace
+using ::operator<<; // use operators from the gloabal namespace
+
+ft::map<int, int> generate_random_map(size_t count = 20)
+{
+	ft::map<int, int> random;
+	debug::insert_random_pair(random, count);
+
+#ifdef DEBUG
+	std::cout << random << std::endl;
+#endif
+	return random;
+}
 
 bool construction()
 {
@@ -49,24 +60,121 @@ bool construction()
 	return result;
 }
 
+bool insert_simple()
+{
+	bool result = true;
+#ifdef DEBUG
+	std::cout << "insert one by one (total=6)" << std::endl;
+#endif
+	ft::map<int, int>							  map;
+	ft::pair< ft::map<int, int>::iterator, bool > insert_result;
+
+	insert_result = map.insert(ft::make_pair(1, 0));
+	result = result && debug::insertion_status(
+						   insert_result.first, insert_result.second) == true;
+
+#ifdef DEBUG
+	std::cout << "insert the same key again" << std::endl;
+#endif
+	insert_result = map.insert(ft::make_pair(1, 99999999));
+	result = result && debug::insertion_status(
+						   insert_result.first, insert_result.second) == false;
+
+	insert_result = map.insert(ft::make_pair(2, 0));
+	result = result && debug::insertion_status(
+						   insert_result.first, insert_result.second) == true;
+	insert_result = map.insert(ft::make_pair(3, 0));
+	result = result && debug::insertion_status(
+						   insert_result.first, insert_result.second) == true;
+	insert_result = map.insert(ft::make_pair(4, 0));
+	result = result && debug::insertion_status(
+						   insert_result.first, insert_result.second) == true;
+	insert_result = map.insert(ft::make_pair(5, 0));
+	result = result && debug::insertion_status(
+						   insert_result.first, insert_result.second) == true;
+	insert_result = map.insert(ft::make_pair(6, 0));
+	result = result && debug::insertion_status(
+						   insert_result.first, insert_result.second) == true;
+
+#ifdef DEBUG
+	std::cout << map << std::endl;
+#endif
+	result = result && map.size() == 6;
+	return result;
+}
+
+bool insert_hint(
+	ft::map<int, int>&			map,
+	ft::map<int, int>::iterator hint,
+	const ft::pair<int, int>&	pair)
+{
+	ft::map<int, int>::iterator	 it;
+	ft::map<int, int>::size_type map_size;
+
+	map_size = map.size();
+	it = map.insert(hint, pair);
+	return debug::insertion_status(it, map.size() != map_size);
+}
+
+bool insert_hint()
+{
+	bool result = true;
+#ifdef DEBUG
+	std::cout << "insert one by one with hint (total=6)" << std::endl;
+#endif
+	ft::map<int, int>			 map;
+
+	result = result && insert_hint(map, map.end(), ft::make_pair(1, 0)) == true;
+
+#ifdef DEBUG
+	std::cout << "insert the same key again" << std::endl;
+#endif
+	result =
+		result && insert_hint(map, map.end(), ft::make_pair(1, 99999)) == false;
+
+#ifdef DEBUG
+	std::cout << "insert with wrong hint" << std::endl;
+#endif
+	result =
+		result && insert_hint(map, map.begin(), ft::make_pair(2, -1)) == true;
+	result =
+		result && insert_hint(map, map.end(), ft::make_pair(3, 3)) == true;
+	result =
+		result && insert_hint(map, map.end(), ft::make_pair(4, 4)) == true;
+	result =
+		result && insert_hint(map, map.end(), ft::make_pair(5, 5)) == true;
+	result =
+		result && insert_hint(map, map.end(), ft::make_pair(6, 6)) == true;
+
+#ifdef DEBUG
+	std::cout << map << std::endl;
+#endif
+	result = result && map.size() == 6;
+	return result;
+}
+
 bool insert()
 {
 	bool result = true;
 
+	result = result && debug::run_test("insert simple", insert_simple);
+	result = result && debug::run_test("insert hint", insert_hint);
+
 	ft::map<int, int> empty;
 
-	empty.insert(ft::make_pair(120, 0));
-	empty.insert(ft::make_pair(7, 0));
-	empty.insert(ft::make_pair(3, 0));
-	empty.insert(ft::make_pair(15, 0));
-	empty.insert(ft::make_pair(16, 0));
-	empty.insert(ft::make_pair(14, 0));
-	empty.insert(ft::make_pair(200, 0));
-	empty.insert(ft::make_pair(150, 0));
-	empty.insert(ft::make_pair(250, 0));
+	// empty.insert(ft::make_pair(120, 0));
+	// empty.insert(ft::make_pair(7, 0));
+	// empty.insert(ft::make_pair(3, 0));
+	// empty.insert(ft::make_pair(15, 0));
+	// empty.insert(ft::make_pair(16, 0));
+	// empty.insert(ft::make_pair(14, 0));
+	// empty.insert(ft::make_pair(200, 0));
+	// empty.insert(ft::make_pair(150, 0));
+	// empty.insert(ft::make_pair(250, 0));
+	debug::insert_random_pair(empty, 20);
 
-#if defined(DEBUG) && !defined(USE_STL)
-	// std::cout << empty.m_tree << std::endl;
+#ifdef DEBUG
+	std::cout << empty << std::endl;
 #endif
 
 	return result;
@@ -77,8 +185,9 @@ bool all()
 	bool success = true;
 
 	std::cout << "-- Test map --" << std::endl;
-	debug::run_test("map construction", test_map::construction);
-	debug::run_test("map insert", test_map::insert);
+	success =
+		success && debug::run_test("map construction", test_map::construction);
+	success = success && debug::run_test("map insert", test_map::insert);
 
 	// debug::run_test("relational operators", test_relational_operators);
 	return success;

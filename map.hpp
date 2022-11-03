@@ -96,8 +96,9 @@ public:
 
 	// element access
 
-	T&		 at(const key_type& key);
-	const T& at(const key_type& key) const;
+	// C++11
+	// T&		 at(const key_type& key);
+	// const T& at(const key_type& key) const;
 	T&		 operator[](const key_type& key);
 
 	// iterators
@@ -340,6 +341,47 @@ ft::pair<typename map<Key, T, Compare, Allocator>::iterator, bool>
 map<Key, T, Compare, Allocator>::insert(const value_type& value)
 {
 	return m_tree.insert(value);
+}
+
+template <class Key, class T, class Compare, class Allocator>
+typename map<Key, T, Compare, Allocator>::iterator
+map<Key, T, Compare, Allocator>::insert(iterator pos, const value_type& value)
+{
+	return m_tree.insert(pos, value);
+}
+
+template <class Key, class T, class Compare, class Allocator>
+template <class InputIterator>
+void map<Key, T, Compare, Allocator>::insert(
+	InputIterator first,
+	InputIterator last)
+{
+	return m_tree.insert(first, last);
+}
+
+template <class Key, class T, class Compare, class Allocator>
+void map<Key, T, Compare, Allocator>::erase(iterator pos)
+{
+	m_tree.erase(pos);
+}
+
+template <class Key, class T, class Compare, class Allocator>
+void map<Key, T, Compare, Allocator>::erase(iterator first, iterator last)
+{
+	m_tree.erase(first, last);
+}
+
+template <class Key, class T, class Compare, class Allocator>
+typename map<Key, T, Compare, Allocator>::size_type
+map<Key, T, Compare, Allocator>::erase(const key_type& key)
+{
+	return m_tree.erase(key);
+}
+
+template <class Key, class T, class Compare, class Allocator>
+void map<Key, T, Compare, Allocator>::swap(map& other)
+{
+	m_tree.swap(other.m_tree);
 }
 
 // relational operators
