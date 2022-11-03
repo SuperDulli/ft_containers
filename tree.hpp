@@ -456,18 +456,25 @@ public:
 
 	iterator find(const key_type& key)
 	{
-		node_type node = m_find(key);
-		if (node)
-			return iterator(node);
-		return end();
+		iterator it = lower_bound(key);
+		if (it == end() || m_key_compare(key, s_key(it.m_node)))
+			return end();
+		return it;
 	}
 
-	size_type count(const key_type& key)
+	const_iterator find(const key_type& key) const
 	{
-		node_type node = m_find(key);
-		if (node)
-			return 1;
-		return 0;
+		const_iterator it = lower_bound(key);
+		if (it == end() || m_key_compare(key, s_key(it.m_node)))
+			return end();
+		return it;
+	}
+
+	size_type count(const key_type& key) const
+	{
+		ft::pair<const_iterator, const_iterator> pair = equal_range(key);
+		const size_type n = ft::distance(pair.first, pair.second);
+		return n;
 	}
 
 	iterator lower_bound(const key_type& key)
@@ -611,8 +618,6 @@ private:
 
 	void m_left_rotate(node_type node);
 	void m_right_rotate(node_type node);
-
-	node_type m_find(key_type key);
 
 	void m_transplant(node_type u, node_type v);
 	void m_remove(node_type node);
@@ -955,37 +960,6 @@ void RB_tree<Key, Value, KeyOfValue, Compare, Allocator>::m_right_rotate(
 		node->parent->left = y;
 	y->right = node;
 	node->parent = y;
-}
-
-template <
-	class Key,
-	class Value,
-	class KeyOfValue,
-	class Compare,
-	class Allocator>
-typename RB_tree<Key, Value, KeyOfValue, Compare, Allocator>::node_type
-RB_tree<Key, Value, KeyOfValue, Compare, Allocator>::m_find(key_type key)
-{
-	node_type result = m_root();
-	bool	  found = false;
-	while (result && !found)
-	{
-		if (m_key_compare(key, s_key(result)))
-		{
-			result = result->left;
-		}
-		else if (m_key_compare(s_key(result), key))
-		{
-			result = result->right;
-		}
-		else
-		{
-			found = true;
-		}
-	}
-	if (!found)
-		return NULL;
-	return result;
 }
 
 template <
