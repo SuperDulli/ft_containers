@@ -384,6 +384,29 @@ void map<Key, T, Compare, Allocator>::swap(map& other)
 	m_tree.swap(other.m_tree);
 }
 
+// look up
+
+template <class Key, class T, class Compare, class Allocator>
+typename map<Key, T, Compare, Allocator>::size_type
+map<Key, T, Compare, Allocator>::count(const key_type& key) const
+{
+	return m_tree.count(key);
+}
+
+template <class Key, class T, class Compare, class Allocator>
+typename map<Key, T, Compare, Allocator>::iterator
+map<Key, T, Compare, Allocator>::find(const key_type& key)
+{
+	return m_tree.find(key);
+}
+
+template <class Key, class T, class Compare, class Allocator>
+typename map<Key, T, Compare, Allocator>::const_iterator
+map<Key, T, Compare, Allocator>::find(const key_type& key) const
+{
+	return m_tree.find(key);
+}
+
 // relational operators
 
 template <class Key, class T, class Compare, class Allocator>

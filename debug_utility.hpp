@@ -28,6 +28,8 @@ template <class C>
 void insert_random(C& container, size_t count);
 template <class C>
 void insert_random_pair(C& container, size_t count);
+template <class C>
+void insert_sorted_pair(C& container, size_t count);
 template <class Iterator>
 bool insertion_status(Iterator it, bool success);
 
@@ -101,6 +103,17 @@ std::ostream& operator<<(std::ostream& os, const ft::map<K, V>& map)
 }
 // TODO: do sth similar for set
 
+template <class C>
+void printIterName(const C& container, typename C::const_iterator it)
+{
+	if (it == container.end())
+		std::cout << "end()";
+	else if (it == container.begin())
+		std::cout << "begin()";
+	else
+		std::cout << *it;
+}
+
 template <typename InputIterator>
 void printIterValues(InputIterator first, InputIterator last)
 {
@@ -135,6 +148,19 @@ void debug::insert_random_pair(C& container, size_t count)
 		int rand_number = rand() % 100;
 		container.insert(ft::make_pair(rand_number, i));
 		pairs.push_back(ft::make_pair(rand_number, i));
+	}
+
+	std::cout << "inserted: " << pairs << std::endl;
+}
+
+template <class C>
+void debug::insert_sorted_pair(C& container, size_t count)
+{
+	ft::vector< ft::pair<int, int> > pairs;
+	for (size_t i = 0; i < count; i++)
+	{
+		container.insert(ft::make_pair(i, 0));
+		pairs.push_back(ft::make_pair(i, 0));
 	}
 
 	std::cout << "inserted: " << pairs << std::endl;

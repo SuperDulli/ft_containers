@@ -28,6 +28,17 @@ ft::map<int, int> generate_random_map(size_t count = 20)
 	return random;
 }
 
+ft::map<int, int> generate_sorted_map(size_t count = 20)
+{
+	ft::map<int, int> sorted;
+	debug::insert_sorted_pair(sorted, count);
+
+#ifdef DEBUG
+	std::cout << sorted << std::endl;
+#endif
+	return sorted;
+}
+
 bool construction()
 {
 	bool result = true;
@@ -122,7 +133,7 @@ bool insert_hint()
 #ifdef DEBUG
 	std::cout << "insert one by one with hint (total=6)" << std::endl;
 #endif
-	ft::map<int, int>			 map;
+	ft::map<int, int> map;
 
 	result = result && insert_hint(map, map.end(), ft::make_pair(1, 0)) == true;
 
@@ -137,14 +148,10 @@ bool insert_hint()
 #endif
 	result =
 		result && insert_hint(map, map.begin(), ft::make_pair(2, -1)) == true;
-	result =
-		result && insert_hint(map, map.end(), ft::make_pair(3, 3)) == true;
-	result =
-		result && insert_hint(map, map.end(), ft::make_pair(4, 4)) == true;
-	result =
-		result && insert_hint(map, map.end(), ft::make_pair(5, 5)) == true;
-	result =
-		result && insert_hint(map, map.end(), ft::make_pair(6, 6)) == true;
+	result = result && insert_hint(map, map.end(), ft::make_pair(3, 3)) == true;
+	result = result && insert_hint(map, map.end(), ft::make_pair(4, 4)) == true;
+	result = result && insert_hint(map, map.end(), ft::make_pair(5, 5)) == true;
+	result = result && insert_hint(map, map.end(), ft::make_pair(6, 6)) == true;
 
 #ifdef DEBUG
 	std::cout << map << std::endl;
@@ -156,13 +163,13 @@ bool insert_hint()
 bool insert_range()
 {
 	const int count = 10;
-	int				ints[] = {88, 64, 5, 89, 78, 17, 95, 8, 61, 0};
+	int		  ints[] = {88, 64, 5, 89, 78, 17, 95, 8, 61, 0};
 	ft::vector< ft::pair<int, int> > number_pairs;
 	for (size_t i = 0; i < count; i++)
 	{
 		number_pairs.push_back(ft::make_pair(ints[i], i));
 	}
-	ft::map<int, int>	range;
+	ft::map<int, int> range;
 
 	range.insert(number_pairs.begin(), number_pairs.end());
 
@@ -175,7 +182,7 @@ bool insert_range()
 
 bool insert_random()
 {
-	ft::map<int, int>	random;
+	ft::map<int, int> random;
 
 	debug::insert_random_pair(random, 20);
 
@@ -198,6 +205,117 @@ bool insert()
 	return result;
 }
 
+bool erase_pos()
+{
+	ft::map<int, int>			 map = generate_random_map(20);
+	ft::map<int, int>::size_type map_size = map.size();
+
+#ifdef DEBUG
+	std::cout << "erase begin() by iterator:" << std::endl;
+#endif
+	map.erase(map.begin());
+
+#ifdef DEBUG
+	std::cout << map << std::endl;
+#endif
+	return map.size() + 1 == map_size;
+}
+
+bool erase_range(
+	ft::map<int, int>&			map,
+	ft::map<int, int>::iterator first,
+	ft::map<int, int>::iterator last)
+{
+	ft::map<int, int>::size_type map_size = map.size();
+	ft::map<int, int>::size_type removed_size = ft::distance(first, last);
+
+#ifdef DEBUG
+	std::cout << "erase range [";
+	printIterName(map, first);
+	std::cout << ", ";
+	printIterName(map, last);
+	std::cout << ") by iterator (" << removed_size
+			  << " element(s)):" << std::endl;
+#endif
+	map.erase(first, last);
+#ifdef DEBUG
+	std::cout << map << std::endl;
+#endif
+
+	return map.size() == map_size - removed_size;
+}
+
+bool erase_range()
+{
+	bool result = true;
+
+	ft::map<int, int>			map = generate_sorted_map(20);
+	ft::map<int, int>::iterator first;
+	ft::map<int, int>::iterator last;
+
+	first = map.begin();
+	last = map.begin();
+	ft::advance(last, 5);
+	result = result && erase_range(map, first, last);
+
+	first = map.begin();
+	last = map.end();
+	ft::advance(first, 5);
+	result = result && erase_range(map, first, last);
+
+	first = map.begin();
+	ft::advance(first, 2);
+	last = first;
+	ft::advance(last, 1);
+	result = result && erase_range(map, first, last);
+
+	result = result && erase_range(map, map.begin(), map.end());
+
+	return result;
+}
+
+bool erase_key(ft::map<int, int>& map, int key)
+{
+	ft::map<int, int>::size_type map_size = map.size();
+	ft::map<int, int>::size_type removed;
+
+#ifdef DEBUG
+	std::cout << "erase key=" << key << std::endl;
+#endif
+	removed = map.erase(key);
+#ifdef DEBUG
+	std::cout << map << std::endl;
+#endif
+
+	return map.size() == map_size - removed && map.count(key) == 0;
+}
+
+bool erase_key()
+{
+	bool result = true;
+
+	ft::map<int, int> map = generate_sorted_map(20);
+
+	result = result && erase_key(map, 5);
+	#ifdef DEBUG
+	std::cout << "erase non existing key;" << std::endl;
+#endif
+	result = result && erase_key(map, -42);
+
+	return result;
+}
+
+bool erase()
+{
+	bool result = true;
+
+	result = result && debug::run_test("erase pos", erase_pos);
+	result = result && debug::run_test("erase range", erase_range);
+	result = result && debug::run_test("erase key", erase_key);
+
+	return result;
+}
+
 bool all()
 {
 	bool success = true;
@@ -206,6 +324,7 @@ bool all()
 	success =
 		success && debug::run_test("map construction", test_map::construction);
 	success = success && debug::run_test("map insert", test_map::insert);
+	success = success && debug::run_test("map erase", test_map::erase);
 
 	// debug::run_test("relational operators", test_relational_operators);
 	return success;
