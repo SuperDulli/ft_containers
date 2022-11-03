@@ -294,7 +294,7 @@ public:
 	~RB_tree()
 	{
 		clear();
-		m_destroy_node(NIL);
+		m_destroy_NIL(NIL);
 	}
 
 	RB_tree& operator=(const RB_tree& other);
@@ -547,7 +547,12 @@ public:
 		return const_reverse_iterator(begin());
 	}
 
+	// observers
 
+	key_compare key_comp() const
+	{
+		return m_key_compare;
+	}
 
 private:
 	node_allocator		m_alloc;
@@ -608,6 +613,7 @@ private:
 
 	node_type m_new_node(value_type value);
 	void	  m_destroy_node(node_type node);
+	void	  m_destroy_NIL(node_type node);
 	node_type m_clone_node(const_node_type value);
 	node_type m_copy(const_node_type node, node_type parent);
 	void	  m_recolor(node_type node);
@@ -642,7 +648,7 @@ private:
 public:
 	// debug
 
-	bool verify() const;
+	bool	   verify() const;
 	node_type& get_root()
 	{
 		return m_root();
@@ -709,6 +715,18 @@ void RB_tree<Key, Value, KeyOfValue, Compare, Allocator>::m_destroy_node(
 	node_type node)
 {
 	get_allocator().destroy(&node->value);
+	m_alloc.deallocate(node, 1);
+}
+
+template <
+	class Key,
+	class Value,
+	class KeyOfValue,
+	class Compare,
+	class Allocator>
+void RB_tree<Key, Value, KeyOfValue, Compare, Allocator>::m_destroy_NIL(
+	node_type node)
+{
 	m_alloc.deallocate(node, 1);
 }
 

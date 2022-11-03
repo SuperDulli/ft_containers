@@ -62,6 +62,9 @@ bool construction()
 	// TODO: empty with custom compare and/or allocator
 	// TODO: complex objects
 
+	ft::map<std::string, int> animal_weights;
+result = result && animal_weights.empty();
+
 	ft::map<int, int> empty_copy(empty);
 	result = result && empty_copy == empty;
 
@@ -297,7 +300,7 @@ bool erase_key()
 	ft::map<int, int> map = generate_sorted_map(20);
 
 	result = result && erase_key(map, 5);
-	#ifdef DEBUG
+#ifdef DEBUG
 	std::cout << "erase non existing key;" << std::endl;
 #endif
 	result = result && erase_key(map, -42);
@@ -316,6 +319,40 @@ bool erase()
 	return result;
 }
 
+bool access()
+{
+	bool result = true;
+
+	ft::map<std::string, int> animal_weights;
+	int						  wieght;
+
+	wieght = animal_weights["Whale"];
+#ifdef DEBUG
+	std::cout << "Try to look up the weight of a Whale: " << wieght << std::endl;
+#endif
+	result = result && wieght == 0;
+
+	animal_weights["Whale"] = 136000;
+#ifdef DEBUG
+	std::cout << "Set the weight of a Whale: " << animal_weights["Whale"]
+			  << std::endl;
+#endif
+	result = result && animal_weights["Whale"] == 136000;
+
+	animal_weights["Moose"] = 386;
+#ifdef DEBUG
+	std::cout << "Set the weight of a Moose: " << animal_weights["Moose"]
+			  << std::endl;
+#endif
+	result = result && animal_weights["Moose"] == 386;
+
+#ifdef DEBUG
+	std::cout << animal_weights << std::endl;
+#endif
+
+	return result;
+}
+
 bool all()
 {
 	bool success = true;
@@ -325,6 +362,7 @@ bool all()
 		success && debug::run_test("map construction", test_map::construction);
 	success = success && debug::run_test("map insert", test_map::insert);
 	success = success && debug::run_test("map erase", test_map::erase);
+	success = success && debug::run_test("map access", test_map::access);
 
 	// debug::run_test("relational operators", test_relational_operators);
 	return success;

@@ -96,10 +96,7 @@ public:
 
 	// element access
 
-	// C++11
-	// T&		 at(const key_type& key);
-	// const T& at(const key_type& key) const;
-	T&		 operator[](const key_type& key);
+	mapped_type& operator[](const key_type& key);
 
 	// iterators
 
@@ -210,7 +207,7 @@ map<Key, T, Compare, Allocator>::~map()
 #ifdef DEBUG
 	std::cout << "map destructor" << std::endl;
 #endif
-	clear();
+	// clear();
 }
 
 template <class Key, class T, class Compare, class Allocator>
@@ -241,15 +238,15 @@ map<Key, T, Compare, Allocator>::get_allocator() const
 
 // element access
 
-// template <class Key, class T, class Compare, class Allocator>
-
-// T&		 map<Key, T, Compare, Allocator>::at(const key_type& key)
-// {
-// 	return m_tree
-// }
-
-// const T& at(const key_type& key) const;
-// T&		 operator[](const key_type& key);
+template <class Key, class T, class Compare, class Allocator>
+typename map<Key, T, Compare, Allocator>::mapped_type&
+map<Key, T, Compare, Allocator>::operator[](const key_type& key)
+{
+	iterator it = lower_bound(key);
+	if (it == end() || key_comp()(key, (*it).first))
+		it = insert(it, value_type(key, mapped_type()));
+	return (*it).second;
+}
 
 // iterators
 
@@ -405,6 +402,68 @@ typename map<Key, T, Compare, Allocator>::const_iterator
 map<Key, T, Compare, Allocator>::find(const key_type& key) const
 {
 	return m_tree.find(key);
+}
+
+template <class Key, class T, class Compare, class Allocator>
+ft::pair<
+	typename map<Key, T, Compare, Allocator>::iterator,
+	typename map<Key, T, Compare, Allocator>::iterator>
+map<Key, T, Compare, Allocator>::equal_range(const key_type& key)
+{
+	return m_tree.equal_range(key);
+}
+
+template <class Key, class T, class Compare, class Allocator>
+ft::pair<
+	typename map<Key, T, Compare, Allocator>::const_iterator,
+	typename map<Key, T, Compare, Allocator>::const_iterator>
+map<Key, T, Compare, Allocator>::equal_range(const key_type& key) const
+{
+	return m_tree.equal_range(key);
+}
+
+template <class Key, class T, class Compare, class Allocator>
+typename map<Key, T, Compare, Allocator>::iterator
+map<Key, T, Compare, Allocator>::lower_bound(const key_type& key)
+{
+	return m_tree.lower_bound(key);
+}
+
+template <class Key, class T, class Compare, class Allocator>
+typename map<Key, T, Compare, Allocator>::const_iterator
+map<Key, T, Compare, Allocator>::lower_bound(const key_type& key) const
+{
+	return m_tree.lower_bound(key);
+}
+
+template <class Key, class T, class Compare, class Allocator>
+typename map<Key, T, Compare, Allocator>::iterator
+map<Key, T, Compare, Allocator>::upper_bound(const key_type& key)
+{
+	return m_tree.upper_bound(key);
+}
+
+template <class Key, class T, class Compare, class Allocator>
+typename map<Key, T, Compare, Allocator>::const_iterator
+map<Key, T, Compare, Allocator>::upper_bound(const key_type& key) const
+{
+	return m_tree.upper_bound(key);
+}
+
+// observer
+
+template <class Key, class T, class Compare, class Allocator>
+typename map<Key, T, Compare, Allocator>::key_compare
+map<Key, T, Compare, Allocator>::key_comp() const
+{
+	return m_tree.key_comp();
+}
+
+template <class Key, class T, class Compare, class Allocator>
+typename map<Key, T, Compare, Allocator>::value_compare
+map<Key, T, Compare, Allocator>::value_comp() const
+{
+	return value_compare(m_tree.key_comp());
 }
 
 // relational operators
