@@ -206,7 +206,7 @@ ft::vector<T, Alloc>::vector(const vector& other) : m_alloc(other.m_alloc)
 	size_type i;
 
 	m_start = m_alloc.allocate(other.capacity());
-	for (i = 0; i < other.capacity(); i++)
+	for (i = 0; i < other.size(); i++)
 	{
 		m_alloc.construct(m_start + i, other[i]);
 	}
