@@ -598,17 +598,22 @@ bool all()
 	bool success = true;
 
 	std::cout << "-- Test vector --" << std::endl;
-	debug::run_test("vector construction", test_vector::construction);
-	debug::run_test("vector copy", test_vector::copy);
-	debug::run_test("vector assign", test_vector::assign);
-	debug::run_test("vector capacity", test_vector::capacity);
-	debug::run_test("vector data", test_vector::data);
-	debug::run_test("vector reverse_iteration", test_vector::reverse_iteration);
-	debug::run_test("vector clear", test_vector::clear);
-	debug::run_test("vector insert", test_vector::insert);
-	debug::run_test("vector erase", test_vector::erase);
-	debug::run_test("vector pop_back", test_vector::pop_back);
-	debug::run_test("vector resize", test_vector::resize);
+	success = success &&
+			  debug::run_test("vector construction", test_vector::construction);
+	success = success && debug::run_test("vector copy", test_vector::copy);
+	success = success && debug::run_test("vector assign", test_vector::assign);
+	success =
+		success && debug::run_test("vector capacity", test_vector::capacity);
+	success = success && debug::run_test("vector data", test_vector::data);
+	success = success &&
+			  debug::run_test(
+				  "vector reverse_iteration", test_vector::reverse_iteration);
+	success = success && debug::run_test("vector clear", test_vector::clear);
+	success = success && debug::run_test("vector insert", test_vector::insert);
+	success = success && debug::run_test("vector erase", test_vector::erase);
+	success =
+		success && debug::run_test("vector pop_back", test_vector::pop_back);
+	success = success && debug::run_test("vector resize", test_vector::resize);
 	// debug::run_test("relational operators", test_relational_operators);
 	return success;
 }
