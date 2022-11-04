@@ -1,6 +1,10 @@
 #ifndef SET_HPP
 #define SET_HPP
 
+#ifdef DEBUG
+#include <iostream>
+#endif
+
 #include "tree.hpp"
 
 #include <functional> // less
@@ -92,7 +96,7 @@ public:
 	void	  erase(iterator pos);
 	void	  erase(iterator first, iterator last);
 	size_type erase(const key_type& key);
-	void	  swap(map& other);
+	void	  swap(set& other);
 
 	// lookup
 
@@ -115,14 +119,362 @@ public:
 	// set comparison
 
 	template <typename Key1, typename Compare1, typename A1>
-	friend bool operator==(
-		const set<Key1, Compare1, A1>&,
-		const set<Key1, Compare1, A1>&);
+	friend bool
+	operator==(const set<Key1, Compare1, A1>&, const set<Key1, Compare1, A1>&);
 	template <typename Key1, typename Compare1, typename A1>
-	friend bool operator<(
-		const set<Key1, Compare1, A1>&,
-		const set<Key1, Compare1, A1>&);
+	friend bool
+	operator<(const set<Key1, Compare1, A1>&, const set<Key1, Compare1, A1>&);
 };
+
+// constructor
+
+template <class Key, class Compare, class Allocator>
+set<Key, Compare, Allocator>::set() : m_tree()
+{
+#ifdef DEBUG
+	std::cout << "set default constructor" << std::endl;
+#endif
+}
+
+template <class Key, class Compare, class Allocator>
+set<Key, Compare, Allocator>::set(
+	const key_compare&	  comp,
+	const allocator_type& alloc)
+	: m_tree(comp, alloc)
+{
+#ifdef DEBUG
+	std::cout << "set empty constructor" << std::endl;
+#endif
+}
+
+template <class Key, class Compare, class Allocator>
+template <class InputIterator>
+set<Key, Compare, Allocator>::set(
+	InputIterator		  first,
+	InputIterator		  last,
+	const key_compare&	  key_compare,
+	const allocator_type& alloc)
+	: m_tree(comp, alloc)
+{
+#ifdef DEBUG
+	std::cout << "set range constructor" << std::endl;
+#endif
+	m_tree.insert(first, last);
+}
+
+template <class Key, class Compare, class Allocator>
+set<Key, Compare, Allocator>::set(const set& other) : m_tree(other.m_tree)
+{
+#ifdef DEBUG
+	std::cout << "set copy constructor" << std::endl;
+#endif
+}
+
+template <class Key, class Compare, class Allocator>
+set<Key, Compare, Allocator>::~set()
+{
+#ifdef DEBUG
+	std::cout << "set destructor" << std::endl;
+#endif
+}
+
+template <class Key, class Compare, class Allocator>
+set<Key, Compare, Allocator>&
+set<Key, Compare, Allocator>::operator=(const set& other)
+{
+#ifdef DEBUG
+	std::cout << "set operator= (copy assignment)" << std::endl;
+#endif
+	if (this != &other)
+	{
+#ifdef DEBUG
+		std::cout << "sets are not identical (copying elemements)" << std::endl;
+#endif
+		set tmp(other);
+		swap(tmp);
+		return *this;
+	}
+	return *this;
+}
+
+template <class Key, class Compare, class Allocator>
+typename set<Key, Compare, Allocator>::allocator_type
+set<Key, Compare, Allocator>::get_allocator() const
+{
+	return m_tree.get_allocator();
+}
+
+// iterators
+
+template <class Key, class Compare, class Allocator>
+typename set<Key, Compare, Allocator>::iterator
+set<Key, Compare, Allocator>::begin()
+{
+	return m_tree.begin();
+}
+
+template <class Key, class Compare, class Allocator>
+typename set<Key, Compare, Allocator>::const_iterator
+set<Key, Compare, Allocator>::begin() const
+{
+	return m_tree.begin();
+}
+
+template <class Key, class Compare, class Allocator>
+typename set<Key, Compare, Allocator>::iterator
+set<Key, Compare, Allocator>::end()
+{
+	return m_tree.end();
+}
+
+template <class Key, class Compare, class Allocator>
+typename set<Key, Compare, Allocator>::const_iterator
+set<Key, Compare, Allocator>::end() const
+{
+	return m_tree.end();
+}
+
+template <class Key, class Compare, class Allocator>
+typename set<Key, Compare, Allocator>::reverse_iterator
+set<Key, Compare, Allocator>::rbegin()
+{
+	return m_tree.rbegin();
+}
+
+template <class Key, class Compare, class Allocator>
+typename set<Key, Compare, Allocator>::const_reverse_iterator
+set<Key, Compare, Allocator>::rbegin() const
+{
+	return m_tree.rbegin();
+}
+
+template <class Key, class Compare, class Allocator>
+typename set<Key, Compare, Allocator>::reverse_iterator
+set<Key, Compare, Allocator>::rend()
+{
+	return m_tree.rend();
+}
+
+template <class Key, class Compare, class Allocator>
+typename set<Key, Compare, Allocator>::const_reverse_iterator
+set<Key, Compare, Allocator>::rend() const
+{
+	return m_tree.rend();
+}
+
+// capacity
+
+template <class Key, class Compare, class Allocator>
+bool set<Key, Compare, Allocator>::empty() const
+{
+	return m_tree.empty();
+}
+
+template <class Key, class Compare, class Allocator>
+typename set<Key, Compare, Allocator>::size_type
+set<Key, Compare, Allocator>::max_size() const
+{
+	return m_tree.max_size();
+}
+
+// modifiers
+
+template <class Key, class Compare, class Allocator>
+void set<Key, Compare, Allocator>::clear()
+{
+	m_tree.clear();
+}
+
+template <class Key, class Compare, class Allocator>
+pair<typename set<Key, Compare, Allocator>::iterator, bool>
+set<Key, Compare, Allocator>::insert(const value_type& value)
+{
+	return m_tree.insert(value);
+}
+
+template <class Key, class Compare, class Allocator>
+typename set<Key, Compare, Allocator>::iterator
+set<Key, Compare, Allocator>::insert(iterator pos, const value_type& value)
+{
+	return m_tree.insert(pos, value);
+}
+
+template <class Key, class Compare, class Allocator>
+template <class InputIterator>
+void set<Key, Compare, Allocator>::insert(
+	InputIterator first,
+	InputIterator last)
+{
+	m_tree.insert(first, last);
+}
+
+template <class Key, class Compare, class Allocator>
+void set<Key, Compare, Allocator>::erase(iterator pos)
+{
+	m_tree.erase(pos);
+}
+
+template <class Key, class Compare, class Allocator>
+void set<Key, Compare, Allocator>::erase(iterator first, iterator last)
+{
+	m_tree.erase(first, last);
+}
+
+template <class Key, class Compare, class Allocator>
+typename set<Key, Compare, Allocator>::size_type
+set<Key, Compare, Allocator>::erase(const key_type& key)
+{
+	return m_tree.erase(key);
+}
+
+template <class Key, class Compare, class Allocator>
+void set<Key, Compare, Allocator>::swap(set& other)
+{
+	m_tree.swap(other);
+}
+
+// lookup
+
+template <class Key, class Compare, class Allocator>
+typename set<Key, Compare, Allocator>::size_type
+set<Key, Compare, Allocator>::count(const key_type& key) const
+{
+	return m_tree.count(key);
+}
+
+template <class Key, class Compare, class Allocator>
+typename set<Key, Compare, Allocator>::iterator
+set<Key, Compare, Allocator>::find(const key_type& key)
+{
+	return m_tree.find(key);
+}
+
+template <class Key, class Compare, class Allocator>
+typename set<Key, Compare, Allocator>::const_iterator
+set<Key, Compare, Allocator>::find(const key_type& key) const
+{
+	return m_tree.find(key);
+}
+
+template <class Key, class Compare, class Allocator>
+pair<
+	typename set<Key, Compare, Allocator>::iterator,
+	typename set<Key, Compare, Allocator>::iterator >
+set<Key, Compare, Allocator>::equal_range(const key_type& key)
+{
+	return m_tree.equal_range(key);
+}
+
+template <class Key, class Compare, class Allocator>
+pair<
+	typename set<Key, Compare, Allocator>::const_iterator,
+	typename set<Key, Compare, Allocator>::const_iterator >
+set<Key, Compare, Allocator>::equal_range(const key_type& key) const
+{
+	return m_tree.equal_range(key);
+}
+
+template <class Key, class Compare, class Allocator>
+typename set<Key, Compare, Allocator>::iterator
+set<Key, Compare, Allocator>::lower_bound(const key_type& key)
+{
+	return m_tree.lower_bound(key);
+}
+
+template <class Key, class Compare, class Allocator>
+typename set<Key, Compare, Allocator>::const_iterator
+set<Key, Compare, Allocator>::lower_bound(const key_type& key) const
+{
+	return m_tree.lower_bound(key);
+}
+
+template <class Key, class Compare, class Allocator>
+typename set<Key, Compare, Allocator>::iterator
+set<Key, Compare, Allocator>::upper_bound(const key_type& key)
+{
+	return m_tree.upper_bound(key);
+}
+
+template <class Key, class Compare, class Allocator>
+typename set<Key, Compare, Allocator>::const_iterator
+set<Key, Compare, Allocator>::upper_bound(const key_type& key) const
+{
+	return m_tree.upper_bound(key);
+}
+
+// observer
+
+template <class Key, class Compare, class Allocator>
+typename set<Key, Compare, Allocator>::key_compare
+set<Key, Compare, Allocator>::key_comp() const
+{
+	return m_tree.key_comp();
+}
+
+template <class Key, class Compare, class Allocator>
+typename set<Key, Compare, Allocator>::value_compare
+set<Key, Compare, Allocator>::value_comp() const
+{
+	return m_tree.value_comp();
+}
+
+// relational operators
+
+template <class Key, class Compare, class Allocator>
+bool operator==(
+	const set<Key, Compare, Allocator>& lhs,
+	const set<Key, Compare, Allocator>& rhs)
+{
+	return lhs.m_tree == rhs.m_tree;
+}
+
+template <class Key, class Compare, class Allocator>
+bool operator!=(
+	const set<Key, Compare, Allocator>& lhs,
+	const set<Key, Compare, Allocator>& rhs)
+{
+	return !(lhs == rhs);
+}
+
+template <class Key, class Compare, class Allocator>
+bool operator<(
+	const set<Key, Compare, Allocator>& lhs,
+	const set<Key, Compare, Allocator>& rhs)
+{
+	return lhs.m_tree < rhs.m_tree;
+}
+
+template <class Key, class Compare, class Allocator>
+bool operator<=(
+	const set<Key, Compare, Allocator>& lhs,
+	const set<Key, Compare, Allocator>& rhs)
+{
+	return !(rhs < lhs);
+}
+
+template <class Key, class Compare, class Allocator>
+bool operator>(
+	const set<Key, Compare, Allocator>& lhs,
+	const set<Key, Compare, Allocator>& rhs)
+{
+	return rhs < lhs;
+}
+
+template <class Key, class Compare, class Allocator>
+bool operator>=(
+	const set<Key, Compare, Allocator>& lhs,
+	const set<Key, Compare, Allocator>& rhs)
+{
+	return !(lhs < rhs);
+}
+
+// specialization for ft::swap(set)
+
+template <class Key, class T, class Compare, class Allocator>
+void swap(set<Key, Compare, Allocator>& lhs, set<Key, Compare, Allocator>& rhs)
+{
+	lhs.swap(rhs);
+}
 
 } // namespace ft
 
