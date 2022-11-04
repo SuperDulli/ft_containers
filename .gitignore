@@ -34,6 +34,13 @@ mine
 mine_debug
 stl
 stl_debug
+test_rb_tree
+
+# vs code
+.vscode/
+
+*.dSYM
 
 *.txt
+*.ans
 test_main.cpp

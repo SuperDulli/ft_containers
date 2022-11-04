@@ -445,6 +445,8 @@ template <class InputIterator>
 typename iterator_traits<InputIterator>::difference_type
 distance(InputIterator first, InputIterator last)
 {
+	// TODO: optimize for RandomAccessIterator
+
 	typename ft::iterator_traits<InputIterator>::difference_type result = 0;
 	while (first != last)
 	{
@@ -452,6 +454,21 @@ distance(InputIterator first, InputIterator last)
 		++result;
 	}
 	return result;
+}
+
+// advance
+
+template <class Iterator, class Distance>
+void advance(Iterator& it, Distance n)
+{
+	// TODO: allow negative n
+
+	while (n > 0)
+	{
+		--n;
+		++it;
+	}
+
 }
 
 } // namespace ft

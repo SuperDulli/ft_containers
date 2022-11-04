@@ -6,6 +6,14 @@ namespace test_vector
 {
 bool all();
 }
+namespace test_tree
+{
+	bool all();
+}
+namespace test_map
+{
+	bool all();
+}
 
 int main()
 {
@@ -14,6 +22,8 @@ int main()
 	result = result && debug::run_test("pair", test_pair);
 	result = result && debug::run_test("utility", test_utility);
 	result = result && debug::run_test("vector", test_vector::all);
+	// result = result && debug::run_test("tree", test_tree::all);
+	result = result && debug::run_test("map", test_map::all);
 
 	if (result)
 		std::cout << Color::Modifier(Color::FG_GREEN) << "All Test passed."

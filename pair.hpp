@@ -1,7 +1,7 @@
 #ifndef PAIR_HPP
 #define PAIR_HPP
 
-#include "utility.hpp"
+// #include "utility.hpp"
 
 #ifdef DEBUG
 #include <iostream>
@@ -23,7 +23,7 @@ struct pair {
 	pair() : first(), second()
 	{
 #ifdef DEBUG
-		std::cout << "pair constructor (default)" << std::endl;
+		// std::cout << "pair constructor (default)" << std::endl;
 #endif
 	}
 
@@ -31,7 +31,7 @@ struct pair {
 	pair(const ft::pair<U, V>& other) : first(other.first), second(other.second)
 	{
 #ifdef DEBUG
-		std::cout << "pair constructor (copy template)" << std::endl;
+		// std::cout << "pair constructor (copy template)" << std::endl;
 #endif
 	}
 
@@ -39,14 +39,14 @@ struct pair {
 		: first(other.first), second(other.second)
 	{
 #ifdef DEBUG
-		std::cout << "pair constructor (copy)" << std::endl;
+		// std::cout << "pair constructor (copy)" << std::endl;
 #endif
 	}
 
 	pair(const first_type& a, const second_type& b) : first(a), second(b)
 	{
 #ifdef DEBUG
-		std::cout << "pair constructor (initialization)" << std::endl;
+		// std::cout << "pair constructor (initialization)" << std::endl;
 #endif
 	}
 
