@@ -80,14 +80,61 @@ bool construction()
 	return true;
 }
 
+bool copy()
+{
+	bool result = true;
+
+	ft::stack<std::string> empty;
+	ft::stack<std::string> stack;
+
+	stack.push("first");
+	stack.push("second");
+	stack.push("third");
+
+#ifdef DEBUG
+	std::cout << "empty: " << empty << std::endl;
+	std::cout << "stack: " << stack << std::endl;
+
+	std::cout << "empty = stack (copy assignment)" << std::endl;
+#endif
+	empty = stack;
+#ifdef DEBUG
+	std::cout << "empty2(stack) (copy construction)" << std::endl;
+#endif
+	ft::stack<std::string> empty2(stack);
+#ifdef DEBUG
+	std::cout << "empty: " << empty << std::endl;
+	std::cout << "empty2: " << empty2 << std::endl;
+	std::cout << "stack: " << stack << std::endl;
+#endif
+	result = result && empty == stack && empty2 == stack;
+
+#ifdef DEBUG
+	std::cout << "empty.push(\"fourth\");" << std::endl;
+	std::cout << "empty2.pop(); " << std::endl;
+#endif
+	empty.push("fourth");
+	empty2.pop();
+
+#ifdef DEBUG
+	std::cout << "empty: " << empty << std::endl;
+	std::cout << "empty2: " << empty2 << std::endl;
+	std::cout << "stack: " << stack << std::endl;
+#endif
+	result =
+		result && empty.size() == 4 && empty2.size() == 2 && stack.size() == 3;
+
+	return result;
+}
+
 bool all()
 {
 	bool success = true;
 
 	std::cout << "-- Test stack --" << std::endl;
 	success = success && debug::run_test("stack construction", construction);
+	success = success && debug::run_test("stack copy", copy);
 
-	// debug::run_test("relational operators", test_relational_operators);
 	return success;
 }
 } // namespace test_stack
