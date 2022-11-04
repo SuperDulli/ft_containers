@@ -130,8 +130,6 @@ private:
 	void m_moveElementsLeft(iterator pos, size_type count);
 }; // class vector
 
-} // namespace ft
-
 // Constructors
 
 template <class T, class Alloc>
@@ -751,6 +749,9 @@ bool operator==(
 	const ft::vector<T, Alloc>& lhs,
 	const ft::vector<T, Alloc>& rhs)
 {
+	#ifdef DEBUG
+	std::cout << "vector equality test" << std::endl;
+#endif
 	return (
 		lhs.size() == rhs.size() &&
 		ft::equal(lhs.begin(), lhs.end(), rhs.begin()));
@@ -792,5 +793,7 @@ bool operator>=(
 {
 	return (!(lhs < rhs));
 }
+
+} // namespace ft
 
 #endif // VECTOR_HPP

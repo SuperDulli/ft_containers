@@ -5,11 +5,13 @@
 #include <map>
 #include <utility>
 #include <vector>
+#include <stack>
 namespace ft = std;
 #else
 #include "map.hpp"
 #include "pair.hpp"
 #include "vector.hpp"
+#include "stack.hpp"
 #endif
 
 #include <stdlib.h> // rand
@@ -97,11 +99,31 @@ std::ostream& operator<<(std::ostream& os, const ft::map<K, V>& map)
 		 it != map.end();
 		 ++it)
 	{
-		os << "[" << (*it).first << "]=" << (*it).second << ", ";
+		os << "[" << it->first << "]=" << it->second << ", ";
 	}
 	return os;
 }
 // TODO: do sth similar for set
+
+template <typename T, typename Container>
+std::ostream& operator<<(std::ostream& os, const ft::stack<T, Container>& stack)
+{
+	ft::stack<T, Container> copy(stack);
+	os << "stack(size=" << stack.size() << ")" << std::endl;
+
+	if (stack.empty())
+	{
+		os << "<empty>";
+		return os;
+	}
+	os << "top -> ";
+	while (!copy.empty())
+	{
+		os << copy.top() << ", ";
+		copy.pop();
+	}
+	return os;
+}
 
 template <class C>
 void printIterName(const C& container, typename C::const_iterator it)
@@ -169,6 +191,7 @@ void debug::insert_sorted_pair(C& container, size_t count)
 template <class Iterator>
 bool debug::insertion_status(Iterator it, bool success)
 {
+	(void) it;
 #ifdef DEBUG
 	std::cout << "insertion of " << *it << (success ? " succeded" : " failed")
 			  << std::endl;

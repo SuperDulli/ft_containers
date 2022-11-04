@@ -14,9 +14,9 @@ template <class T, class Container = ft::vector<T> >
 class stack
 {
 public:
-	typedef Container			  container_type;
-	typedef Container::value_type value_type;
-	typedef Container::size_type  size_type;
+	typedef Container					   container_type;
+	typedef typename Container::value_type value_type;
+	typedef typename Container::size_type  size_type;
 
 	// c++11
 	//  typedef Container::reference	   reference;
@@ -25,7 +25,7 @@ public:
 	// constructor
 
 	explicit stack(const container_type& cont = container_type());
-	stack(const container_type& other);
+	stack(const stack& other);
 
 	~stack();
 
@@ -47,7 +47,7 @@ public:
 	void pop();
 
 protected:
-	container_type m_cont;
+	container_type c;
 
 private:
 	template <class T1, class C1>
@@ -59,7 +59,7 @@ private:
 // constructor
 
 template <class T, class Container>
-stack<T, Container>::stack(const container_type& cont) : m_cont(cont)
+stack<T, Container>::stack(const container_type& cont) : c(cont)
 {
 #ifdef DEBUG
 	std::cout << "stack default constructor" << std::endl;
@@ -67,7 +67,8 @@ stack<T, Container>::stack(const container_type& cont) : m_cont(cont)
 }
 
 template <class T, class Container>
-stack<T, Container>::stack(const container_type& other) : m_cont(other)
+stack<T, Container>::stack(const stack<T, Container>& other)
+	: c(other.c)
 {
 #ifdef DEBUG
 	std::cout << "stack copy constructor" << std::endl;
@@ -88,22 +89,22 @@ stack<T, Container>& stack<T, Container>::operator=(const container_type& other)
 #ifdef DEBUG
 	std::cout << "stack copy assignment operator" << std::endl;
 #endif
-	m_cont = other.m_cont;
-	return *this:
+	c = other.c;
+	return *this;
 }
 
 // element access
 
 template <class T, class Container>
-stack<T, Container>::value_type& stack<T, Container>::top()
+typename stack<T, Container>::value_type& stack<T, Container>::top()
 {
-	return m_cont.back();
+	return c.back();
 }
 
 template <class T, class Container>
-const stack<T, Container>::value_type& stack<T, Container>::top() const
+const typename stack<T, Container>::value_type& stack<T, Container>::top() const
 {
-	return m_cont.back();
+	return c.back();
 }
 
 // capacity
@@ -111,13 +112,13 @@ const stack<T, Container>::value_type& stack<T, Container>::top() const
 template <class T, class Container>
 bool stack<T, Container>::empty() const
 {
-	return m_cont.empty();
+	return c.empty();
 }
 
 template <class T, class Container>
-stack<T, Container>::size_type stack<T, Container>::size() const
+typename stack<T, Container>::size_type stack<T, Container>::size() const
 {
-	return m_cont.size();
+	return c.size();
 }
 
 // modifiers
@@ -125,13 +126,13 @@ stack<T, Container>::size_type stack<T, Container>::size() const
 template <class T, class Container>
 void stack<T, Container>::push(const value_type& value)
 {
-	m_cont.push_back(value);
+	c.push_back(value);
 }
 
 template <class T, class Container>
 void stack<T, Container>::pop()
 {
-	m_cont.pop_back(value);
+	c.pop_back();
 }
 
 // relational operators - non member functions
@@ -139,7 +140,7 @@ void stack<T, Container>::pop()
 template <class T, class Container>
 bool operator==(const stack<T, Container>& lhs, const stack<T, Container>& rhs)
 {
-	return lhs.m_cont == rhs.m_cont;
+	return lhs.c == rhs.c;
 }
 
 template <class T, class Container>
@@ -151,7 +152,7 @@ bool operator!=(const stack<T, Container>& lhs, const stack<T, Container>& rhs)
 template <class T, class Container>
 bool operator<(const stack<T, Container>& lhs, const stack<T, Container>& rhs)
 {
-	return lhs.m_cont < rhs.m_cont;
+	return lhs.c < rhs.c;
 }
 
 template <class T, class Container>

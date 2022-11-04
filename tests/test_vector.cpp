@@ -42,7 +42,7 @@ bool construction()
 	return (
 		empty.size() == 0 && intVec.size() == 2 &&
 		charVec.size() == s.length() && iter.size() == intVec.size() &&
-		copy.size() == init.size());
+		copy.size() == init.size() && copy == init);
 }
 
 bool copy()

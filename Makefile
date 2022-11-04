@@ -14,7 +14,8 @@ TMPLATES= \
 			utility.hpp \
 			vector.hpp \
 			tree.hpp \
-			map.hpp
+			map.hpp \
+			stack.hpp
 
 HEADERS	= $(patsubst %.cpp,%.hpp,$(CLASSES)) $(TMPLATES)
 TST_SRCS= \
@@ -22,7 +23,8 @@ TST_SRCS= \
 			test_pair.cpp \
 			test_vector.cpp \
 			test_utility.cpp \
-			test_map.cpp
+			test_map.cpp \
+			test_stack.cpp
 			# test_rb_tree.cpp \ # causes namespace conflict because there is no counter part in STL
 
 SRCS	= main.cpp $(patsubst %.cpp,tests/%.cpp,$(TST_SRCS)) $(CLASSES)
@@ -30,7 +32,7 @@ OBJDIR	= obj
 OBJS	= $(patsubst %.cpp,$(OBJDIR)/%.o,$(SRCS))
 
 INTRA_MAIN = intra_main.cpp
-
+SEED = 4242
 
 all: $(NAME) $(NAME_STL) $(NAME_DEBUG) $(NAME_STL_DEBUG)
 
@@ -79,6 +81,11 @@ test_debug: $(NAME_DEBUG)
 
 test_rb_tree: tests/test_rb_tree.cpp Color.cpp tree.hpp pair.hpp utility.hpp debug_utility.hpp debug_tree_utility.hpp
 	$(CXX) $(CXXFLAGS) -g -DDEBUG=1 tests/test_rb_tree.cpp Color.cpp -o $@
+	./$@
+
+test_intra: $(INTRA_MAIN) $(HEADERS)
+	$(CXX) $(CXXFLAGS) $(INTRA_MAIN) -I. -o $@
+	./$@ $(SEED)
 
 $(NAME): $(OBJS) $(SRCS) $(HEADERS)
 	$(CXX) $(CXXFLAGS) $(OBJS) -o $@
@@ -110,4 +117,4 @@ compare: $(NAME_DEBUG) $(NAME_STL_DEBUG)
 	./$(NAME_STL_DEBUG) > theirs.txt 2>&1
 	diff -y --width=200 --color=always mine.txt theirs.txt
 
-.PHONY: all clean fclean re show debug leaks test valgrind test_rb_tree
+.PHONY: all clean fclean re show debug leaks test valgrind test_rb_tree test_intra
