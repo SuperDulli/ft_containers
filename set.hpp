@@ -176,6 +176,7 @@ set<Key, Compare, Allocator>::~set()
 #ifdef DEBUG
 	std::cout << "set destructor" << std::endl;
 #endif
+	clear();
 }
 
 template <class Key, class Compare, class Allocator>
