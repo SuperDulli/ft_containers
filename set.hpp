@@ -154,7 +154,7 @@ set<Key, Compare, Allocator>::set(
 	InputIterator		  last,
 	const key_compare&	  key_compare,
 	const allocator_type& alloc)
-	: m_tree(comp, alloc)
+	: m_tree(key_compare, alloc)
 {
 #ifdef DEBUG
 	std::cout << "set range constructor" << std::endl;
@@ -272,6 +272,13 @@ bool set<Key, Compare, Allocator>::empty() const
 
 template <class Key, class Compare, class Allocator>
 typename set<Key, Compare, Allocator>::size_type
+set<Key, Compare, Allocator>::size() const
+{
+	return m_tree.size();
+}
+
+template <class Key, class Compare, class Allocator>
+typename set<Key, Compare, Allocator>::size_type
 set<Key, Compare, Allocator>::max_size() const
 {
 	return m_tree.max_size();
@@ -330,7 +337,7 @@ set<Key, Compare, Allocator>::erase(const key_type& key)
 template <class Key, class Compare, class Allocator>
 void set<Key, Compare, Allocator>::swap(set& other)
 {
-	m_tree.swap(other);
+	m_tree.swap(other.m_tree);
 }
 
 // lookup

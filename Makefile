@@ -15,7 +15,8 @@ TMPLATES= \
 			vector.hpp \
 			tree.hpp \
 			map.hpp \
-			stack.hpp
+			stack.hpp \
+			set.hpp
 
 HEADERS	= $(patsubst %.cpp,%.hpp,$(CLASSES)) $(TMPLATES)
 TST_SRCS= \
@@ -24,7 +25,8 @@ TST_SRCS= \
 			test_vector.cpp \
 			test_utility.cpp \
 			test_map.cpp \
-			test_stack.cpp
+			test_stack.cpp \
+			test_set.cpp
 			# test_rb_tree.cpp \ # causes namespace conflict because there is no counter part in STL
 
 SRCS	= main.cpp $(patsubst %.cpp,tests/%.cpp,$(TST_SRCS)) $(CLASSES)
