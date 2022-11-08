@@ -128,9 +128,8 @@ private:
 
 	void m_moveElementsRight(iterator pos, size_type count);
 	void m_moveElementsLeft(iterator pos, size_type count);
+	void m_destroy(pointer, size_type count);
 }; // class vector
-
-} // namespace ft
 
 // Constructors
 
@@ -222,6 +221,7 @@ ft::vector<T, Alloc>::~vector(void)
 #ifdef DEBUG
 	std::cout << "vector destructor" << std::endl;
 #endif
+	m_destroy(m_start, this->size());
 	m_alloc.deallocate(m_start, this->capacity());
 }
 
@@ -337,6 +337,7 @@ void ft::vector<T, Alloc>::reserve(size_type new_cap)
 		{
 			m_alloc.construct(newArray + i, m_start[i]);
 		}
+		m_destroy(m_start, this->size());
 		m_alloc.deallocate(m_start, this->capacity());
 		m_start = newArray;
 		m_finish = m_start + i;
@@ -482,10 +483,15 @@ ft::vector<T, Alloc>::rend() const
 template <class T, class Alloc>
 void ft::vector<T, Alloc>::clear()
 {
-	for (pointer it = m_start; it != m_finish; ++it)
-	{
-		it->~T();
-	}
+	#ifdef DEBUG
+	std::cout << "vector clear" << std::endl;
+	#endif
+	// for (pointer it = m_start; it != m_finish; ++it)
+	// {
+	// 	// it->~T();
+	// 	m_alloc.destroy(it);
+	// }
+	m_destroy(m_start, this->size());
 	m_finish = m_start;
 }
 
@@ -636,6 +642,7 @@ ft::vector<T, Alloc>::erase(iterator first, iterator last)
 template <class T, class Alloc>
 void ft::vector<T, Alloc>::push_back(const T& value)
 {
+	std::cout << "pushbask" << std::endl;
 	size_type currentCapacity = capacity();
 	if (size() + 1 > currentCapacity)
 	{
@@ -683,6 +690,7 @@ void ft::vector<T, Alloc>::resize(size_type count, T value)
 		// reduce size to count
 		m_alloc.destroy(m_start + count);
 		m_finish = m_start + count;
+		// TODO: fix: destroy all extra elements
 	}
 	else if (size() < count)
 	{
@@ -744,6 +752,16 @@ void ft::vector<T, Alloc>::m_moveElementsLeft(iterator pos, size_type steps)
 	}
 }
 
+template <class T, class Alloc>
+void ft::vector<T, Alloc>::m_destroy(pointer start, size_type count)
+{
+	std::cout << "destroy" << count << std::endl;
+	for (size_type i = 0; i < count; i++)
+	{
+		m_alloc.destroy(start + i);
+	}
+}
+
 // relational operators
 
 template <class T, class Alloc>
@@ -792,5 +810,7 @@ bool operator>=(
 {
 	return (!(lhs < rhs));
 }
+
+} // namespace ft
 
 #endif // VECTOR_HPP

@@ -169,6 +169,7 @@ void debug::insert_sorted_pair(C& container, size_t count)
 template <class Iterator>
 bool debug::insertion_status(Iterator it, bool success)
 {
+	(void) it;
 #ifdef DEBUG
 	std::cout << "insertion of " << *it << (success ? " succeded" : " failed")
 			  << std::endl;

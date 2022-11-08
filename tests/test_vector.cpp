@@ -17,6 +17,8 @@ using ::operator<<; // use operators from the gloabal namespace
 
 bool construction()
 {
+	bool result = true;
+
 	ft::vector<int> empty;
 	ft::vector<int> intVec;
 	// ft::vector<int, > emptyCstmAlloc;
@@ -31,6 +33,13 @@ bool construction()
 	ft::vector<int> iter(intVec.begin(), intVec.end());
 	ft::vector<int> copy(init);
 
+	ft::vector< ft::vector<int> > empty_empty_matrix;
+	ft::vector< ft::vector<int> > empty_matrix(2, ft::vector<int>());
+	ft::vector< ft::vector<int> > matrix(2, ft::vector<int>(3));
+	ft::vector< ft::vector<int> > iter_matrix(
+		2, ft::vector<int>(intVec.begin(), intVec.end()));
+	ft::vector< ft::vector<int> > copy_matrix(matrix);
+
 #ifdef DEBUG
 	std::cout << "empty " << empty << std::endl;
 	std::cout << "intVec " << intVec << std::endl;
@@ -38,11 +47,31 @@ bool construction()
 	std::cout << "charVec " << charVec << std::endl;
 	std::cout << "iter " << iter << std::endl;
 	std::cout << "copy " << copy << std::endl;
+	std::cout << "empty_empty_matrix " << empty_empty_matrix << std::endl;
+	std::cout << "empty_matrix " << empty_matrix << std::endl;
+	std::cout << "matrix " << matrix << std::endl;
+	std::cout << "iter_matrix " << iter_matrix << std::endl;
+	std::cout << "copy_matrix " << iter_matrix << std::endl;
 #endif
-	return (
-		empty.size() == 0 && intVec.size() == 2 &&
-		charVec.size() == s.length() && iter.size() == intVec.size() &&
-		copy.size() == init.size());
+	result = result && empty.empty() && empty.size() == 0;
+	result = result && !intVec.empty() && intVec.size() == 2;
+	result = result && !charVec.empty() && charVec.size() == s.length();
+	result = result && !iter.empty() && iter.size() == intVec.size();
+	result = result && copy == init;
+	result =
+		result && empty_empty_matrix.empty() && empty_empty_matrix.size() == 0;
+	result = result && !empty_matrix.empty() && empty_matrix.size() == 2;
+	result = result && empty_matrix[0].empty() && empty_matrix[0].size() == 0;
+	result = result && empty_matrix[1].empty() && empty_matrix[1].size() == 0;
+	result = result && !matrix.empty() && matrix.size() == 2;
+	result = result && !matrix[0].empty() && matrix[0].size() == 3;
+	result = result && !matrix[1].empty() && matrix[1].size() == 3;
+	result = result && !iter_matrix.empty() && iter_matrix.size() == 2;
+	result = result && iter_matrix[0] == intVec;
+	result = result && iter_matrix[1] == intVec;
+	result = result && copy_matrix == matrix;
+
+	return result;
 }
 
 bool copy()
@@ -587,8 +616,8 @@ bool resize()
 	std::cout << std::endl;
 #endif
 
-// TODO: test resize(currentSize) should not do anything;
-// TODO: test resize(0) should effectivly clear the vector;
+	// TODO: test resize(currentSize) should not do anything;
+	// TODO: test resize(0) should effectivly clear the vector;
 
 	return result;
 }
