@@ -7,6 +7,7 @@
 
 #include "iterator.hpp"
 #include "utility.hpp"
+#include "pair.hpp"
 
 #include <stdexcept>
 
