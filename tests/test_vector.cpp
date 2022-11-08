@@ -267,6 +267,21 @@ bool reverse_iteration()
 	ft::vector<char>		empty;
 
 #ifdef DEBUG
+	std::cout << "conversion and comparison iterator to const_iterator"
+			  << std::endl;
+#endif
+	ft::vector<int>::const_iterator c_it = nums.begin();
+	result = result && c_it != nums.end();
+
+#ifdef DEBUG
+	std::cout << "conversion and comparison reverse_iterator to "
+				 "reverse_const_iterator"
+			  << std::endl;
+#endif
+	ft::vector<int>::const_reverse_iterator c_rit = nums.rbegin();
+	result = result && c_rit != nums.rend();
+
+#ifdef DEBUG
 	std::cout << "reverse of nums:" << std::endl;
 #endif
 	int i = 0;
@@ -584,7 +599,7 @@ bool resize()
 		"mango",
 		"kiwi",
 		"strawberry"};
-	ft::vector<std::string> fruits(strings, strings + 7);
+	ft::vector<std::string>	 fruits(strings, strings + 7);
 	ft::vector<std::string>* fruits_heap = new ft::vector<std::string>(fruits);
 	ft::vector< ft::vector<int> > matrix(3);
 
@@ -659,7 +674,7 @@ bool all()
 	success =
 		success && debug::run_test("vector pop_back", test_vector::pop_back);
 	success = success && debug::run_test("vector resize", test_vector::resize);
-	// debug::run_test("relational operators", test_relational_operators);
+
 	return success;
 }
 } // namespace test_vector
