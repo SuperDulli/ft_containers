@@ -35,6 +35,7 @@ mine_debug
 stl
 stl_debug
 test_rb_tree
+test_intra
 
 # vs code
 .vscode/
@@ -44,3 +45,4 @@ test_rb_tree
 *.txt
 *.ans
 test_main.cpp
+intra_main.cpp

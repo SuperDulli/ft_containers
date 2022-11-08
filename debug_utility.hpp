@@ -3,12 +3,16 @@
 
 #ifdef USE_STL // CREATE A REAL STL EXAMPLE
 #include <map>
+#include <set>
+#include <stack>
 #include <utility>
 #include <vector>
 namespace ft = std;
 #else
 #include "map.hpp"
 #include "pair.hpp"
+#include "set.hpp"
+#include "stack.hpp"
 #include "vector.hpp"
 #endif
 
@@ -28,6 +32,8 @@ template <class C>
 void insert_random(C& container, size_t count);
 template <class C>
 void insert_random_pair(C& container, size_t count);
+template <class C>
+void insert_sorted(C& container, size_t count);
 template <class C>
 void insert_sorted_pair(C& container, size_t count);
 template <class Iterator>
@@ -97,11 +103,49 @@ std::ostream& operator<<(std::ostream& os, const ft::map<K, V>& map)
 		 it != map.end();
 		 ++it)
 	{
-		os << "[" << (*it).first << "]=" << (*it).second << ", ";
+		os << "[" << it->first << "]=" << it->second << ", ";
 	}
 	return os;
 }
-// TODO: do sth similar for set
+
+template <typename K>
+std::ostream& operator<<(std::ostream& os, const ft::set<K>& set)
+{
+	os << "set(size=" << set.size() << ", max_size=" << set.max_size() << ")"
+	   << std::endl;
+
+	if (set.empty())
+	{
+		os << "<empty>";
+		return os;
+	}
+	for (typename ft::set<K>::const_iterator it = set.begin(); it != set.end();
+		 ++it)
+	{
+		os << *it << ", ";
+	}
+	return os;
+}
+
+template <typename T, typename Container>
+std::ostream& operator<<(std::ostream& os, const ft::stack<T, Container>& stack)
+{
+	ft::stack<T, Container> copy(stack);
+	os << "stack(size=" << stack.size() << ")" << std::endl;
+
+	if (stack.empty())
+	{
+		os << "<empty>";
+		return os;
+	}
+	os << "top -> ";
+	while (!copy.empty())
+	{
+		os << copy.top() << ", ";
+		copy.pop();
+	}
+	return os;
+}
 
 template <class C>
 void printIterName(const C& container, typename C::const_iterator it)
@@ -151,6 +195,19 @@ void debug::insert_random_pair(C& container, size_t count)
 	}
 
 	std::cout << "inserted: " << pairs << std::endl;
+}
+
+template <class C>
+void debug::insert_sorted(C& container, size_t count)
+{
+	ft::vector<int> ints;
+	for (size_t i = 0; i < count; i++)
+	{
+		container.insert(i);
+		ints.push_back(i);
+	}
+
+	std::cout << "inserted: " << ints << std::endl;
 }
 
 template <class C>

@@ -207,7 +207,7 @@ ft::vector<T, Alloc>::vector(const vector& other) : m_alloc(other.m_alloc)
 	size_type i;
 
 	m_start = m_alloc.allocate(other.capacity());
-	for (i = 0; i < other.capacity(); i++)
+	for (i = 0; i < other.size(); i++)
 	{
 		m_alloc.construct(m_start + i, other[i]);
 	}
@@ -765,6 +765,9 @@ bool operator==(
 	const ft::vector<T, Alloc>& lhs,
 	const ft::vector<T, Alloc>& rhs)
 {
+	#ifdef DEBUG
+	std::cout << "vector equality test" << std::endl;
+#endif
 	return (
 		lhs.size() == rhs.size() &&
 		ft::equal(lhs.begin(), lhs.end(), rhs.begin()));
