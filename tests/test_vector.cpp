@@ -585,10 +585,14 @@ bool resize()
 		"kiwi",
 		"strawberry"};
 	ft::vector<std::string> fruits(strings, strings + 7);
+	ft::vector<std::string>* fruits_heap = new ft::vector<std::string>(fruits);
+	ft::vector< ft::vector<int> > matrix(3);
 
 #ifdef DEBUG
 	std::cout << "nums " << nums << std::endl;
 	std::cout << "fruits " << fruits << std::endl;
+	std::cout << "fruits_heap " << *fruits_heap << std::endl;
+	std::cout << "matrix " << matrix << std::endl;
 	std::cout << std::endl;
 #endif
 
@@ -608,16 +612,28 @@ bool resize()
 	result = result && nums.size() == 3;
 	fruits.resize(3);
 	result = result && fruits.size() == 3;
+	fruits_heap->resize(3);
+	result = result && fruits_heap->size() == 3;
+	matrix.resize(2);
+	result = result && matrix.size() == 2;
 
 #ifdef DEBUG
 	std::cout << "After resizing to make it smaller:" << std::endl;
 	std::cout << "nums " << nums << std::endl;
 	std::cout << "fruits " << fruits << std::endl;
+	std::cout << "fruits_heap " << *fruits_heap << std::endl;
 	std::cout << std::endl;
 #endif
+	delete fruits_heap;
 
-	// TODO: test resize(currentSize) should not do anything;
-	// TODO: test resize(0) should effectivly clear the vector;
+	// resize(currentSize) should not do anything;
+	ft::vector<int>::size_type numsSize = nums.size();
+	nums.resize(numsSize);
+	result = result && nums.size() == numsSize;
+
+	// resize(0) should effectivly clear the vector;
+	matrix.resize(0);
+	result = result && matrix.empty();
 
 	return result;
 }

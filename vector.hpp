@@ -576,7 +576,7 @@ typename ft::vector<T, Alloc>::iterator ft::vector<T, Alloc>::insert(
 		return iterator(m_start + offset);
 
 	size_type count = ft::distance(first, last);
-	reserve(size() + count); // TODO: review
+	reserve(size() + count);
 	iterator newPosition(m_start + offset);
 
 	if (newPosition != end())
@@ -642,7 +642,6 @@ ft::vector<T, Alloc>::erase(iterator first, iterator last)
 template <class T, class Alloc>
 void ft::vector<T, Alloc>::push_back(const T& value)
 {
-	std::cout << "pushbask" << std::endl;
 	size_type currentCapacity = capacity();
 	if (size() + 1 > currentCapacity)
 	{
@@ -684,13 +683,11 @@ void ft::vector<T, Alloc>::pop_back()
 template <class T, class Alloc>
 void ft::vector<T, Alloc>::resize(size_type count, T value)
 {
-	// size_type currentSize = size();
 	if (size() > count)
 	{
 		// reduce size to count
-		m_alloc.destroy(m_start + count);
+		m_destroy(m_start + count, size() - count);
 		m_finish = m_start + count;
-		// TODO: fix: destroy all extra elements
 	}
 	else if (size() < count)
 	{
@@ -755,7 +752,6 @@ void ft::vector<T, Alloc>::m_moveElementsLeft(iterator pos, size_type steps)
 template <class T, class Alloc>
 void ft::vector<T, Alloc>::m_destroy(pointer start, size_type count)
 {
-	std::cout << "destroy" << count << std::endl;
 	for (size_type i = 0; i < count; i++)
 	{
 		m_alloc.destroy(start + i);
