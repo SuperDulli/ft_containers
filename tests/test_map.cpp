@@ -353,6 +353,17 @@ bool access()
 	return result;
 }
 
+bool clear()
+{
+	ft::map<int, int> map = generate_random_map();
+
+	map.clear();
+#ifdef DEBUG
+	std::cout << map << std::endl;
+#endif
+	return map.empty() && map.size() == 0;
+}
+
 bool all()
 {
 	bool success = true;
@@ -363,6 +374,7 @@ bool all()
 	success = success && debug::run_test("map insert", test_map::insert);
 	success = success && debug::run_test("map erase", test_map::erase);
 	success = success && debug::run_test("map access", test_map::access);
+	success = success && debug::run_test("map clear", test_map::clear);
 
 	// debug::run_test("relational operators", test_relational_operators);
 	return success;

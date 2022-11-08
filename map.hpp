@@ -1,6 +1,10 @@
 #ifndef MAP_HPP
 #define MAP_HPP
 
+#ifdef DEBUG
+	#include <iostream>
+#endif
+
 #include <cstddef>	  // size_t, ptrdiff_t
 #include <functional> // less
 #include <memory>	  // allocator
@@ -330,7 +334,7 @@ map<Key, T, Compare, Allocator>::max_size() const
 template <class Key, class T, class Compare, class Allocator>
 void map<Key, T, Compare, Allocator>::clear()
 {
-	// TODO: clear map
+	m_tree.clear();
 }
 
 template <class Key, class T, class Compare, class Allocator>
