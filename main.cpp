@@ -35,6 +35,8 @@ int main()
 	result = result && debug::run_test("stack", test_stack::all);
 	result = result && debug::run_test("set", test_set::all);
 
+	// TODO: add test for typedefs?
+
 	if (result)
 		std::cout << Color::Modifier(Color::FG_GREEN) << "All Test passed."
 				  << Color::Modifier() << std::endl;

@@ -10,6 +10,7 @@
 namespace ft
 {
 
+// TODO: make comaptiable with std tags
 // Empty classes to identify the category of an iterator
 struct input_iterator_tag {};
 struct output_iterator_tag {};
