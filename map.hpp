@@ -2,12 +2,13 @@
 #define MAP_HPP
 
 #ifdef DEBUG
-	#include <iostream>
+#include <iostream>
 #endif
 
 #include <cstddef>	  // size_t, ptrdiff_t
 #include <functional> // less
 #include <memory>	  // allocator
+#include <stdexcept>  // out_of_range
 
 #include "pair.hpp"
 #include "tree.hpp"
@@ -100,7 +101,9 @@ public:
 
 	// element access
 
-	mapped_type& operator[](const key_type& key);
+	mapped_type& at(const key_type& key); // added in defect report 464 to c++98
+	const mapped_type& at(const key_type& key) const;
+	mapped_type&	   operator[](const key_type& key);
 
 	// iterators
 
@@ -241,6 +244,26 @@ map<Key, T, Compare, Allocator>::get_allocator() const
 }
 
 // element access
+
+template <class Key, class T, class Compare, class Allocator>
+typename map<Key, T, Compare, Allocator>::mapped_type&
+map<Key, T, Compare, Allocator>::at(const key_type& key)
+{
+	iterator it = lower_bound(key);
+	if (it == end() || key_comp()(key, (*it).first))
+		throw std::out_of_range("map::at key does not exist.");
+	return (*it).second;
+}
+
+template <class Key, class T, class Compare, class Allocator>
+const typename map<Key, T, Compare, Allocator>::mapped_type&
+map<Key, T, Compare, Allocator>::at(const key_type& key) const
+{
+	const_iterator it = lower_bound(key);
+	if (it == end() || key_comp()(key, (*it).first))
+		throw std::out_of_range("map::at key does not exist.");
+	return (*it).second;
+}
 
 template <class Key, class T, class Compare, class Allocator>
 typename map<Key, T, Compare, Allocator>::mapped_type&
