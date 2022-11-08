@@ -18,9 +18,10 @@ public:
 	typedef typename Container::value_type value_type;
 	typedef typename Container::size_type  size_type;
 
-	// c++11
-	//  typedef Container::reference	   reference;
-	//  typedef Container::const_reference const_reference;
+	// c++11 on https://cplusplus.com/reference/stack/stack/,
+	// but not on https://en.cppreference.com/w/cpp/container/stack
+	 typedef typename Container::reference	   reference;
+	 typedef typename Container::const_reference const_reference;
 
 	// constructor
 
