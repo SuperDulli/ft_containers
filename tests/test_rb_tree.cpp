@@ -5,8 +5,8 @@
 #include <functional> // less
 #include <utility>	  // pair
 
-#include "../debug_utility.hpp"
 #include "../debug_tree_utility.hpp"
+#include "../debug_utility.hpp"
 #include "../utility.hpp" // selectFirst
 
 #include "../tree.hpp"
@@ -336,7 +336,8 @@ bool erase_pos()
 	// set_tree_type tree = create_test_tree(numbers);
 
 	std::cout << "erase root=" << tree.get_root()->value << std::endl;
-	result = result && erase_pos(tree, set_tree_type::iterator(tree.get_root()));
+	result =
+		result && erase_pos(tree, set_tree_type::iterator(tree.get_root()));
 
 	std::cout << "erase begin" << std::endl;
 	result = result && erase_pos(tree, tree.begin());
@@ -732,6 +733,26 @@ bool equal_range()
 	return result;
 }
 
+bool reverse_iteration()
+{
+	bool		  result = true;
+	set_tree_type tree = create_random_test_tree(10);
+
+	set_tree_type::reverse_iterator i;
+	for (i = tree.rbegin(); i != tree.rend(); ++i)
+	{
+		std::cout << *i << ", ";
+	}
+	std::cout << std::endl;
+
+	result = result && i == tree.rend();
+	std::cout << "first element (prefix decrement(rend)):" << *--i << std::endl;
+	std::cout << "first element (postfix decrement(rend)):" << *i--
+			  << std::endl;
+	std::cout << "second element:" << *i << std::endl;
+	return *i == *++tree.begin();
+}
+
 bool all()
 {
 	bool result = true;
@@ -749,6 +770,9 @@ bool all()
 		result && debug::run_test("tree upper_bound", test_tree::upper_bound);
 	result =
 		result && debug::run_test("tree equal_range", test_tree::equal_range);
+	result =
+		result &&
+		debug::run_test("tree reverse_iteration", test_tree::reverse_iteration);
 
 	// debug::run_test("relational operators", test_relational_operators);
 	return result;

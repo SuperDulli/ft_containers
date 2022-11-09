@@ -88,7 +88,7 @@ struct RB_tree_node {
 // iterator
 
 template <typename T>
-struct RB_tree_iterator : ft::iterator<ft::bidirectional_iterator_tag, T> {
+struct RB_tree_iterator : ft::iterator<std::bidirectional_iterator_tag, T> {
 	typedef typename RB_tree_iterator<T>::pointer	pointer;
 	typedef typename RB_tree_iterator<T>::reference reference;
 
@@ -150,7 +150,7 @@ struct RB_tree_iterator : ft::iterator<ft::bidirectional_iterator_tag, T> {
 
 template <typename T>
 struct RB_tree_const_iterator
-	: ft::iterator<ft::bidirectional_iterator_tag, T> {
+	: ft::iterator<std::bidirectional_iterator_tag, T> {
 	typedef typename RB_tree_iterator<const T>::pointer	  pointer;
 	typedef typename RB_tree_iterator<const T>::reference reference;
 
@@ -828,7 +828,7 @@ RB_tree<Key, Value, KeyOfValue, Compare, Allocator>::m_insert(value_type value)
 		}
 		else
 		{
-			return ft::make_pair(iterator(previous), false);
+			return ft::make_pair(iterator(tmp), false);
 		}
 	}
 	it = m_add_child(previous, value);
