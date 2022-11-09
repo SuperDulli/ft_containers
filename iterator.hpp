@@ -162,6 +162,24 @@ private:
 	T* m_pos;
 };
 
+// non-member function
+
+// allow mixed iterator/const_iterator parameters
+template <typename L, typename R>
+typename PtrIterator<L>::difference_type
+operator-(const PtrIterator<L>& lhs, const PtrIterator<R>& rhs)
+{
+	return (lhs.base() - rhs.base());
+}
+
+// allow n + iterator
+template <typename T>
+PtrIterator<T>
+operator+(typename PtrIterator<T>::difference_type n, const PtrIterator<T>& it)
+{
+	return PtrIterator<T>(it.base() + n);
+}
+
 // relation operators (to allow comparison between const and non cost versions)
 
 template <typename L, typename R>
@@ -446,7 +464,7 @@ typename reverse_iterator<Iterator>::difference_type operator-(
 	const reverse_iterator<Iterator>& lhs,
 	const reverse_iterator<Iterator>& rhs)
 {
-	return (lhs.base() - rhs.base());
+	return (rhs.base() - lhs.base());
 }
 
 // distance TODO: use STL version
