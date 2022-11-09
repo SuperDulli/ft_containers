@@ -394,7 +394,9 @@ bool insert()
 
 	// ft::vector<int>::const_iterator cit = nums.begin();
 
-	// insert one value at a time
+#ifdef DEBUG
+	std::cout << "insert one value at a time:" << std::endl;
+#endif
 	r_one = nums.insert(nums.begin(), -1);
 	result = result && *r_one == -1 && nums.front() == -1;
 	r_one = nums.insert(nums.begin() + 3, -2);
@@ -402,13 +404,17 @@ bool insert()
 	r_one = nums.insert(nums.end(), -3);
 	result = result && *r_one == -3 && nums.back() == -3;
 
-	// insert multiple copies at once
+#ifdef DEBUG
+	std::cout << "insert multiple copies at once:" << std::endl;
+#endif
 	r_multiple = nums.insert(nums.begin(), 3, 0);
 	result = result && *r_multiple == 0 && nums.front() == 0;
 	r_multiple_string = empty.insert(empty.begin(), 2, "hi");
 	result = result && *r_multiple_string == "hi" && empty.front() == "hi";
 
-	// insert 0 copies -> pos getting returned
+#ifdef DEBUG
+	std::cout << "insert 0 copies -> pos getting returned:" << std::endl;
+#endif
 	r_multiple_fail = nums.insert(nums.begin(), 0, 7);
 	result = result && r_multiple_fail == nums.begin() && nums.front() != 7;
 	r_multiple_fail_string = empty.insert(empty.begin(), 0, "nothing");
@@ -420,7 +426,9 @@ bool insert()
 	std::cout << "empty " << empty << std::endl;
 #endif
 
-	// insert range
+#ifdef DEBUG
+	std::cout << "insert range:" << std::endl;
+#endif
 	r_range = nums.insert(nums.end(), numbers.begin(), numbers.end());
 	result = result && *r_range == numbers.front() &&
 			 ft::equal(r_range, nums.end(), numbers.begin());
@@ -499,7 +507,7 @@ bool erase()
 	// try erasing empty range -> last gets returned
 	r_range_empty = nums.erase(nums.begin(), nums.begin());
 	result = result && r_range_empty == nums.begin();
-	r_string_range_empty = fruits.erase(fruits.begin() + 2, fruits.begin() + 2);
+	r_string_range_empty = fruits.erase(2 + fruits.begin(), fruits.begin() + 2);
 	result = result && r_string_range_empty == fruits.begin() + 2;
 
 #ifdef DEBUG

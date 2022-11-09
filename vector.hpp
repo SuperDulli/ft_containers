@@ -6,8 +6,8 @@
 #include <string>
 
 #include "iterator.hpp"
-#include "utility.hpp"
 #include "pair.hpp"
+#include "utility.hpp"
 
 #include <stdexcept>
 
@@ -171,6 +171,8 @@ ft::vector<T, Alloc>::vector(
 	m_endOfStorage = m_finish;
 }
 
+// TODO: determine if InputIterator also is atleast ForwardIterator to determine
+// new size beforehand
 template <class T, class Alloc>
 template <class InputIterator>
 ft::vector<T, Alloc>::vector(
@@ -179,24 +181,15 @@ ft::vector<T, Alloc>::vector(
 		!ft::is_integral< InputIterator>::value,
 		InputIterator>::type last,
 	const allocator_type&	 alloc)
-	: m_alloc(alloc)
+	: m_alloc(alloc), m_start(), m_finish(), m_endOfStorage()
 {
 #ifdef DEBUG
 	std::cout << "vector constructor (range)" << std::endl;
 #endif
-	InputIterator tmp(first);
-	size_type	  size = ft::distance(tmp, last);
-
-	m_start = m_alloc.allocate(size);
-	size_type i = 0;
 	while (first != last)
 	{
-		m_alloc.construct(m_start + i, *first);
-		++first;
-		++i;
+		push_back(*first++);
 	}
-	m_finish = m_start + i;
-	m_endOfStorage = m_start + size;
 }
 
 template <class T, class Alloc>
@@ -222,6 +215,8 @@ ft::vector<T, Alloc>::~vector(void)
 #ifdef DEBUG
 	std::cout << "vector destructor" << std::endl;
 #endif
+	if (!m_start)
+		return;
 	m_destroy(m_start, this->size());
 	m_alloc.deallocate(m_start, this->capacity());
 }
@@ -256,7 +251,8 @@ void ft::vector<T, Alloc>::assign(size_type count, const T& value)
 
 	if (count > capacity())
 	{
-		m_alloc.deallocate(m_start, capacity());
+		if (m_start)
+			m_alloc.deallocate(m_start, capacity());
 		m_start = m_alloc.allocate(count);
 		m_endOfStorage = m_start + count;
 	}
@@ -268,6 +264,8 @@ void ft::vector<T, Alloc>::assign(size_type count, const T& value)
 	m_finish = m_start + count;
 }
 
+// TODO: determine if InputIterator also is atleast ForwardIterator to determine
+// new size beforehand
 template <class T, class Alloc>
 template <class InputIterator>
 void ft::vector<T, Alloc>::assign(
@@ -278,23 +276,10 @@ void ft::vector<T, Alloc>::assign(
 {
 	clear();
 
-	InputIterator tmp(first);
-	size_type	  count = ft::distance(tmp, last);
-	if (count > capacity())
-	{
-		m_alloc.deallocate(m_start, capacity());
-		m_start = m_alloc.allocate(count);
-		m_endOfStorage = m_start + count;
-	}
-
-	size_type i = 0;
 	while (first != last)
 	{
-		m_alloc.construct(m_start + i, *first);
-		++first;
-		++i;
+		push_back(*first++);
 	}
-	m_finish = m_start + i;
 }
 
 template <class T, class Alloc>
@@ -338,8 +323,11 @@ void ft::vector<T, Alloc>::reserve(size_type new_cap)
 		{
 			m_alloc.construct(newArray + i, m_start[i]);
 		}
-		m_destroy(m_start, this->size());
-		m_alloc.deallocate(m_start, this->capacity());
+		if (m_start)
+		{
+			m_destroy(m_start, this->size());
+			m_alloc.deallocate(m_start, this->capacity());
+		}
 		m_start = newArray;
 		m_finish = m_start + i;
 		m_endOfStorage = m_start + new_cap;
@@ -484,14 +472,11 @@ ft::vector<T, Alloc>::rend() const
 template <class T, class Alloc>
 void ft::vector<T, Alloc>::clear()
 {
-	#ifdef DEBUG
+#ifdef DEBUG
 	std::cout << "vector clear" << std::endl;
-	#endif
-	// for (pointer it = m_start; it != m_finish; ++it)
-	// {
-	// 	// it->~T();
-	// 	m_alloc.destroy(it);
-	// }
+#endif
+	if (!m_start)
+		return;
 	m_destroy(m_start, this->size());
 	m_finish = m_start;
 }
@@ -536,7 +521,7 @@ typename ft::vector<T, Alloc>::iterator ft::vector<T, Alloc>::insert(
 		return iterator(m_start + offset);
 
 	if (size() + count > capacity())
-		reserve(capacity() == 0 ? count : (capacity()) * 2);
+		reserve(capacity() == 0 ? count : (size() + count));
 	iterator newPosition(m_start + offset);
 
 	if (newPosition != end())
@@ -551,6 +536,8 @@ typename ft::vector<T, Alloc>::iterator ft::vector<T, Alloc>::insert(
 	return m_start + offset;
 }
 
+// TODO: determine if InputIterator also is atleast ForwardIterator to determine
+// new size beforehand
 /**
  * @brief Inserts elements at the specified location in the container.
  *
@@ -560,7 +547,7 @@ typename ft::vector<T, Alloc>::iterator ft::vector<T, Alloc>::insert(
  * into container for which insert is called
  * @param last end of the range of elements to insert, can't be a iterator
  * into container for which insert is called
- * @return iterator pointing to the inserted value.
+ * @return iterator pointing to the first inserted value.
  */
 template <class T, class Alloc>
 template <class InputIterator>
@@ -571,26 +558,23 @@ typename ft::vector<T, Alloc>::iterator ft::vector<T, Alloc>::insert(
 		!ft::is_integral<InputIterator>::value,
 		InputIterator>::type last)
 {
+	if (!m_start)
+	{
+		while (first != last)
+		{
+			push_back(*first++);
+		}
+		return iterator(m_start);
+	}
 	// pos would become in valid in case of realloc
 	difference_type offset = pos.base() - m_start;
-	if (first == last)
-		return iterator(m_start + offset);
-
-	size_type count = ft::distance(first, last);
-	reserve(size() + count);
-	iterator newPosition(m_start + offset);
-
-	if (newPosition != end())
-		m_moveElementsRight(newPosition, count);
-	for (size_type i = 0; i < count; i++)
+	iterator		new_pos(m_start + offset);
+	while (first != last)
 	{
-		m_alloc.construct(&(*newPosition), *first);
-		++newPosition;
-		++first;
+		new_pos = insert(new_pos, *first++);
+		++new_pos;
 	}
-	m_finish += count;
-
-	return m_start + offset;
+	return iterator(m_start + offset);
 }
 
 /**
@@ -667,8 +651,7 @@ void ft::vector<T, Alloc>::push_back(const T& value)
 template <class T, class Alloc>
 void ft::vector<T, Alloc>::pop_back()
 {
-	m_alloc.destroy(m_finish);
-	m_finish--;
+	m_alloc.destroy(--m_finish);
 }
 
 /**
@@ -690,6 +673,9 @@ void ft::vector<T, Alloc>::resize(size_type count, T value)
 		m_destroy(m_start + count, size() - count);
 		m_finish = m_start + count;
 	}
+	else if (count > this->max_size())
+		throw std::length_error(
+			"vector::resize (specified size would exceed maximum size)");
 	else if (size() < count)
 	{
 		// append value to fill the new spots
@@ -766,7 +752,7 @@ bool operator==(
 	const ft::vector<T, Alloc>& lhs,
 	const ft::vector<T, Alloc>& rhs)
 {
-	#ifdef DEBUG
+#ifdef DEBUG
 	std::cout << "vector equality test" << std::endl;
 #endif
 	return (
