@@ -423,7 +423,7 @@ template <class Key, class Compare, class Allocator>
 typename set<Key, Compare, Allocator>::value_compare
 set<Key, Compare, Allocator>::value_comp() const
 {
-	return m_tree.value_comp();
+	return value_compare(m_tree.key_comp());
 }
 
 // relational operators

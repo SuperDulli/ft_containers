@@ -79,46 +79,55 @@ bool construction()
 	return result;
 }
 
+bool insert_simple(ft::set<int>& set, int value, bool expectSuccess)
+{
+	ft::pair< ft::set<int>::iterator, bool > insert_result;
+#ifdef DEBUG
+	std::cout << "insert(value=" << value << ")" << std::endl;
+#endif
+	insert_result = set.insert(value);
+	return debug::insertion_status(insert_result.first, insert_result.second) ==
+			   expectSuccess &&
+		   *insert_result.first == value;
+}
+
 bool insert_simple()
 {
 	bool result = true;
+	{
 #ifdef DEBUG
-	std::cout << "insert one by one (total=6)" << std::endl;
+		std::cout << "insert one by one [1..6] (total=6)" << std::endl;
 #endif
-	ft::set<int>							 set;
-	ft::pair< ft::set<int>::iterator, bool > insert_result;
-
-	insert_result = set.insert(1);
-	result = result && debug::insertion_status(
-						   insert_result.first, insert_result.second) == true;
-
-#ifdef DEBUG
-	std::cout << "insert the same key again" << std::endl;
-#endif
-	insert_result = set.insert(1);
-	result = result && debug::insertion_status(
-						   insert_result.first, insert_result.second) == false;
-
-	insert_result = set.insert(2);
-	result = result && debug::insertion_status(
-						   insert_result.first, insert_result.second) == true;
-	insert_result = set.insert(3);
-	result = result && debug::insertion_status(
-						   insert_result.first, insert_result.second) == true;
-	insert_result = set.insert(4);
-	result = result && debug::insertion_status(
-						   insert_result.first, insert_result.second) == true;
-	insert_result = set.insert(5);
-	result = result && debug::insertion_status(
-						   insert_result.first, insert_result.second) == true;
-	insert_result = set.insert(6);
-	result = result && debug::insertion_status(
-						   insert_result.first, insert_result.second) == true;
+		ft::set<int> set;
+		result = result && insert_simple(set, 1, true);
+		result = result && insert_simple(set, 2, true);
+		result = result && insert_simple(set, 3, true);
+		result = result && insert_simple(set, 4, true);
+		result = result && insert_simple(set, 5, true);
+		result = result && insert_simple(set, 6, true);
 
 #ifdef DEBUG
-	std::cout << set << std::endl;
+		std::cout << set << std::endl;
 #endif
-	result = result && set.size() == 6;
+		result = result && set.size() == 6;
+	}
+	{
+#ifdef DEBUG
+		std::cout << "insert one by one [64, 64, 0, -23, 64] (3 unique)"
+				  << std::endl;
+#endif
+		ft::set<int> set;
+		result = result && insert_simple(set, 64, true);
+		result = result && insert_simple(set, 64, false);
+		result = result && insert_simple(set, 0, true);
+		result = result && insert_simple(set, -23, true);
+		result = result && insert_simple(set, 64, false);
+
+#ifdef DEBUG
+		std::cout << set << std::endl;
+#endif
+		result = result && set.size() == 3;
+	}
 	return result;
 }
 
