@@ -2,13 +2,13 @@
 #include <iostream>
 #include <string>
 
-#include "../debug_utility.hpp"
+#include <debug_utility.hpp>
 
 #ifdef USE_STL // CREATE A REAL STL EXAMPLE
 #include <vector>
 namespace ft = std;
 #else
-#include "../vector.hpp"
+#include <vector.hpp>
 #endif
 
 namespace test_vector

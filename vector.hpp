@@ -1,15 +1,17 @@
 #ifndef VECTOR_HPP
 #define VECTOR_HPP
 
+#include <algorithm> // swap
 #include <iostream>
 #include <memory>
 #include <string>
+#include <stdexcept> // length_error, out_of_range
 
+#include "algorithm.hpp" // equal, lexicographical_compare
 #include "iterator.hpp"
 #include "pair.hpp"
-#include "utility.hpp"
+#include "type_traits.hpp" // enable_if, is_integral
 
-#include <stdexcept>
 
 namespace ft
 {
@@ -691,10 +693,10 @@ void ft::vector<T, Alloc>::resize(size_type count, T value)
 template <class T, class Alloc>
 void ft::vector<T, Alloc>::swap(vector& other)
 {
-	ft::swap(this->m_start, other.m_start);
-	ft::swap(this->m_finish, other.m_finish);
-	ft::swap(this->m_endOfStorage, other.m_endOfStorage);
-	ft::swap(this->m_alloc, other.m_alloc);
+	std::swap(this->m_start, other.m_start);
+	std::swap(this->m_finish, other.m_finish);
+	std::swap(this->m_endOfStorage, other.m_endOfStorage);
+	std::swap(this->m_alloc, other.m_alloc);
 }
 
 // helper functions
@@ -798,5 +800,12 @@ bool operator>=(
 }
 
 } // namespace ft
+
+// Specialization for the std::swap algorithm
+template <class T, class Alloc>
+void swap(ft::vector<T, Alloc>& lhs, ft::vector<T, Alloc>& rhs)
+{
+	lhs.swap(rhs);
+}
 
 #endif // VECTOR_HPP

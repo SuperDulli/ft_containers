@@ -476,14 +476,16 @@ bool operator>=(
 	return !(lhs < rhs);
 }
 
-// specialization for ft::swap(set)
+} // namespace ft
+
+// specialization for std::swap(set)
 
 template <class Key, class T, class Compare, class Allocator>
-void swap(set<Key, Compare, Allocator>& lhs, set<Key, Compare, Allocator>& rhs)
+void swap(
+	ft::set<Key, Compare, Allocator>& lhs,
+	ft::set<Key, Compare, Allocator>& rhs)
 {
 	lhs.swap(rhs);
 }
-
-} // namespace ft
 
 #endif // SET_HPP

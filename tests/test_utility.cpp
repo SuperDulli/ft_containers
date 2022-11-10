@@ -2,13 +2,13 @@
 #include <iostream>
 #include <string>
 
-#include "../debug_utility.hpp"
+#include <debug_utility.hpp>
 
 #ifdef USE_STL		   // CREATE A REAL STL EXAMPLE
 #include <type_traits> // std::is_integral
 namespace ft = std;
 #else
-#include "../utility.hpp"
+#include <type_traits.hpp>
 #endif
 
 bool test_is_integral()

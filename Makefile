@@ -6,30 +6,39 @@ NAME_STL		= stl
 NAME_DEBUG		:= $(NAME)_debug
 NAME_STL_DEBUG	:= $(NAME_STL)_debug
 
-CLASSES	= Color.cpp
+DEBUG_DIR = debug
+DEBUG_TMPLATES = \
+		debug_tree_utility.hpp \
+		debug_utility.hpp
+
+CLASSES	= $(DEBUG_DIR)/Color.cpp
+
 TMPLATES= \
+			algorithm.hpp \
 			iterator.hpp \
-			pair.hpp \
-			debug_utility.hpp \
-			utility.hpp \
-			vector.hpp \
-			tree.hpp \
 			map.hpp \
+			pair.hpp \
+			set.hpp \
 			stack.hpp \
-			set.hpp
+			tree.hpp \
+			type_traits.hpp \
+			utility.hpp \
+			vector.hpp
 
-HEADERS	= $(patsubst %.cpp,%.hpp,$(CLASSES)) $(TMPLATES)
+HEADERS	= $(patsubst %.cpp,%.hpp,$(CLASSES)) $(TMPLATES) $(addprefix $(DEBUG_DIR)/,$(DEBUG_TMPLATES))
 TST_SRCS= \
+			main.cpp \
 			test_iterator.cpp \
-			test_pair.cpp \
-			test_vector.cpp \
-			test_utility.cpp \
 			test_map.cpp \
+			test_pair.cpp \
+			test_set.cpp \
 			test_stack.cpp \
-			test_set.cpp
+			test_utility.cpp \
+			test_vector.cpp
 			# test_rb_tree.cpp \ # causes namespace conflict because there is no counter part in STL
+TESTS_SRC_DIR = tests
 
-SRCS	= main.cpp $(patsubst %.cpp,tests/%.cpp,$(TST_SRCS)) $(CLASSES)
+SRCS	= $(patsubst %.cpp,$(TESTS_SRC_DIR)/%.cpp,$(TST_SRCS)) $(CLASSES)
 OBJDIR	= obj
 OBJS	= $(patsubst %.cpp,$(OBJDIR)/%.o,$(SRCS))
 
@@ -90,24 +99,27 @@ test_intra: $(INTRA_MAIN) $(HEADERS)
 	./$@ $(SEED)
 
 $(NAME): $(OBJS) $(SRCS) $(HEADERS)
-	$(CXX) $(CXXFLAGS) $(OBJS) -o $@
+	$(CXX) $(CXXFLAGS) $(OBJS) -I. -o $@
 
 $(NAME_STL): $(SRCS) $(HEADERS)
-	$(CXX) $(filter-out -std=c++98,$(CXXFLAGS)) -DUSE_STL=1 $(SRCS) -o $@
+	$(CXX) $(filter-out -std=c++98,$(CXXFLAGS)) -DUSE_STL=1 $(SRCS) -I. -I$(DEBUG_DIR) -o $@
 
 $(NAME_DEBUG): $(SRCS) $(HEADERS)
-	$(CXX) $(CXXFLAGS) -g -DDEBUG=1 $(SRCS) -o $@
+	$(CXX) $(CXXFLAGS) -g -DDEBUG=1 -I. -I$(DEBUG_DIR) $(SRCS) -o $@
 
 $(NAME_STL_DEBUG): $(SRCS) $(HEADERS)
-	$(CXX) $(filter-out -std=c++98,$(CXXFLAGS)) -g -DDEBUG=1 -DUSE_STL=1 $(SRCS) -o $@
+	$(CXX) $(filter-out -std=c++98,$(CXXFLAGS)) -g -DDEBUG=1 -DUSE_STL=1 -I. -I$(DEBUG_DIR) $(SRCS) -o $@
 
-$(OBJDIR)/%.o: %.cpp $(TMPLATES) | $(OBJDIR) $(OBJDIR)/tests
-	$(CXX) $(CXXFLAGS) -c $< -o $@
+$(OBJDIR)/%.o: %.cpp $(TMPLATES) | $(OBJDIR) $(OBJDIR)/tests $(OBJDIR)/$(DEBUG_DIR)
+	$(CXX) $(CXXFLAGS) -c $< -I. -I$(DEBUG_DIR) -o $@
 
 $(OBJDIR):
 	mkdir $@
 
 $(OBJDIR)/tests: | $(OBJDIR)
+	mkdir -p $@
+
+$(OBJDIR)/$(DEBUG_DIR): | $(OBJDIR)
 	mkdir -p $@
 
 $(INTRA_MAIN):
@@ -119,4 +131,4 @@ compare: $(NAME_DEBUG) $(NAME_STL_DEBUG)
 	./$(NAME_STL_DEBUG) > theirs.txt 2>&1
 	diff -y --width=200 --color=always mine.txt theirs.txt
 
-.PHONY: all clean fclean re show debug leaks test valgrind test_rb_tree test_intra
+.PHONY: all clean fclean re show debug leaks test valgrind test_rb_tree test_intra compare

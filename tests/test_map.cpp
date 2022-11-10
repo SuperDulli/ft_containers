@@ -4,13 +4,13 @@
 
 #include <vector> // for getting iterators
 
-#include "../debug_utility.hpp"
+#include <debug_utility.hpp>
 
 #ifdef USE_STL // CREATE A REAL STL EXAMPLE
 #include <map>
 namespace ft = std;
 #else
-#include "../map.hpp"
+#include <map.hpp>
 #endif
 
 namespace test_map

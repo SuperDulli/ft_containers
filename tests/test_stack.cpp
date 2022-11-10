@@ -2,17 +2,18 @@
 #include <iostream>
 #include <string>
 
-#include "../debug_utility.hpp"
 #include <deque>
 #include <list>
 #include <map>
 #include <vector>
 
+#include <debug_utility.hpp>
+
 #ifdef USE_STL // CREATE A REAL STL EXAMPLE
 #include <stack>
 namespace ft = std;
 #else
-#include "../stack.hpp"
+#include <stack.hpp>
 #endif
 
 namespace test_stack

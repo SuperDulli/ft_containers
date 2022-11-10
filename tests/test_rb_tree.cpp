@@ -5,11 +5,10 @@
 #include <functional> // less
 #include <utility>	  // pair
 
-#include "../debug_tree_utility.hpp"
-#include "../debug_utility.hpp"
-#include "../utility.hpp" // selectFirst
+#include <debug_utility.hpp>
+#include <utility.hpp> // selectFirst
 
-#include "../tree.hpp"
+#include <tree.hpp>
 
 namespace test_tree
 {

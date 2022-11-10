@@ -1,13 +1,16 @@
 #ifndef TREE_HPP
 #define TREE_HPP
 
-#include "iterator.hpp"
-#include "pair.hpp"
-#include "utility.hpp"
+#include <algorithm> // swap
 #include <iomanip>
 #include <iostream>
 #include <memory> // allocator
 #include <string>
+
+#include "algorithm.hpp" // equal, lexicographical_compare
+#include "iterator.hpp"
+#include "pair.hpp"
+#include "utility.hpp"
 
 namespace ft
 {
@@ -420,14 +423,14 @@ public:
 		}
 		else
 		{
-			ft::swap(m_root(), other.m_root());
+			std::swap(m_root(), other.m_root());
 			this->m_set_root(m_root());
 			other.m_set_root(other.m_root());
 		}
-		ft::swap(m_node_count, other.m_node_count);
-		ft::swap(m_key_compare, other.m_key_compare);
-		ft::swap(NIL, other.NIL);
-		ft::swap(m_alloc, other.m_alloc);
+		std::swap(m_node_count, other.m_node_count);
+		std::swap(m_key_compare, other.m_key_compare);
+		std::swap(NIL, other.NIL);
+		std::swap(m_alloc, other.m_alloc);
 	}
 
 	allocator_type get_allocator() const
@@ -996,10 +999,6 @@ void RB_tree<Key, Value, KeyOfValue, Compare, Allocator>::m_transplant(
 		u->parent->left = v;
 	else
 		u->parent->right = v;
-	// if (!v)
-	// {
-	// 	v = &m_arbitrary_parent;
-	// }
 	if (v)
 		v->parent = u->parent;
 }
@@ -1056,11 +1055,6 @@ void RB_tree<Key, Value, KeyOfValue, Compare, Allocator>::m_remove(
 	}
 	if (y_original_color == BLACK && x)
 	{
-#ifdef DEBUG
-		std::cout << "delete fixup" << std::endl;
-#endif
-		// TODO: delete debug print
-		// std::cout << *this << std::endl;
 		m_remove_fixup(x);
 	}
 	if (x == NIL)

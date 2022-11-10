@@ -1,8 +1,6 @@
 #ifndef PAIR_HPP
 #define PAIR_HPP
 
-// #include "utility.hpp"
-
 #ifdef DEBUG
 #include <iostream>
 #endif // DEBUG
@@ -28,31 +26,34 @@ struct pair {
 	}
 
 	template <class U, class V>
-	pair(const ft::pair<U, V>& other) : first(other.first), second(other.second)
-	{
+	pair(const ft::pair<U, V>& other)
+		: first(other.first),
+		  second(other.second){
 #ifdef DEBUG
-		// std::cout << "pair constructor (copy template)" << std::endl;
+	// std::cout << "pair constructor (copy template)" << std::endl;
 #endif
-	}
+		  }
 
-	pair(const ft::pair<T1, T2>& other)
-		: first(other.first), second(other.second)
-	{
+		  pair(const ft::pair<T1, T2>& other)
+		: first(other.first),
+		  second(other.second){
 #ifdef DEBUG
-		// std::cout << "pair constructor (copy)" << std::endl;
+	// std::cout << "pair constructor (copy)" << std::endl;
 #endif
-	}
+		  }
 
-	pair(const first_type& a, const second_type& b) : first(a), second(b)
-	{
+		  pair(const first_type& a, const second_type& b)
+		: first(a),
+		  second(b){
 #ifdef DEBUG
-		// std::cout << "pair constructor (initialization)" << std::endl;
+	// std::cout << "pair constructor (initialization)" << std::endl;
 #endif
-	}
+		  }
 
-	// public member function
+			  // public member function
 
-	pair& operator=(const pair& other)
+			  pair
+			  & operator=(const pair& other)
 	{
 #ifdef DEBUG
 		std::cout << "pair copy assignment operator" << std::endl;

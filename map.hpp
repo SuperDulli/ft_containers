@@ -543,7 +543,9 @@ bool operator>=(
 	return !(lhs < rhs);
 }
 
-// specialization for ft::swap(map)
+} // namespace ft
+
+// specialization for std::swap(map)
 
 template <class Key, class T, class Compare, class Allocator>
 void swap(
@@ -552,7 +554,5 @@ void swap(
 {
 	lhs.swap(rhs);
 }
-
-} // namespace ft
 
 #endif // MAP_HPP
