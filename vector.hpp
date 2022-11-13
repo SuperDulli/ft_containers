@@ -4,14 +4,13 @@
 #include <algorithm> // swap
 #include <iostream>
 #include <memory>
-#include <string>
 #include <stdexcept> // length_error, out_of_range
+#include <string>
 
 #include "algorithm.hpp" // equal, lexicographical_compare
 #include "iterator.hpp"
 #include "pair.hpp"
 #include "type_traits.hpp" // enable_if, is_integral
-
 
 namespace ft
 {
@@ -128,6 +127,19 @@ private:
 	pointer		   m_start;
 	pointer		   m_finish;
 	pointer		   m_endOfStorage;
+
+	template <class InputIterator>
+	iterator m_insert(
+		const_iterator pos,
+		InputIterator  first,
+		InputIterator  last,
+		std::input_iterator_tag);
+	template <class InputIterator>
+	iterator m_insert(
+		const_iterator pos,
+		InputIterator  first,
+		InputIterator  last,
+		std::forward_iterator_tag);
 
 	void m_moveElementsRight(iterator pos, size_type count);
 	void m_moveElementsLeft(iterator pos, size_type count);
@@ -560,23 +572,11 @@ typename ft::vector<T, Alloc>::iterator ft::vector<T, Alloc>::insert(
 		!ft::is_integral<InputIterator>::value,
 		InputIterator>::type last)
 {
-	if (!m_start)
-	{
-		while (first != last)
-		{
-			push_back(*first++);
-		}
-		return iterator(m_start);
-	}
-	// pos would become in valid in case of realloc
-	difference_type offset = pos.base() - m_start;
-	iterator		new_pos(m_start + offset);
-	while (first != last)
-	{
-		new_pos = insert(new_pos, *first++);
-		++new_pos;
-	}
-	return iterator(m_start + offset);
+	return m_insert(
+		pos,
+		first,
+		last,
+		typename ft::iterator_traits<InputIterator>::iterator_category());
 }
 
 /**
@@ -700,6 +700,80 @@ void ft::vector<T, Alloc>::swap(vector& other)
 }
 
 // helper functions
+
+template <class T, class Alloc>
+template <class InputIterator>
+typename ft::vector<T, Alloc>::iterator ft::vector<T, Alloc>::m_insert(
+	const_iterator pos,
+	InputIterator  first,
+	InputIterator  last,
+	std::input_iterator_tag)
+{
+#ifdef DEBUG
+	std::cout << "vector m_insert for input iterator" << std::endl;
+#endif
+	if (!m_start)
+	{
+		while (first != last)
+		{
+			push_back(*first++);
+		}
+		return iterator(m_start);
+	}
+
+	// pos would become in valid in case of realloc
+	difference_type offset = pos.base() - m_start;
+	iterator		new_pos(m_start + offset);
+	while (first != last)
+	{
+		new_pos = insert(new_pos, *first++);
+		++new_pos;
+	}
+	return iterator(m_start + offset);
+}
+
+template <class T, class Alloc>
+template <class InputIterator>
+typename ft::vector<T, Alloc>::iterator ft::vector<T, Alloc>::m_insert(
+	const_iterator pos,
+	InputIterator  first,
+	InputIterator  last,
+	std::forward_iterator_tag)
+{
+#ifdef DEBUG
+	std::cout << "vector m_insert for forward iterator" << std::endl;
+#endif
+	if (!m_start)
+	{
+		while (first != last)
+		{
+			push_back(*first++);
+		}
+		return iterator(m_start);
+	}
+
+	// pos would become in valid in case of realloc
+	difference_type offset = pos.base() - m_start;
+	if (first == last)
+		return iterator(m_start + offset);
+
+	size_type count = ft::distance(first, last);
+	reserve(size() + count);
+	iterator newPosition(m_start + offset);
+
+	if (newPosition != end())
+		m_moveElementsRight(newPosition, count);
+	for (size_type i = 0; i < count; i++)
+	{
+		m_alloc.construct(&(*newPosition), *first);
+		++newPosition;
+		++first;
+	}
+	m_finish += count;
+
+	return m_start + offset;
+	return iterator(m_start + offset);
+}
 
 /**
  * @brief moves elements starting at pos to the right
