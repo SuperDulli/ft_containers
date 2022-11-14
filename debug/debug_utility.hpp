@@ -9,11 +9,11 @@
 #include <vector>
 namespace ft = std;
 #else
-#include "map.hpp"
-#include "pair.hpp"
-#include "set.hpp"
-#include "stack.hpp"
-#include "vector.hpp"
+#include <map.hpp>
+#include <pair.hpp>
+#include <set.hpp>
+#include <stack.hpp>
+#include <vector.hpp>
 #endif
 
 #include <stdlib.h> // rand

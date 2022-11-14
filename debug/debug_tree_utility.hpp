@@ -1,9 +1,9 @@
 #ifndef DEBUG_TREE_UTILITY_HPP
 #define DEBUG_TREE_UTILITY_HPP
 
-#include "debug_utility.hpp"
-#include "tree.hpp"
-#include "Color.hpp"
+#include <debug_utility.hpp>
+#include <tree.hpp>
+#include <Color.hpp>
 #include <iostream>
 #include <string>
 

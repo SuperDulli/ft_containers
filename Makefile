@@ -66,6 +66,8 @@ fclean: clean
 	$(RM) -f test_rb_tree
 	$(RM) -f mine.txt
 	$(RM) -f theirs.txt
+	$(RM) -f test_intra
+	$(RM) -f $(INTRA_MAIN)
 
 re: fclean
 	make all
@@ -96,8 +98,8 @@ test: $(NAME)
 test_debug: $(NAME_DEBUG)
 	./$^
 
-test_rb_tree: tests/test_rb_tree.cpp Color.cpp tree.hpp pair.hpp utility.hpp debug_utility.hpp debug_tree_utility.hpp
-	$(CXX) $(CXXFLAGS) -g -DDEBUG=1 tests/test_rb_tree.cpp Color.cpp -o $@
+test_rb_tree: tests/test_rb_tree.cpp debug/Color.cpp tree.hpp pair.hpp utility.hpp $(addprefix $(DEBUG_DIR)/,$(DEBUG_TMPLATES))
+	$(CXX) $(CXXFLAGS) -g -DDEBUG=1 -I. -I$(DEBUG_DIR) tests/test_rb_tree.cpp debug/Color.cpp -o $@
 	./$@
 
 test_intra: $(INTRA_MAIN) $(HEADERS)

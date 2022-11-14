@@ -6,7 +6,7 @@
 #endif
 
 #include <iterator>
-#include <stddef.h>
+#include <cstddef>
 
 namespace ft
 {
