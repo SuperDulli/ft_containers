@@ -39,7 +39,7 @@ int main()
 	// TODO: add test for typedefs?
 
 	if (result)
-		std::cout << Color::Modifier(Color::FG_GREEN) << "All Test passed."
+		std::cout << Color::Modifier(Color::FG_GREEN) << "All Tests passed."
 				  << Color::Modifier() << std::endl;
 	else
 		std::cout << Color::Modifier(Color::FG_RED)
