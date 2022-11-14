@@ -38,6 +38,12 @@ TST_SRCS= \
 			# test_rb_tree.cpp \ # causes namespace conflict because there is no counter part in STL
 TESTS_SRC_DIR = tests
 
+UNAME = $(shell uname -s)
+DIFF_OPTIONS = --width=200
+ifeq ($(UNAME), Linux)
+	DIFF_OPTIONS := $(DIFF_OPTIONS) --color=always
+endif
+
 SRCS	= $(patsubst %.cpp,$(TESTS_SRC_DIR)/%.cpp,$(TST_SRCS)) $(CLASSES)
 OBJDIR	= obj
 OBJS	= $(patsubst %.cpp,$(OBJDIR)/%.o,$(SRCS))
@@ -129,6 +135,6 @@ $(INTRA_MAIN):
 compare: $(NAME_DEBUG) $(NAME_STL_DEBUG)
 	./$< > mine.txt 2>&1
 	./$(NAME_STL_DEBUG) > theirs.txt 2>&1
-	diff -y --width=200 --color=always mine.txt theirs.txt
+	diff -y $(DIFF_OPTIONS) mine.txt theirs.txt
 
 .PHONY: all clean fclean re show debug leaks test valgrind test_rb_tree test_intra compare
