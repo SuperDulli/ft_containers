@@ -17,7 +17,7 @@ namespace ft = std;
 #endif
 
 #include <stdlib.h> // rand
-#include <time.h>
+#include <ctime> // clock, time (for seed)
 
 #include "Color.hpp"
 #include <iostream>
