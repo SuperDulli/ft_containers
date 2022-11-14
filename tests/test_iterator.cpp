@@ -1,8 +1,9 @@
-#include "../iterator.hpp"
 #include <iostream>
 #include <iterator>
 #include <vector>
 #include <typeinfo>
+
+#include <iterator.hpp>
 
 typedef std::vector<int>::iterator	iter_type;
 

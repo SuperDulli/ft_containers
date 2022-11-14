@@ -1,14 +1,16 @@
 #ifndef VECTOR_HPP
 #define VECTOR_HPP
 
+#include <algorithm> // swap
 #include <iostream>
 #include <memory>
+#include <stdexcept> // length_error, out_of_range
 #include <string>
 
+#include "algorithm.hpp" // equal, lexicographical_compare
 #include "iterator.hpp"
-#include "utility.hpp"
-
-#include <stdexcept>
+#include "pair.hpp"
+#include "type_traits.hpp" // enable_if, is_integral
 
 namespace ft
 {
@@ -114,7 +116,6 @@ public:
 	iterator erase(iterator first, iterator last);
 	void	 push_back(const T& value);
 	void	 pop_back();
-	void	 resize(size_type count);
 	void	 resize(size_type count, T value = T());
 	void	 swap(vector& other);
 
@@ -127,11 +128,23 @@ private:
 	pointer		   m_finish;
 	pointer		   m_endOfStorage;
 
+	template <class InputIterator>
+	iterator m_insert(
+		const_iterator pos,
+		InputIterator  first,
+		InputIterator  last,
+		std::input_iterator_tag);
+	template <class InputIterator>
+	iterator m_insert(
+		const_iterator pos,
+		InputIterator  first,
+		InputIterator  last,
+		std::forward_iterator_tag);
+
 	void m_moveElementsRight(iterator pos, size_type count);
 	void m_moveElementsLeft(iterator pos, size_type count);
+	void m_destroy(pointer, size_type count);
 }; // class vector
-
-} // namespace ft
 
 // Constructors
 
@@ -172,6 +185,8 @@ ft::vector<T, Alloc>::vector(
 	m_endOfStorage = m_finish;
 }
 
+// TODO: determine if InputIterator also is atleast ForwardIterator to determine
+// new size beforehand
 template <class T, class Alloc>
 template <class InputIterator>
 ft::vector<T, Alloc>::vector(
@@ -180,24 +195,15 @@ ft::vector<T, Alloc>::vector(
 		!ft::is_integral< InputIterator>::value,
 		InputIterator>::type last,
 	const allocator_type&	 alloc)
-	: m_alloc(alloc)
+	: m_alloc(alloc), m_start(), m_finish(), m_endOfStorage()
 {
 #ifdef DEBUG
 	std::cout << "vector constructor (range)" << std::endl;
 #endif
-	InputIterator tmp(first);
-	size_type	  size = ft::distance(tmp, last);
-
-	m_start = m_alloc.allocate(size);
-	size_type i = 0;
 	while (first != last)
 	{
-		m_alloc.construct(m_start + i, *first);
-		++first;
-		++i;
+		push_back(*first++);
 	}
-	m_finish = m_start + i;
-	m_endOfStorage = m_start + size;
 }
 
 template <class T, class Alloc>
@@ -209,7 +215,7 @@ ft::vector<T, Alloc>::vector(const vector& other) : m_alloc(other.m_alloc)
 	size_type i;
 
 	m_start = m_alloc.allocate(other.capacity());
-	for (i = 0; i < other.capacity(); i++)
+	for (i = 0; i < other.size(); i++)
 	{
 		m_alloc.construct(m_start + i, other[i]);
 	}
@@ -223,6 +229,9 @@ ft::vector<T, Alloc>::~vector(void)
 #ifdef DEBUG
 	std::cout << "vector destructor" << std::endl;
 #endif
+	if (!m_start)
+		return;
+	m_destroy(m_start, this->size());
 	m_alloc.deallocate(m_start, this->capacity());
 }
 
@@ -256,7 +265,8 @@ void ft::vector<T, Alloc>::assign(size_type count, const T& value)
 
 	if (count > capacity())
 	{
-		m_alloc.deallocate(m_start, capacity());
+		if (m_start)
+			m_alloc.deallocate(m_start, capacity());
 		m_start = m_alloc.allocate(count);
 		m_endOfStorage = m_start + count;
 	}
@@ -268,6 +278,8 @@ void ft::vector<T, Alloc>::assign(size_type count, const T& value)
 	m_finish = m_start + count;
 }
 
+// TODO: determine if InputIterator also is atleast ForwardIterator to determine
+// new size beforehand
 template <class T, class Alloc>
 template <class InputIterator>
 void ft::vector<T, Alloc>::assign(
@@ -278,23 +290,10 @@ void ft::vector<T, Alloc>::assign(
 {
 	clear();
 
-	InputIterator tmp(first);
-	size_type	  count = ft::distance(tmp, last);
-	if (count > capacity())
-	{
-		m_alloc.deallocate(m_start, capacity());
-		m_start = m_alloc.allocate(count);
-		m_endOfStorage = m_start + count;
-	}
-
-	size_type i = 0;
 	while (first != last)
 	{
-		m_alloc.construct(m_start + i, *first);
-		++first;
-		++i;
+		push_back(*first++);
 	}
-	m_finish = m_start + i;
 }
 
 template <class T, class Alloc>
@@ -338,7 +337,11 @@ void ft::vector<T, Alloc>::reserve(size_type new_cap)
 		{
 			m_alloc.construct(newArray + i, m_start[i]);
 		}
-		m_alloc.deallocate(m_start, this->capacity());
+		if (m_start)
+		{
+			m_destroy(m_start, this->size());
+			m_alloc.deallocate(m_start, this->capacity());
+		}
 		m_start = newArray;
 		m_finish = m_start + i;
 		m_endOfStorage = m_start + new_cap;
@@ -483,10 +486,12 @@ ft::vector<T, Alloc>::rend() const
 template <class T, class Alloc>
 void ft::vector<T, Alloc>::clear()
 {
-	for (pointer it = m_start; it != m_finish; ++it)
-	{
-		it->~T();
-	}
+#ifdef DEBUG
+	std::cout << "vector clear" << std::endl;
+#endif
+	if (!m_start)
+		return;
+	m_destroy(m_start, this->size());
 	m_finish = m_start;
 }
 
@@ -530,7 +535,7 @@ typename ft::vector<T, Alloc>::iterator ft::vector<T, Alloc>::insert(
 		return iterator(m_start + offset);
 
 	if (size() + count > capacity())
-		reserve(capacity() == 0 ? count : (capacity()) * 2);
+		reserve(capacity() == 0 ? count : (size() + count));
 	iterator newPosition(m_start + offset);
 
 	if (newPosition != end())
@@ -545,6 +550,8 @@ typename ft::vector<T, Alloc>::iterator ft::vector<T, Alloc>::insert(
 	return m_start + offset;
 }
 
+// TODO: determine if InputIterator also is atleast ForwardIterator to determine
+// new size beforehand
 /**
  * @brief Inserts elements at the specified location in the container.
  *
@@ -554,7 +561,7 @@ typename ft::vector<T, Alloc>::iterator ft::vector<T, Alloc>::insert(
  * into container for which insert is called
  * @param last end of the range of elements to insert, can't be a iterator
  * into container for which insert is called
- * @return iterator pointing to the inserted value.
+ * @return iterator pointing to the first inserted value.
  */
 template <class T, class Alloc>
 template <class InputIterator>
@@ -565,26 +572,11 @@ typename ft::vector<T, Alloc>::iterator ft::vector<T, Alloc>::insert(
 		!ft::is_integral<InputIterator>::value,
 		InputIterator>::type last)
 {
-	// pos would become in valid in case of realloc
-	difference_type offset = pos.base() - m_start;
-	if (first == last)
-		return iterator(m_start + offset);
-
-	size_type count = ft::distance(first, last);
-	reserve(size() + count); // TODO: review
-	iterator newPosition(m_start + offset);
-
-	if (newPosition != end())
-		m_moveElementsRight(newPosition, count);
-	for (size_type i = 0; i < count; i++)
-	{
-		m_alloc.construct(&(*newPosition), *first);
-		++newPosition;
-		++first;
-	}
-	m_finish += count;
-
-	return m_start + offset;
+	return m_insert(
+		pos,
+		first,
+		last,
+		typename ft::iterator_traits<InputIterator>::iterator_category());
 }
 
 /**
@@ -654,32 +646,46 @@ void ft::vector<T, Alloc>::push_back(const T& value)
 	m_alloc.construct(m_finish++, value);
 }
 
+/**
+ * @brief removes the last element.
+ *
+ */
 template <class T, class Alloc>
 void ft::vector<T, Alloc>::pop_back()
 {
-	m_alloc.destroy(m_finish);
-	m_finish--;
+	m_alloc.destroy(--m_finish);
 }
 
+/**
+ * @brief Resizes the vector to contain count elements.
+ *
+ * @param count new size of the vector.
+ * If the current size is greater than count, the container is reduced to its
+ * first count elements.
+ * If the current size is less than count, additional copies of value are
+ * appended.
+ * @param value the value to initialize the new elements with
+ */
 template <class T, class Alloc>
 void ft::vector<T, Alloc>::resize(size_type count, T value)
 {
-	size_type currentSize = size();
-	pointer	  newEnd = m_start + count;
-	if (currentSize > count)
+	if (size() > count)
 	{
 		// reduce size to count
-		while (m_finish != newEnd)
-		{
-			m_alloc.destroy(m_finish);
-			m_finish--;
-		}
+		m_destroy(m_start + count, size() - count);
+		m_finish = m_start + count;
 	}
-	else if (currentSize < count)
+	else if (count > this->max_size())
+		throw std::length_error(
+			"vector::resize (specified size would exceed maximum size)");
+	else if (size() < count)
 	{
-		while (m_finish != newEnd)
+		// append value to fill the new spots
+		size_type i = count - size();
+		while (i > 0)
 		{
 			push_back(value);
+			i--;
 		}
 	}
 }
@@ -687,13 +693,87 @@ void ft::vector<T, Alloc>::resize(size_type count, T value)
 template <class T, class Alloc>
 void ft::vector<T, Alloc>::swap(vector& other)
 {
-	ft::swap(this->m_start, other.m_start);
-	ft::swap(this->m_finish, other.m_finish);
-	ft::swap(this->m_endOfStorage, other.m_endOfStorage);
-	ft::swap(this->m_alloc, other.m_alloc);
+	std::swap(this->m_start, other.m_start);
+	std::swap(this->m_finish, other.m_finish);
+	std::swap(this->m_endOfStorage, other.m_endOfStorage);
+	std::swap(this->m_alloc, other.m_alloc);
 }
 
 // helper functions
+
+template <class T, class Alloc>
+template <class InputIterator>
+typename ft::vector<T, Alloc>::iterator ft::vector<T, Alloc>::m_insert(
+	const_iterator pos,
+	InputIterator  first,
+	InputIterator  last,
+	std::input_iterator_tag)
+{
+#ifdef DEBUG
+	std::cout << "vector m_insert for input iterator" << std::endl;
+#endif
+	if (!m_start)
+	{
+		while (first != last)
+		{
+			push_back(*first++);
+		}
+		return iterator(m_start);
+	}
+
+	// pos would become in valid in case of realloc
+	difference_type offset = pos.base() - m_start;
+	iterator		new_pos(m_start + offset);
+	while (first != last)
+	{
+		new_pos = insert(new_pos, *first++);
+		++new_pos;
+	}
+	return iterator(m_start + offset);
+}
+
+template <class T, class Alloc>
+template <class InputIterator>
+typename ft::vector<T, Alloc>::iterator ft::vector<T, Alloc>::m_insert(
+	const_iterator pos,
+	InputIterator  first,
+	InputIterator  last,
+	std::forward_iterator_tag)
+{
+#ifdef DEBUG
+	std::cout << "vector m_insert for forward iterator" << std::endl;
+#endif
+	if (!m_start)
+	{
+		while (first != last)
+		{
+			push_back(*first++);
+		}
+		return iterator(m_start);
+	}
+
+	// pos would become in valid in case of realloc
+	difference_type offset = pos.base() - m_start;
+	if (first == last)
+		return iterator(m_start + offset);
+
+	size_type count = ft::distance(first, last);
+	reserve(size() + count);
+	iterator newPosition(m_start + offset);
+
+	if (newPosition != end())
+		m_moveElementsRight(newPosition, count);
+	for (size_type i = 0; i < count; i++)
+	{
+		m_alloc.construct(&(*newPosition), *first);
+		++newPosition;
+		++first;
+	}
+	m_finish += count;
+
+	return m_start + offset;
+	return iterator(m_start + offset);
+}
 
 /**
  * @brief moves elements starting at pos to the right
@@ -732,6 +812,15 @@ void ft::vector<T, Alloc>::m_moveElementsLeft(iterator pos, size_type steps)
 	}
 }
 
+template <class T, class Alloc>
+void ft::vector<T, Alloc>::m_destroy(pointer start, size_type count)
+{
+	for (size_type i = 0; i < count; i++)
+	{
+		m_alloc.destroy(start + i);
+	}
+}
+
 // relational operators
 
 template <class T, class Alloc>
@@ -739,6 +828,9 @@ bool operator==(
 	const ft::vector<T, Alloc>& lhs,
 	const ft::vector<T, Alloc>& rhs)
 {
+#ifdef DEBUG
+	std::cout << "vector equality test" << std::endl;
+#endif
 	return (
 		lhs.size() == rhs.size() &&
 		ft::equal(lhs.begin(), lhs.end(), rhs.begin()));
@@ -779,6 +871,15 @@ bool operator>=(
 	const ft::vector<T, Alloc>& rhs)
 {
 	return (!(lhs < rhs));
+}
+
+} // namespace ft
+
+// Specialization for the std::swap algorithm
+template <class T, class Alloc>
+void swap(ft::vector<T, Alloc>& lhs, ft::vector<T, Alloc>& rhs)
+{
+	lhs.swap(rhs);
 }
 
 #endif // VECTOR_HPP
