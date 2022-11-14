@@ -86,8 +86,8 @@ debug: clean
 debug: CXXFLAGS := $(CXXFLAGS) -g -DDEBUG=1
 debug: $(NAME_DEBUG)
 
-leaks: $(NAME)
-	leaks --atExit -- ./$@
+leaks: debug
+	leaks --atExit -- ./$(NAME_DEBUG)
 
 valgrind: debug
 	valgrind --leak-check=full --show-leak-kinds=all ./$(NAME_DEBUG)
