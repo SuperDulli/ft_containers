@@ -757,7 +757,7 @@ typename ft::vector<T, Alloc>::iterator ft::vector<T, Alloc>::m_insert(
 	if (first == last)
 		return iterator(m_start + offset);
 
-	size_type count = ft::distance(first, last);
+	size_type count = std::distance(first, last);
 	reserve(size() + count);
 	iterator newPosition(m_start + offset);
 

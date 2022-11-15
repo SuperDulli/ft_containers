@@ -476,7 +476,7 @@ public:
 	size_type count(const key_type& key) const
 	{
 		ft::pair<const_iterator, const_iterator> pair = equal_range(key);
-		const size_type n = ft::distance(pair.first, pair.second);
+		const size_type n = std::distance(pair.first, pair.second);
 		return n;
 	}
 

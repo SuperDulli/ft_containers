@@ -38,6 +38,12 @@ TST_SRCS= \
 			# test_rb_tree.cpp \ # causes namespace conflict because there is no counter part in STL
 TESTS_SRC_DIR = tests
 
+UNAME = $(shell uname -s)
+DIFF_OPTIONS = --width=200
+ifeq ($(UNAME), Linux)
+	DIFF_OPTIONS := $(DIFF_OPTIONS) --color=always
+endif
+
 SRCS	= $(patsubst %.cpp,$(TESTS_SRC_DIR)/%.cpp,$(TST_SRCS)) $(CLASSES)
 OBJDIR	= obj
 OBJS	= $(patsubst %.cpp,$(OBJDIR)/%.o,$(SRCS))
@@ -60,6 +66,8 @@ fclean: clean
 	$(RM) -f test_rb_tree
 	$(RM) -f mine.txt
 	$(RM) -f theirs.txt
+	$(RM) -f test_intra
+	$(RM) -f $(INTRA_MAIN)
 
 re: fclean
 	make all
@@ -78,8 +86,8 @@ debug: clean
 debug: CXXFLAGS := $(CXXFLAGS) -g -DDEBUG=1
 debug: $(NAME_DEBUG)
 
-leaks: $(NAME)
-	leaks --atExit -- ./$@
+leaks: debug
+	leaks --atExit -- ./$(NAME_DEBUG)
 
 valgrind: debug
 	valgrind --leak-check=full --show-leak-kinds=all ./$(NAME_DEBUG)
@@ -90,8 +98,8 @@ test: $(NAME)
 test_debug: $(NAME_DEBUG)
 	./$^
 
-test_rb_tree: tests/test_rb_tree.cpp Color.cpp tree.hpp pair.hpp utility.hpp debug_utility.hpp debug_tree_utility.hpp
-	$(CXX) $(CXXFLAGS) -g -DDEBUG=1 tests/test_rb_tree.cpp Color.cpp -o $@
+test_rb_tree: tests/test_rb_tree.cpp debug/Color.cpp tree.hpp pair.hpp utility.hpp $(addprefix $(DEBUG_DIR)/,$(DEBUG_TMPLATES))
+	$(CXX) $(CXXFLAGS) -g -DDEBUG=1 -I. -I$(DEBUG_DIR) tests/test_rb_tree.cpp debug/Color.cpp -o $@
 	./$@
 
 test_intra: $(INTRA_MAIN) $(HEADERS)
@@ -129,6 +137,6 @@ $(INTRA_MAIN):
 compare: $(NAME_DEBUG) $(NAME_STL_DEBUG)
 	./$< > mine.txt 2>&1
 	./$(NAME_STL_DEBUG) > theirs.txt 2>&1
-	diff -y --width=200 --color=always mine.txt theirs.txt
+	diff -y $(DIFF_OPTIONS) mine.txt theirs.txt
 
 .PHONY: all clean fclean re show debug leaks test valgrind test_rb_tree test_intra compare

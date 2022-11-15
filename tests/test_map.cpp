@@ -230,7 +230,7 @@ bool erase_range(
 	ft::map<int, int>::iterator last)
 {
 	ft::map<int, int>::size_type map_size = map.size();
-	ft::map<int, int>::size_type removed_size = ft::distance(first, last);
+	ft::map<int, int>::size_type removed_size = std::distance(first, last);
 
 #ifdef DEBUG
 	std::cout << "erase range [";
@@ -258,18 +258,18 @@ bool erase_range()
 
 	first = map.begin();
 	last = map.begin();
-	ft::advance(last, 5);
+	std::advance(last, 5);
 	result = result && erase_range(map, first, last);
 
 	first = map.begin();
 	last = map.end();
-	ft::advance(first, 5);
+	std::advance(first, 5);
 	result = result && erase_range(map, first, last);
 
 	first = map.begin();
-	ft::advance(first, 2);
+	std::advance(first, 2);
 	last = first;
-	ft::advance(last, 1);
+	std::advance(last, 1);
 	result = result && erase_range(map, first, last);
 
 	result = result && erase_range(map, map.begin(), map.end());

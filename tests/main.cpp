@@ -8,24 +8,25 @@ bool all();
 }
 namespace test_tree
 {
-	bool all();
+bool all();
 }
 namespace test_map
 {
-	bool all();
+bool all();
 }
 namespace test_stack
 {
-	bool all();
+bool all();
 }
 namespace test_set
 {
-	bool all();
+bool all();
 }
 
 int main()
 {
-	bool result = true;
+	bool		  result = true;
+	const clock_t begin = std::clock();
 
 	result = result && debug::run_test("pair", test_pair);
 	result = result && debug::run_test("utility", test_utility);
@@ -38,12 +39,14 @@ int main()
 	// TODO: add test for typedefs?
 
 	if (result)
-		std::cout << Color::Modifier(Color::FG_GREEN) << "All Test passed."
+		std::cout << Color::Modifier(Color::FG_GREEN) << "All Tests passed."
 				  << Color::Modifier() << std::endl;
 	else
 		std::cout << Color::Modifier(Color::FG_RED)
 				  << "At least one Test failed." << Color::Modifier()
 				  << std::endl;
+	std::cout << 1000.0 * (std::clock() - begin) / CLOCKS_PER_SEC << "ms"
+			  << std::endl;
 	return (result ? 0 : 1);
 }
 

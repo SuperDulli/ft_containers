@@ -311,7 +311,7 @@ bool erase_range(
 	ft::set<int>::iterator last)
 {
 	ft::set<int>::size_type set_size = set.size();
-	ft::set<int>::size_type removed_size = ft::distance(first, last);
+	ft::set<int>::size_type removed_size = std::distance(first, last);
 
 #ifdef DEBUG
 	std::cout << "erase range [";
@@ -339,18 +339,18 @@ bool erase_range()
 
 	first = set.begin();
 	last = set.begin();
-	ft::advance(last, 5);
+	std::advance(last, 5);
 	result = result && erase_range(set, first, last);
 
 	first = set.begin();
 	last = set.end();
-	ft::advance(first, 5);
+	std::advance(first, 5);
 	result = result && erase_range(set, first, last);
 
 	first = set.begin();
-	ft::advance(first, 2);
+	std::advance(first, 2);
 	last = first;
-	ft::advance(last, 1);
+	std::advance(last, 1);
 	result = result && erase_range(set, first, last);
 
 	result = result && erase_range(set, set.begin(), set.end());

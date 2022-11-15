@@ -5,7 +5,7 @@
 #include <functional> // less
 #include <utility>	  // pair
 
-#include <debug_utility.hpp>
+#include <debug_tree_utility.hpp>
 #include <utility.hpp> // selectFirst
 
 #include <tree.hpp>
@@ -377,7 +377,7 @@ bool erase_range(
 	bool result = true;
 
 	set_tree_type::size_type tree_prev_size = tree.size();
-	int						 removed_count = ft::distance(first, last);
+	int						 removed_count = std::distance(first, last);
 	ft::vector<int>			 removed_values(first, last);
 
 	std::cout << "erase " << removed_count << " values ("
@@ -699,9 +699,9 @@ bool equal_range(set_tree_type& tree, int key)
 
 	// the range should either include zero or one element
 	set_tree_type::iterator::difference_type distance =
-		ft::distance(pair.first, pair.second);
+		std::distance(pair.first, pair.second);
 	set_tree_type::const_iterator::difference_type c_distance =
-		ft::distance(c_pair.first, c_pair.second);
+		std::distance(c_pair.first, c_pair.second);
 
 	result = result && (distance == 0 || distance == 1);
 	result = result && (c_distance == 0 || c_distance == 1);

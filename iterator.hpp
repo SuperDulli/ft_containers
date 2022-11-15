@@ -6,7 +6,7 @@
 #endif
 
 #include <iterator>
-#include <stddef.h>
+#include <cstddef>
 
 namespace ft
 {
@@ -465,37 +465,6 @@ typename reverse_iterator<Iterator>::difference_type operator-(
 	const reverse_iterator<Iterator>& rhs)
 {
 	return (rhs.base() - lhs.base());
-}
-
-// distance TODO: use STL version
-
-template <class InputIterator>
-typename iterator_traits<InputIterator>::difference_type
-distance(InputIterator first, InputIterator last)
-{
-	// TODO: optimize for RandomAccessIterator
-
-	typename ft::iterator_traits<InputIterator>::difference_type result = 0;
-	while (first != last)
-	{
-		++first;
-		++result;
-	}
-	return result;
-}
-
-// advance TODO: use stl version
-
-template <class Iterator, class Distance>
-void advance(Iterator& it, Distance n)
-{
-	// TODO: allow negative n
-
-	while (n > 0)
-	{
-		--n;
-		++it;
-	}
 }
 
 } // namespace ft

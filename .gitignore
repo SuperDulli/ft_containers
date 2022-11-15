@@ -42,6 +42,11 @@ test_intra
 
 *.dSYM
 
+# vs code
+.vscode/
+
+*.dSYM
+
 *.txt
 *.ans
 test_main.cpp
